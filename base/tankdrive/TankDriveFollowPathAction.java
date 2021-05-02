@@ -14,7 +14,6 @@ public class TankDriveFollowPathAction extends TankDriveAction {
     private double left_start_ ;
     private double right_start_ ;
     private double start_time_ ;
-    double turn_correction_ ;
     double angle_correction_ ;
     XeroPath path_ ;
     String path_name_ ;
@@ -45,7 +44,6 @@ public class TankDriveFollowPathAction extends TankDriveAction {
 
         left_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:left", false) ;
         right_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:right", false) ;
-        turn_correction_ = drive.getRobot().getSettingsParser().get("tankdrive:follower:turn_correction").getDouble() ;
         angle_correction_ = drive.getRobot().getSettingsParser().get("tankdrive:follower:angle_correction").getDouble() ;
 
         plot_id_ = drive.initPlot(toString(0)) ;
