@@ -119,7 +119,9 @@ public abstract class XeroRobot extends TimedRobot {
         return logger_id_ ;
     }
 
-    protected abstract String getSimulationFileName() ;
+    protected String getSimulationFileName() {
+        return null ;
+    }
 
     protected abstract XeroPathType getPathType() ;
 
