@@ -25,6 +25,8 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
     private int plot_id_ ;
     private Double[] plot_data_ ;
     private int cycle_ ;
+    private double current_vel_ ;
+    private double max_accel_ ;
 
     static final String[] plot_columns_ = {             
         "time", 
@@ -39,7 +41,8 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         super(drive);
 
         path_name_ = path;
-        look_ahead_distance_ = 24.0;
+        look_ahead_distance_ = drive.getRobot().getSettingsParser().get("tankdrive:purepursuit:lookahead").getDouble() ;
+        max_accel_ = drive.getRobot().getSettingsParser().get("tankdrive:purepursuit:maxaccel").getDouble() ;       
 
         path_ = getSubsystem().getRobot().getPathManager().getPath(path) ;
         plot_id_ = drive.initPlot(toString(0)) ;
@@ -106,19 +109,15 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
             // position to the look ahead position
             //
             double curvature = findDrivingCurvature(current, look.getPose()) ;
-            double velocity ;
-            
-            if (closest.which() != path_.getSize() - 1)
-                velocity = path_.getSegment(MainRobot, closest.which() + 1).getVelocity() ;
-            else
-                velocity = path_.getSegment(MainRobot, closest.which()).getVelocity() ;
+
+            current_vel_ = current_vel_ + max_accel_ * robot.getDeltaTime() ;
                 
             double width = getSubsystem().getWidth() / getSubsystem().getScrub() ;
 
             //
             // Compute the left and right drive velocities
             //
-            TankDriveVelocities vel = inverseKinematics(curvature, velocity, width) ;
+            TankDriveVelocities vel = inverseKinematics(curvature, current_vel_, width) ;
 
             double left_out = left_pid_.getOutput(vel.getLeft(), sub.getLeftVelocity(), sub.getRobot().getDeltaTime()) ;
             double right_out = right_pid_.getOutput(vel.getRight(), sub.getRightVelocity(), sub.getRobot().getDeltaTime());
@@ -137,9 +136,11 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
             logger.add("la", look.getPose().getRotation().getDegrees()) ;
             logger.add("delta", delta) ;
             logger.add("curv", curvature) ;
-            logger.add("velocity", velocity) ;
+            logger.add("velocity", current_vel_) ;
             logger.add("left", vel.getLeft()) ;
             logger.add("right", vel.getRight()) ;
+            logger.add("leftpower", left_out) ;
+            logger.add("rightpower", right_out) ;
             logger.endMessage();
 
             sub.setPower(left_out, right_out) ;
