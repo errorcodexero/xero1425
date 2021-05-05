@@ -88,14 +88,23 @@ public class SparkMaxMotorController extends MotorController
     }
 
     public double getInputVoltage() throws BadMotorRequestException {
+        if (RobotBase.isSimulation())
+            return 12.0 ;
+
         return controller_.getBusVoltage() ;
     }
 
     public double getAppliedVoltage() throws BadMotorRequestException {
+        if (RobotBase.isSimulation())
+            return 12.0 ;
+
         return controller_.getAppliedOutput() ;
     }
 
     public boolean hasPID() throws BadMotorRequestException {
+        if (RobotBase.isSimulation())
+            return false ;
+            
         return true ;
     }
 
@@ -155,11 +164,15 @@ public class SparkMaxMotorController extends MotorController
     }
 
     public void setPositionConversion(double factor) throws BadMotorRequestException {
-        encoder_.setPositionConversionFactor(factor) ;
+        if (!RobotBase.isSimulation()) {
+            encoder_.setPositionConversionFactor(factor) ;
+        }
     }
 
     public void setVelocityConversion(double factor) throws BadMotorRequestException {
-        encoder_.setVelocityConversionFactor(factor) ;
+        if (!RobotBase.isSimulation()) {
+            encoder_.setVelocityConversionFactor(factor) ;
+        }
     }
 
     public void set(double percent) {

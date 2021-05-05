@@ -10,6 +10,8 @@ import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.PIDCtrl;
 import org.xero1425.misc.SettingsParser;
 
+import edu.wpi.first.wpilibj.RobotBase;
+
 public class MotorEncoderVelocityAction extends MotorAction {   
     private static int which_ = 1 ;
 
@@ -17,6 +19,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
     private double start_ ;
     private PIDCtrl pid_ ;
     private int plot_id_ ;
+    private boolean forcesw_ ;
     private static String [] columns_ = { "time", "target", "actual"}  ;
 
     public MotorEncoderVelocityAction(MotorEncoderSubsystem sub, double target)
@@ -25,8 +28,9 @@ public class MotorEncoderVelocityAction extends MotorAction {
         super(sub);
 
         target_ = target;
+        forcesw_ = RobotBase.isSimulation();
 
-        if (!sub.hasHWPID()) {
+        if (!sub.hasHWPID() || forcesw_) {
             pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":velocity", false);
             plot_id_ = sub.initPlot(toString() + "-" + String.valueOf(which_++)) ;     
         }
@@ -37,8 +41,9 @@ public class MotorEncoderVelocityAction extends MotorAction {
         super(sub) ;
 
         target_ = getSubsystem().getRobot().getSettingsParser().get(target).getDouble() ;
+        forcesw_ = RobotBase.isSimulation();
 
-        if (!sub.hasHWPID()) {
+        if (!sub.hasHWPID() || forcesw_) {
             pid_ = new PIDCtrl(getSubsystem().getRobot().getSettingsParser(), sub.getName() + ":velocity", false);
             plot_id_ = - 1 ;
         }
@@ -47,7 +52,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
     public void setTarget(double target) throws BadMotorRequestException, MotorRequestFailedException {
         target_ = target ;
 
-        if (getSubsystem().getMotorController().hasPID()) {
+        if (!useSWPID()) {
             getSubsystem().getMotorController().setTarget(target);
         }
     }
@@ -60,7 +65,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
     public void start() throws Exception {
         super.start() ;
 
-        if (getSubsystem().getMotorController().hasPID()) {
+        if (!useSWPID()) {
             SettingsParser settings = getSubsystem().getRobot().getSettingsParser() ;
             double p = settings.get("shooter:velocity:kp").getDouble() ;
             double i = settings.get("shooter:velocity:ki").getDouble() ;
@@ -85,7 +90,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
         super.run() ;
 
         MotorEncoderSubsystem me = (MotorEncoderSubsystem)getSubsystem() ;
-        if (!getSubsystem().getMotorController().hasPID()) {
+        if (useSWPID()) {
             double out = pid_.getOutput(target_, me.getVelocity(), getSubsystem().getRobot().getDeltaTime()) ;
             getSubsystem().setPower(out) ;
 
@@ -144,7 +149,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
         String ret = null ;
 
         try {
-            if (getSubsystem().getMotorController().hasPID()) {
+            if (!useSWPID()) {
                 ret = prefix(indent) + "MotorEncoderVelocityAction(HWPID), " + getSubsystem().getName() + ", " +  Double.toString(target_) ;
             }
         }
@@ -156,5 +161,9 @@ public class MotorEncoderVelocityAction extends MotorAction {
         }
 
         return ret ;
+    }
+
+    private boolean useSWPID() throws BadMotorRequestException, MotorRequestFailedException {
+        return forcesw_ || !getSubsystem().getMotorController().hasPID() ;
     }
 }
