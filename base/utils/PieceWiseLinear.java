@@ -109,6 +109,8 @@ public class PieceWiseLinear {
 
             Translation2d pt = new Translation2d(xvalue.getDouble(), yvalue.getDouble()) ;
             points.add(pt) ;
+
+            index++ ;
         }
 
         return points ;
