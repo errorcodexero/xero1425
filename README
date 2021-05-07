@@ -1,1 +1,5 @@
 This is the main directory for the Xero1425 software framework.
+
+This code is stored in a seperate submodule so it can be common across multiple robots.
+
+
