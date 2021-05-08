@@ -78,11 +78,13 @@ public abstract class XeroRobot extends TimedRobot {
             String str = getSimulationFileName() ;
             if (str == null) {
                 System.out.println("The code is setup to simulate, but the derived robot class did not provide a stimulus file") ;
-                System.exit(1) ;
+                System.out.println("Not initializing the Xero1425 Simulation engine - assuming Romi") ;
             }
-            SimulationEngine.initializeSimulator(this, logger_);
-            addRobotSimulationModels() ;
-            SimulationEngine.getInstance().initAll(str) ;
+            else {
+                SimulationEngine.initializeSimulator(this, logger_);
+                addRobotSimulationModels() ;
+                SimulationEngine.getInstance().initAll(str) ;
+            }
         }
 
         // Get the network MAC address, used to determine comp bot versus practice bot
@@ -157,7 +159,7 @@ public abstract class XeroRobot extends TimedRobot {
         //
         try {
             hardwareInit();
-            if (RobotBase.isSimulation())
+            if (RobotBase.isSimulation() && SimulationEngine.getInstance() != null)
                 SimulationEngine.getInstance().createModels() ;
         } catch (Exception ex) {
             logger_.startMessage(MessageType.Error);
@@ -335,7 +337,8 @@ public abstract class XeroRobot extends TimedRobot {
 
         if (isSimulation()) {
             SimulationEngine engine = SimulationEngine.getInstance() ;
-            engine.run(getTime()) ;
+            if (engine != null)
+                engine.run(getTime()) ;
         }
 
         last_time_ = initial_time;
@@ -465,7 +468,9 @@ public abstract class XeroRobot extends TimedRobot {
 
         if (isSimulation()) {
             SimulationEngine engine = SimulationEngine.getInstance() ;
-            engine.run(delta_time_) ;
+            if (engine != null) {
+                engine.run(delta_time_) ;
+            }
         }        
 
         try {
