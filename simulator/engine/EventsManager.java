@@ -1,3 +1,9 @@
+/// \file EventsManager.java
+/// This class manages a timeline of events for a simulation.  The
+/// events are read from a file and are sent to the simulation when
+/// the time associated with the event is reached.
+///
+
 package org.xero1425.simulator.engine;
 
 import java.io.IOException;
@@ -13,6 +19,14 @@ import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsValue;
 
 public class EventsManager {
+    // The simulation engine that owns this event manager
+    private SimulationEngine engine_ ;
+
+    // The set of events read from an events file to be applied to a simulation
+    private List<SimulationEvent> events_ ;
+    
+    /// \brief create the events manager
+    /// \param engine the simulation engine
     public EventsManager(SimulationEngine engine) {
         engine_ = engine ;
         events_ = new ArrayList<SimulationEvent>() ;
@@ -316,6 +330,4 @@ public class EventsManager {
         }
     }
 
-    private SimulationEngine engine_ ;
-    private List<SimulationEvent> events_ ;
 } ;
