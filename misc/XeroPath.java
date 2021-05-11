@@ -101,8 +101,8 @@ public class XeroPath
     }
 
     /// \brief adds a new path segment to the left adn right sides of the robot
-    /// \param left the segment for the left side of the robot
-    /// \param right the segment for the right side of the robot
+    /// \param which which segment of the path to add to
+    /// \param seg the segment value to add to the path
     public void addPathSegment(int which, XeroPathSegment seg) throws Exception
     {
         if (which >= data_.size())

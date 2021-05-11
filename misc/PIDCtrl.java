@@ -65,7 +65,7 @@ public class PIDCtrl
     /// the basename + ":kp".  The kd parameter is found by looking up the basename + ":kd".
     /// \param settings the settings parser
     /// \param name the basename to use to extract params from the settings parser
-    /// \param angle if true it is managing an angle between =180 and +180
+    /// \param isangle if true it is managing an angle between =180 and +180
     public PIDCtrl(SettingsParser settings, String name, boolean isangle) throws MissingParameterException, BadParameterTypeException {
         init(settings, name) ;
     }

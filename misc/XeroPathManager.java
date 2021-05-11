@@ -98,7 +98,7 @@ public class XeroPathManager
     /// based on the XeroPathType given when the path manager was created.  For 
     /// XeroPathType.Swerve this must be four.  For XeroPathType.Tank this must be
     /// two.  For XeroPathType.Robot this must be one.
-    /// \param the array of extensions
+    /// \param exts the array of extensions
     public boolean setExtensions(String [] exts) {
         if (exts.length != exts_.length)
         {
