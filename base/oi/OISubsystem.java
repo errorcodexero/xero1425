@@ -1,5 +1,17 @@
 package org.xero1425.base.oi;
 
+/// \file
+/// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
+/// base, and an OI device can be added for a game specific OI device.
+///
+/// This class has requirements for the settings file.  The following entries must be in the settings file or
+/// this class will not work properly
+///
+/// # The driverstation index for the gamepad controller
+/// hw:driverstation:hid:driver                                             0     
+///
+///
+
 import java.util.List;
 import java.util.ArrayList;
 
