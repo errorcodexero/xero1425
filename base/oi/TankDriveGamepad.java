@@ -14,9 +14,10 @@ import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 
 /// \brief this class controls interprets the input from the game pad to control the drivebase.
-/// This class requires entries in the settings file.
-///      
-///      driver:power:max                                                        1.0     # The magnitude of the maximum power applied to the drive base
+/// This class requires entries in the settings file which are shown below.
+///
+///      # The magnitude of the maximum power applied to the drive base
+///      driver:power:max                                                        1.0
 ///      # The default power applied to the drive base by the velocity stick
 ///      # without the turbo button
 ///      driver:power:default                                                    0.6
