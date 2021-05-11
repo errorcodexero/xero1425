@@ -21,7 +21,7 @@ public class DispatchAction extends ActionGroup {
     /// \brief create a new dispatch action
     /// \param sub the sbusystem to receive the child action
     /// \param act the child action to assign
-    /// \param if true, this action blocks until the child action is complete
+    /// \param block if true, this action blocks until the child action is complete
     public DispatchAction(Subsystem sub, Action act, boolean block) {
         super(sub.getRobot().getMessageLogger());
 

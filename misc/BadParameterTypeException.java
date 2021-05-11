@@ -20,7 +20,7 @@ public class BadParameterTypeException extends Exception
     static final long serialVersionUID = 42 ;
     
     /// \brief create the excpetion object to throw
-    /// \paraa expected the expected type
+    /// \param expected the expected type
     /// \param got the actual type
     public BadParameterTypeException(SettingsValue.SettingsType expected, SettingsValue.SettingsType got) {
         super("wrong parameter type, expected " + expected.toString() + " got " + got.toString()) ;

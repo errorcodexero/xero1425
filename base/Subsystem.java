@@ -522,7 +522,7 @@ public class Subsystem {
     /// name SUBSYSTEM:verbose set to true, where SUBSYSTEM is the name of the subsystem.
     /// \param name name of the value to display
     /// \param dtype indicates when the value should be displayed
-    /// \value the value to display
+    /// \param the value to display
     public void putDashboard(String name, DisplayType dtype, boolean value) {
         if (shouldDisplay(dtype))
             SmartDashboard.putBoolean(name, value) ;
