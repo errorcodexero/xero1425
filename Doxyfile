@@ -189,16 +189,6 @@ SHORT_NAMES            = NO
 
 JAVADOC_AUTOBRIEF      = NO
 
-# If the JAVADOC_BANNER tag is set to YES then doxygen will interpret a line
-# such as
-# /***************
-# as being the beginning of a Javadoc-style comment "banner". If set to NO, the
-# Javadoc-style will behave just like regular comments and it will not be
-# interpreted by doxygen.
-# The default value is: NO.
-
-JAVADOC_BANNER         = NO
-
 # If the QT_AUTOBRIEF tag is set to YES then doxygen will interpret the first
 # line (until the first dot) of a Qt-style comment as the brief description. If
 # set to NO, the Qt-style will behave just like regular Qt-style comments (thus
@@ -218,14 +208,6 @@ QT_AUTOBRIEF           = NO
 # The default value is: NO.
 
 MULTILINE_CPP_IS_BRIEF = NO
-
-# By default Python docstrings are displayed as preformatted text and doxygen's
-# special commands cannot be used. By setting PYTHON_DOCSTRING to NO the
-# doxygen's special commands can be used and the contents of the docstring
-# documentation blocks is shown as doxygen documentation.
-# The default value is: YES.
-
-PYTHON_DOCSTRING       = YES
 
 # If the INHERIT_DOCS tag is set to YES then an undocumented member inherits the
 # documentation from any documented member that it re-implements.
@@ -290,14 +272,6 @@ OPTIMIZE_FOR_FORTRAN   = NO
 # The default value is: NO.
 
 OPTIMIZE_OUTPUT_VHDL   = NO
-
-# Set the OPTIMIZE_OUTPUT_SLICE tag to YES if your project consists of Slice
-# sources only. Doxygen will then generate output that is more tailored for that
-# language. For instance, namespaces will be presented as modules, types will be
-# separated into more groups, etc.
-# The default value is: NO.
-
-OPTIMIZE_OUTPUT_SLICE  = NO
 
 # Doxygen selects the parser to use depending on the extension of the files it
 # parses. With this tag you can assign which parser to use for a given
@@ -451,19 +425,6 @@ TYPEDEF_HIDES_STRUCT   = NO
 # Minimum value: 0, maximum value: 9, default value: 0.
 
 LOOKUP_CACHE_SIZE      = 0
-
-# The NUM_PROC_THREADS specifies the number threads doxygen is allowed to use
-# during processing. When set to 0 doxygen will based this on the number of
-# cores available in the system. You can set it explicitly to a value larger
-# than 0 to get more control over the balance between CPU load and processing
-# speed. At this moment only the input processing can be done using multiple
-# threads. Since this is still an experimental feature the default is set to 1,
-# which efficively disables parallel processing. Please report any issues you
-# encounter. Generating dot graphs in parallel is controlled by the
-# DOT_NUM_THREADS setting.
-# Minimum value: 0, maximum value: 32, default value: 1.
-
-NUM_PROC_THREADS       = 1
 
 #---------------------------------------------------------------------------
 # Build related configuration options
