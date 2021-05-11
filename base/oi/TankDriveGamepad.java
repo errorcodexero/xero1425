@@ -16,8 +16,8 @@ import org.xero1425.misc.SettingsParser;
 /// \brief this class controls interprets the input from the game pad to control the drivebase.
 /// This class requires entries in the settings file which are shown below.
 ///
-///      # The driver station index of the driver gamepad
-///      hw:driverstation:hid:driver                                             0     
+///      # The magnitude of the maximum power applied to the drive base
+///      driver:power:max                                                        1.0
 ///
 public class TankDriveGamepad extends Gamepad {
     public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
