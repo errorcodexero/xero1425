@@ -3,7 +3,8 @@ package org.xero1425.misc ;
 /// \file
 
 /// \brief This class implements a classic PIDF controller
-/// More information about this can be found @https://www.xerosw.org/dokuwiki/doku.php?id=software:followers
+/// More information about this can be found at https://www.xerosw.org/dokuwiki/doku.php?id=software:followers
+///
 public class PIDCtrl
 {
     //
