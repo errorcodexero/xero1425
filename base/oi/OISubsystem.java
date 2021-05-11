@@ -15,6 +15,13 @@ public class OISubsystem extends Subsystem {
         devices_ = new ArrayList<HIDDevice>();
     }
 
+    /// \brief returns true if this is the OI subsystem
+    /// \returns true if this is the OI subsystem
+    @Override
+    public boolean isOI() {
+        return true ;
+    }
+
     @Override
     public void init(LoopType ltype) {
         for (HIDDevice dev : devices_)
