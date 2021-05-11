@@ -22,7 +22,7 @@ import org.xero1425.misc.MissingParameterException;
 /// This class has requirements for the settings file.  The following entries must be in the settings file or
 /// this class will not work properly
 ///
-/// hw:driverstation:hid:driver                                             0     
+///      hw:driverstation:hid:driver                                             0     
 ///
 public class OISubsystem extends Subsystem {
     
