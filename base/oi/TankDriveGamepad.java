@@ -13,11 +13,15 @@ import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 
-/// \brief this class controls interprets the input from the game pad to control the drivebase.
-/// This class requires entries in the settings file which are shown below.
+/// \brief This class controls the various OI devices that are used to control the robot.
+/// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
+/// base, and an OI device can be added for a game specific OI device.
 ///
-///      # The magnitude of the maximum power applied to the drive base
-///      driver:power:max                                                        1.0
+/// This class has requirements for the settings file.  The following entries must be in the settings file or
+/// this class will not work properly
+///
+///      # The driver station index of the driver gamepad
+///      hw:driverstation:hid:driver                                             0     
 ///
 public class TankDriveGamepad extends Gamepad {
     public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
