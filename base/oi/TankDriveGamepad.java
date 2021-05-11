@@ -20,8 +20,8 @@ import org.xero1425.misc.SettingsParser;
 /// This class has requirements for the settings file.  The following entries must be in the settings file or
 /// this class will not work properly
 ///
-///      # The driver station index of the driver gamepad
-///      hw:driverstation:hid:driver                                             0     
+///      # The magnitude of the maximum power applied to the drive base
+///      driver:power:max
 ///
 public class TankDriveGamepad extends Gamepad {
     public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
