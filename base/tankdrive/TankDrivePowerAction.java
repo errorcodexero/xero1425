@@ -11,7 +11,8 @@ public class TankDrivePowerAction extends TankDriveAction {
     private double duration_ ;
     private boolean timed_ ;
     private int plot_id_ ;
-    private static String [] plot_columns_ = { "time", "dist", "velocity", "acceleration", "lticks", "rticks", "left", "right" } ;
+    private static int plot_number_ = 0 ;
+    private static final String [] plot_columns_ = { "time", "dist", "velocity", "acceleration", "lticks", "rticks", "left", "right" } ;
 
 
     public TankDrivePowerAction(TankDriveSubsystem drive, double left, double right) {
@@ -38,7 +39,7 @@ public class TankDrivePowerAction extends TankDriveAction {
         right_ = right ;
         duration_ = duration;
         timed_ = true;
-        plot_id_ = drive.initPlot("tankdrivepower");
+        plot_id_ = drive.initPlot("tankdrivepower_" + Integer.toString(plot_number_++));
     }
 
     public TankDrivePowerAction(TankDriveSubsystem drive, String left, String right, String duration)
@@ -49,7 +50,7 @@ public class TankDrivePowerAction extends TankDriveAction {
         right_ = drive.getRobot().getSettingsParser().get(right).getDouble();
         duration_ = drive.getRobot().getSettingsParser().get(duration).getDouble();
         timed_ = true;
-        plot_id_ = drive.initPlot("tankdrivepower");        
+        plot_id_ = drive.initPlot("tankdrivepower_"+ Integer.toString(plot_number_++));        
     }
 
     @Override
