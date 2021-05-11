@@ -26,8 +26,7 @@ public class MessageDestinationThumbFile implements MessageDestination
 
     /// \brief create a new object that logs messages to a thumb drive
     /// \param bdir the base directory for log files (e.g. /u) ;
-    /// \param timeout the amount of time to wait for the thumb drive to become available
-    /// \param a timeout for trying to open a file in the base directory given
+    /// \param timeout a timeout for trying to open a file in the base directory given
     public MessageDestinationThumbFile(final String bdir, final long timeout) {
         int index = 1;
         valid_ = false;
