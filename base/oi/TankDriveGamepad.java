@@ -15,7 +15,7 @@ import org.xero1425.misc.SettingsParser;
 
 /// \brief this class controls interprets the input from the game pad to control the drivebase.
 /// This class requires entries in the settings file.
-///       \"#" The magnitude of the maximum power applied to the drive base
+///       The magnitude of the maximum power applied to the drive base
 ///       driver:power:max                                                        1.0
 ///       
 ///       # The default power applied to the drive base by the velocity stick
