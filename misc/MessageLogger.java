@@ -191,7 +191,7 @@ public final class MessageLogger
     }
 
     /// \brief disable messages for a given subsystem
-    /// \param the name of the subsystem to disable
+    /// \param name the name of the subsystem to disable
     /// \returns true if the messages are disabled sucessfully
     public boolean disableSubsystem(final String name) {
         boolean ret = false;

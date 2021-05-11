@@ -124,7 +124,7 @@ public abstract class Action
     }
 
     /// \brief used to create a string with a set of spaces.
-    /// \params n the number of spaces to print
+    /// \param n the number of spaces to print
     /// \returns a string with the given number of spaces
     protected String spaces(int n) {
         StringBuilder str = new StringBuilder() ;

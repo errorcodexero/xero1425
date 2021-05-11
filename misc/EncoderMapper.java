@@ -65,7 +65,7 @@ public class EncoderMapper
     }
 
     /// \brief convert an robot value to a encoder value
-    /// \param encoder the robot value
+    /// \param robot the robot value
     /// \returns the encoder value
     public double toEncoder(double robot) {
         double ret ;
