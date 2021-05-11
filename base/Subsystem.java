@@ -522,7 +522,7 @@ public class Subsystem {
     /// name SUBSYSTEM:verbose set to true, where SUBSYSTEM is the name of the subsystem.
     /// \param name name of the value to display
     /// \param dtype indicates when the value should be displayed
-    /// \param the value to display
+    /// \param value the value to display
     public void putDashboard(String name, DisplayType dtype, boolean value) {
         if (shouldDisplay(dtype))
             SmartDashboard.putBoolean(name, value) ;
@@ -538,7 +538,7 @@ public class Subsystem {
     /// name SUBSYSTEM:verbose set to true, where SUBSYSTEM is the name of the subsystem.    
     /// \param name name of the value to display
     /// \param dtype indicates when the value should be displayed
-    /// \value the value to display
+    /// \param value the value to display
     public void putDashboard(String name, DisplayType dtype, double value) {
         if (shouldDisplay(dtype))
             SmartDashboard.putNumber(name, value) ;
@@ -554,7 +554,7 @@ public class Subsystem {
     /// name SUBSYSTEM:verbose set to true, where SUBSYSTEM is the name of the subsystem.    
     /// \param name name of the value to display
     /// \param dtype indicates when the value should be displayed
-    /// \value the value to display
+    /// \param value the value to display
     public void putDashboard(String name, DisplayType dtype, int value) {
         if (shouldDisplay(dtype))
             SmartDashboard.putNumber(name, value) ;
@@ -570,7 +570,7 @@ public class Subsystem {
     /// name SUBSYSTEM:verbose set to true, where SUBSYSTEM is the name of the subsystem.    
     /// \param name name of the value to display
     /// \param dtype indicates when the value should be displayed
-    /// \value the value to display    
+    /// \param value the value to display    
     public void putDashboard(String name, DisplayType dtype, String value) {
         if (shouldDisplay(dtype))
             SmartDashboard.putString(name, value) ;        
