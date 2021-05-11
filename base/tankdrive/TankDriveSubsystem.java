@@ -20,7 +20,41 @@ import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
 
-
+/// \brief The tankdrive subsystem for driving a robot using a tank drive type drivebase.
+/// 
+/// This class expects entries in the settings file.
+///
+///      hw:tankdrive:motors:left:type                                           "romi"
+///      hw:tankdrive:motors:left:canid                                          0
+///      hw:tankdrive:encoder:left:1                                             4
+///      hw:tankdrive:encoder:left:2                                             5
+///      hw:tankdrive:motors:right:type                                          "romi"
+///      hw:tankdrive:motors:right:canid                                         1
+///      hw:tankdrive:motors:right:inverted                                      true
+///      hw:tankdrive:encoder:right:1                                            6
+///      hw:tankdrive:encoder:right:2                                            7
+///      
+///      hw:tankdrive:gyro                                                       "LSM6DS33"
+///
+///      tankdrive:inches_per_tick                                               0.00601246292357961603042471078223
+///      tankdrive:width                                                         5.55
+///      tankdrive:scrub                                                         1.0
+///      tankdrive:speedometer:linearsamples                                     4
+///      tankdrive:speedometer:angularsamples                                    2
+///
+///      tankdrive:follower:left:ka                                              0.002624471
+///      tankdrive:follower:left:kv                                              0.02637896
+///      tankdrive:follower:left:kp                                              0.1
+///      tankdrive:follower:left:kd                                              0.0
+///
+///      tankdrive:follower:right:ka                                             0.002624471
+///      tankdrive:follower:right:kv                                             0.02637896
+///      tankdrive:follower:right:kp                                             0.1
+///      tankdrive:follower:right:kd                                             0.0
+///
+///      tankdrive:follower:turn_correction                                      0
+///      tankdrive:follower:angle_correction                                     0.0
+///
 public class TankDriveSubsystem extends Subsystem {
 
     private PositionTracker tracker_ ;
