@@ -13,7 +13,7 @@ import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 
-/// \brief This class controls the various OI devices that are used to control the robot.
+/// \brief This class controls interprets the input from the game pad to control the drivebase.
 /// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
 /// base, and an OI device can be added for a game specific OI device.
 ///
