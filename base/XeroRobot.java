@@ -126,7 +126,7 @@ public abstract class XeroRobot extends TimedRobot {
     }
 
     protected XeroPathType getPathType() {
-	return XeroPathType.TankPathFollowing ;
+        return XeroPathType.TankPathFollowing ;
     }
 
     public void setRobotSubsystem(RobotSubsystem sub) {

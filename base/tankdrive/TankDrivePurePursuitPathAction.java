@@ -69,12 +69,6 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
 
     @Override
     public void run() {
-
-        if (cycle_ == 36)
-        {
-            System.out.println() ;
-        }
-
         //
         // Get the tank drive subsystem
         //
