@@ -17,6 +17,7 @@ import org.xero1425.misc.SettingsParser;
 /// This class requires entries in the settings file.
 ///
 ///       The magnitude of the maximum power applied to the drive base
+///       
 ///       driver:power:max                                                        1.0
 ///       
 ///       # The default power applied to the drive base by the velocity stick
