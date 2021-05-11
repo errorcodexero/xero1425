@@ -445,7 +445,7 @@ public final class MessageLogger
     }    
 
     /// \brief add a character to a messages
-    /// \param str the character to add
+    /// \param ch the character to add
     /// \returns the MessageLogger object  
     public MessageLogger add(final char ch) {
         final ThreadData per = getPerThreadData();
@@ -456,7 +456,7 @@ public final class MessageLogger
     }
 
     /// \brief add a integer to a messages
-    /// \param str the integer to add
+    /// \param value the integer to add
     /// \returns the MessageLogger object     
     public MessageLogger add(final int value) {
         final ThreadData per = getPerThreadData();
@@ -467,7 +467,7 @@ public final class MessageLogger
     }
 
     /// \brief add a value to a messages
-    /// \param str the value to add
+    /// \param value the value to add
     /// \returns the MessageLogger object     
     public MessageLogger add(final long value) {
         final ThreadData per = getPerThreadData();
@@ -478,7 +478,7 @@ public final class MessageLogger
     }
 
     /// \brief add a value to a messages
-    /// \param str the value to add
+    /// \param value the value to add
     /// \returns the MessageLogger object     
     public MessageLogger add(final boolean value) {
         final ThreadData per = getPerThreadData();
@@ -489,7 +489,7 @@ public final class MessageLogger
     }
 
     /// \brief add a value to a messages
-    /// \param str the value to add
+    /// \param value the value to add
     /// \returns the MessageLogger object     
     public MessageLogger add(final double value) {
         final ThreadData per = getPerThreadData();
@@ -500,7 +500,7 @@ public final class MessageLogger
     }
 
     /// \brief add a value to a messages
-    /// \param str the value to add
+    /// \param value the value to add
     /// \returns the MessageLogger object     
     public MessageLogger add(final float value) {
         final ThreadData per = getPerThreadData();
