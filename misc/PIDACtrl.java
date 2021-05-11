@@ -94,7 +94,7 @@ public class PIDACtrl
     /// \param v the velocity at this point of the motion plan
     /// \param dtarget the target position at this point of the motion plan
     /// \param dactual the actual position at this point of the motion plan
-    /// \param the delta time since the last time this was called
+    /// \param dt the delta time since the last time this was called
     /// \returns the output value for the controller
     public double getOutput(double a, double v, double dtarget, double dactual, double dt) {
         double current_error ;

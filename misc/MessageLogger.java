@@ -166,7 +166,7 @@ public final class MessageLogger
     }
 
     /// \brief enable messages for a given subsystem
-    /// \param the name of the subsystem to enable
+    /// \param name the name of the subsystem to enable
     /// \returns true if the messages are enabled sucessfully
     public boolean enableSubsystem(final String name) {
         boolean ret = false;

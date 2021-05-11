@@ -46,7 +46,7 @@ public class PIDCtrl
     /// \param minout the minimum output
     /// \param maxout the maximum output
     /// \param maxint the maximum integral
-    /// \param angle if true it is managing an angle between =180 and +180
+    /// \param isangle if true it is managing an angle between =180 and +180
     public PIDCtrl(double p, double i, double d, double f, double minout, double maxout, double maxint, boolean isangle) {
         kp_ = p ;
         ki_ = i ;
