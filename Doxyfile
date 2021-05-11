@@ -1562,17 +1562,6 @@ TREEVIEW_WIDTH         = 250
 
 EXT_LINKS_IN_WINDOW    = NO
 
-# If the HTML_FORMULA_FORMAT option is set to svg, doxygen will use the pdf2svg
-# tool (see https://github.com/dawbarton/pdf2svg) or inkscape (see
-# https://inkscape.org) to generate formulas as SVG images instead of PNGs for
-# the HTML output. These images will generally look nicer at scaled resolutions.
-# Possible values are: png (the default) and svg (looks nicer but requires the
-# pdf2svg or inkscape tool).
-# The default value is: png.
-# This tag requires that the tag GENERATE_HTML is set to YES.
-
-HTML_FORMULA_FORMAT    = png
-
 # Use this tag to change the font size of LaTeX formulas included as images in
 # the HTML documentation. When you change the font size after a successful
 # doxygen run you need to manually remove any form_*.png images from the HTML
@@ -1592,12 +1581,6 @@ FORMULA_FONTSIZE       = 10
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
 FORMULA_TRANSPARENT    = YES
-
-# The FORMULA_MACROFILE can contain LaTeX \newcommand and \renewcommand commands
-# to create new LaTeX commands to be used in formulas as building blocks. See
-# the section "Including formulas" for details.
-
-FORMULA_MACROFILE      =
 
 # Enable the USE_MATHJAX option to render LaTeX formulas using MathJax (see
 # https://www.mathjax.org) which uses client side JavaScript for the rendering
@@ -1776,16 +1759,6 @@ LATEX_CMD_NAME         =
 
 MAKEINDEX_CMD_NAME     = makeindex
 
-# The LATEX_MAKEINDEX_CMD tag can be used to specify the command name to
-# generate index for LaTeX. In case there is no backslash (\) as first character
-# it will be automatically added in the LaTeX code.
-# Note: This tag is used in the generated output file (.tex).
-# See also: MAKEINDEX_CMD_NAME for the part in the Makefile / make.bat.
-# The default value is: makeindex.
-# This tag requires that the tag GENERATE_LATEX is set to YES.
-
-LATEX_MAKEINDEX_CMD    = makeindex
-
 # If the COMPACT_LATEX tag is set to YES, doxygen generates more compact LaTeX
 # documents. This may be useful for small projects and may help to save some
 # trees in general.
@@ -1921,14 +1894,6 @@ LATEX_BIB_STYLE        = plain
 # This tag requires that the tag GENERATE_LATEX is set to YES.
 
 LATEX_TIMESTAMP        = NO
-
-# The LATEX_EMOJI_DIRECTORY tag is used to specify the (relative or absolute)
-# path from which the emoji images will be read. If a relative path is entered,
-# it will be relative to the LATEX_OUTPUT directory. If left blank the
-# LATEX_OUTPUT directory will be used.
-# This tag requires that the tag GENERATE_LATEX is set to YES.
-
-LATEX_EMOJI_DIRECTORY  =
 
 #---------------------------------------------------------------------------
 # Configuration options related to the RTF output
@@ -2066,13 +2031,6 @@ XML_OUTPUT             = xml
 # This tag requires that the tag GENERATE_XML is set to YES.
 
 XML_PROGRAMLISTING     = YES
-
-# If the XML_NS_MEMB_FILE_SCOPE tag is set to YES, doxygen will include
-# namespace members in file scope as well, matching the HTML output.
-# The default value is: NO.
-# This tag requires that the tag GENERATE_XML is set to YES.
-
-XML_NS_MEMB_FILE_SCOPE = NO
 
 #---------------------------------------------------------------------------
 # Configuration options related to the DOCBOOK output
@@ -2388,28 +2346,6 @@ UML_LOOK               = NO
 # This tag requires that the tag UML_LOOK is set to YES.
 
 UML_LIMIT_NUM_FIELDS   = 10
-
-# If the DOT_UML_DETAILS tag is set to NO, doxygen will show attributes and
-# methods without types and arguments in the UML graphs. If the DOT_UML_DETAILS
-# tag is set to YES, doxygen will add type and arguments for attributes and
-# methods in the UML graphs. If the DOT_UML_DETAILS tag is set to NONE, doxygen
-# will not generate fields with class member information in the UML graphs. The
-# class diagrams will look similar to the default class diagrams but using UML
-# notation for the relationships.
-# Possible values are: NO, YES and NONE.
-# The default value is: NO.
-# This tag requires that the tag UML_LOOK is set to YES.
-
-DOT_UML_DETAILS        = NO
-
-# The DOT_WRAP_THRESHOLD tag can be used to set the maximum number of characters
-# to display on a single line. If the actual line length exceeds this threshold
-# significantly it will wrapped across multiple lines. Some heuristics are apply
-# to avoid ugly line breaks.
-# Minimum value: 0, maximum value: 1000, default value: 17.
-# This tag requires that the tag HAVE_DOT is set to YES.
-
-DOT_WRAP_THRESHOLD     = 17
 
 # If the TEMPLATE_RELATIONS tag is set to YES then the inheritance and
 # collaboration graphs will show the relations between templates and their
