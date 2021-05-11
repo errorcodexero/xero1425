@@ -19,7 +19,10 @@ import org.xero1425.misc.SettingsParser;
 /// this class will not work properly
 ///
 ///      # The magnitude of the maximum power applied to the drive base
-///      driver:power:max   
+///      driver:power:max                                                       1.0
+///      # The default power applied to the drive base by the velocity stick
+///      # without the turbo button
+///      driver:power:default                                                   0.6
 ///
 public class TankDriveGamepad extends Gamepad {
     public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
