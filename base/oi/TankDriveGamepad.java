@@ -23,6 +23,26 @@ import org.xero1425.misc.SettingsParser;
 ///      # The default power applied to the drive base by the velocity stick
 ///      # without the turbo button
 ///      driver:power:default                                                   0.6
+///      # The maximum power applied to the drive base by the turn stick
+///      driver:turn:max                                                         0.8
+///      # The default power applied to the drive base by the turn stick without the
+///      # turbo button
+///      driver:turn:default                                                     0.4
+///      # The maximum power applied to the drive base when the slow button is pressed
+///      driver:power:slowby                                                     0.5
+///      # The tolerance between the current motor power and the desired motor power to
+///      # determine if a new power number should be sent to the motor controllers.
+///      driver:power:tolerance                                                  0.05
+///      # The power to apply when using the nudge button to go straight
+///      driver:power:nudge_straight                                             0.2
+///      # The power to apply when using the nudge button to turn
+///      driver:power:nudge_rotate                                               0.2
+///      # The amount of time to apply power during a nudge operation 
+///      driver:nudge_time                                                       0.1 
+///      # The value from the joystick that is considered a zero level.  Anything below
+///      # this value is interpreted as a desire to stop the robot and zero power is 
+///      # applied to the robot.
+///      driver:zerolevel                                                        0.1
 ///
 public class TankDriveGamepad extends Gamepad {
     public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
