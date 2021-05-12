@@ -52,7 +52,6 @@ import org.xero1425.misc.Speedometer;
 ///      tankdrive:follower:right:kp                                             0.1
 ///      tankdrive:follower:right:kd                                             0.0
 ///
-///      tankdrive:follower:turn_correction                                      0
 ///      tankdrive:follower:angle_correction                                     0.0
 ///
 public class TankDriveSubsystem extends Subsystem {
