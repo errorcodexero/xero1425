@@ -29,7 +29,7 @@ public class TankDriveScrubCharAction extends TankDriveAction {
         final double distl = getSubsystem().getLeftDistance();
         final double distr = getSubsystem().getRightDistance();
 
-        if (angle > total_) {
+        if (Math.Abs(angle) > total_) {
             final MessageLogger logger = getSubsystem().getRobot().getMessageLogger();
             setDone();
             getSubsystem().setPower(0.0, 0.0);
