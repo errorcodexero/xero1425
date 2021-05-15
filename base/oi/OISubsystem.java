@@ -66,6 +66,10 @@ public class OISubsystem extends Subsystem {
         }
     }
 
+    /// 
+    public TankDriveGamepad getGamePad() {
+        return gp_ ;
+    }
     /// \brief returns true if this is the OI subsystem
     /// \returns true if this is the OI subsystem
     @Override
