@@ -26,7 +26,10 @@ import org.xero1425.misc.MissingParameterException;
 public class OISubsystem extends Subsystem {
     
     private List<HIDDevice> devices_ ;
+    private TankDriveSubsystem db_ ;
     private TankDriveGamepad gp_ ;
+    private int gp_index_ ;
+    private double last_time_ ;
     
     private final static String DriverGamepadHIDIndexName = "hw:driverstation:hid:driver";
 
@@ -34,36 +37,11 @@ public class OISubsystem extends Subsystem {
         super(parent, name);
 
         devices_ = new ArrayList<HIDDevice>();
+        db_ = db ;
+        gp_index_ = -1 ;
+        last_time_ = 0.0 ;
 
-        if (db != null) {           
-            MessageLogger logger = getRobot().getMessageLogger() ;
-            int index;
-
-            try {
-                index = getRobot().getSettingsParser().get(DriverGamepadHIDIndexName).getInteger();
-            } catch (BadParameterTypeException e) {
-                logger.startMessage(MessageType.Error) ;
-                logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
-                logger.add(" exists, but is not an integer").endMessage();
-                index = -1 ;
-            } catch (MissingParameterException e) {
-                logger.startMessage(MessageType.Error) ;
-                logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
-                logger.add(" does not exist").endMessage();
-                index = -1 ;            
-            }
-            
-            if (index != -1) {
-                try {
-                    gp_ = new TankDriveGamepad(this, index, db) ;
-                    addHIDDevice(gp_);
-                }
-                catch(Exception ex) {
-                    logger.startMessage(MessageType.Error) ;
-                    logger.add("driver gamepad HID device was not created ").endMessage();
-                }
-            }
-        }
+        addTankDriveGamePad();
     }
 
     /// \brief return the gamepad
@@ -100,6 +78,8 @@ public class OISubsystem extends Subsystem {
 
     @Override
     public void run() {
+        if (gp_ == null)
+            addTankDriveGamePad() ;
     }
 
     @Override
@@ -126,4 +106,47 @@ public class OISubsystem extends Subsystem {
     protected void addHIDDevice(HIDDevice dev) {
         devices_.add(dev) ;
     }
-} ;
+
+    private void addTankDriveGamePad() {
+        if (db_ != null) {           
+            MessageLogger logger = getRobot().getMessageLogger() ;
+
+            if (gp_index_ == -1) {
+                try {
+                    gp_index_ = getRobot().getSettingsParser().get(DriverGamepadHIDIndexName).getInteger();
+                } catch (BadParameterTypeException e) {
+                    logger.startMessage(MessageType.Error) ;
+                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
+                    logger.add(" exists, but is not an integer").endMessage();
+                    gp_index_ = -1 ;
+                } catch (MissingParameterException e) {
+                    logger.startMessage(MessageType.Error) ;
+                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
+                    logger.add(" does not exist").endMessage();
+                    gp_index_ = -1 ;            
+                }
+            }
+            
+            if (gp_index_ != -1 &&  gp_ == null) {
+                try {
+                    gp_ = new TankDriveGamepad(this, gp_index_, db_) ;
+                    addHIDDevice(gp_);
+
+                    logger.startMessage(MessageType.Info) ;
+                    logger.add("driver gamepad HID device was sucessfully created ").endMessage();
+                    logger.endMessage();
+                }
+                catch(Exception ex) {
+                    if (getRobot().getTime() - last_time_ > 10.0) {
+                        logger.startMessage(MessageType.Error) ;
+                        logger.add("driver gamepad HID device was not created ").endMessage();
+                        logger.endMessage();
+
+                        last_time_ = getRobot().getTime() ;
+                    }
+                    gp_ = null ;
+                }
+            }
+        }
+    }
+}
