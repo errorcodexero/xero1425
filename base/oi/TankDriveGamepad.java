@@ -165,7 +165,7 @@ public class TankDriveGamepad extends Gamepad {
                 }
                 else {
                     double boost = ds.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) ;
-                    boolean slow = isLJoyButtonPressed() ;
+                    boolean slow = isLBackButtonPrssed() ;
 
                     double power = scalePower(-ly, boost, slow) ;
                     double spin = (Math.abs(rx) > 0.01) ? scaleTurn(rx, boost, slow) : 0.0 ;

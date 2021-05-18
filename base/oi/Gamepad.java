@@ -88,6 +88,11 @@ public abstract class Gamepad extends HIDDevice
         return ds.getStickButton(getIndex(), ButtonNumber.RB.value) ;        
     }
 
+    public boolean isLBackButtonPrssed() {
+        DriverStation ds = DriverStation.getInstance() ;
+        return ds.getStickButton(getIndex(), ButtonNumber.LB.value) ;        
+    }
+
     public POVAngle getPOVAngle() {
         DriverStation ds = DriverStation.getInstance() ;
         int povval = ds.getStickPOV(getIndex(), 0) ;
