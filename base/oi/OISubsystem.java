@@ -12,6 +12,7 @@ import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
+import org.xero1425.misc.SettingsValue;
 
 /// \brief This class controls the various OI devices that are used to control the robot.
 /// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
@@ -26,7 +27,11 @@ import org.xero1425.misc.MissingParameterException;
 public class OISubsystem extends Subsystem {
     
     private List<HIDDevice> devices_ ;
-    private TankDriveGamepad gp_ ;
+    private TankDriveSubsystem db_ ;
+    private Gamepad gp_ ;
+    private int gp_index_ ;
+    private double last_time_ ;
+    private boolean use_new_gamepad_ ;
     
     private final static String DriverGamepadHIDIndexName = "hw:driverstation:hid:driver";
 
@@ -34,36 +39,25 @@ public class OISubsystem extends Subsystem {
         super(parent, name);
 
         devices_ = new ArrayList<HIDDevice>();
+        db_ = db ;
+        gp_index_ = -1 ;
+        last_time_ = 0.0 ;
 
-        if (db != null) {           
-            MessageLogger logger = getRobot().getMessageLogger() ;
-            int index;
-
-            try {
-                index = getRobot().getSettingsParser().get(DriverGamepadHIDIndexName).getInteger();
-            } catch (BadParameterTypeException e) {
-                logger.startMessage(MessageType.Error) ;
-                logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
-                logger.add(" exists, but is not an integer").endMessage();
-                index = -1 ;
-            } catch (MissingParameterException e) {
-                logger.startMessage(MessageType.Error) ;
-                logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
-                logger.add(" does not exist").endMessage();
-                index = -1 ;            
-            }
-            
-            if (index != -1) {
-                try {
-                    gp_ = new TankDriveGamepad(this, index, db) ;
-                    addHIDDevice(gp_);
-                }
-                catch(Exception ex) {
-                    logger.startMessage(MessageType.Error) ;
-                    logger.add("driver gamepad HID device was not created ").endMessage();
-                }
-            }
+        use_new_gamepad_ = false ;
+        SettingsValue v = db.getRobot().getSettingsParser().getOrNull("oi:newdrive") ;
+        try {
+            if (v != null && v.isBoolean() && v.getBoolean())
+                use_new_gamepad_ = true;
+        } catch (BadParameterTypeException e) {
         }
+
+        addTankDriveGamePad();
+    }
+
+    /// \brief return the gamepad
+    /// \returs the gamepad
+    public TankDriveGamepad getGamePad() {
+        return gp_ ;
     }
 
     /// 
@@ -98,6 +92,8 @@ public class OISubsystem extends Subsystem {
 
     @Override
     public void run() {
+        if (gp_ == null)
+            addTankDriveGamePad() ;
     }
 
     @Override
@@ -124,4 +120,50 @@ public class OISubsystem extends Subsystem {
     protected void addHIDDevice(HIDDevice dev) {
         devices_.add(dev) ;
     }
-} ;
+
+    private void addTankDriveGamePad() {
+        if (db_ != null) {           
+            MessageLogger logger = getRobot().getMessageLogger() ;
+
+            if (gp_index_ == -1) {
+                try {
+                    gp_index_ = getRobot().getSettingsParser().get(DriverGamepadHIDIndexName).getInteger();
+                } catch (BadParameterTypeException e) {
+                    logger.startMessage(MessageType.Error) ;
+                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
+                    logger.add(" exists, but is not an integer").endMessage();
+                    gp_index_ = -1 ;
+                } catch (MissingParameterException e) {
+                    logger.startMessage(MessageType.Error) ;
+                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
+                    logger.add(" does not exist").endMessage();
+                    gp_index_ = -1 ;            
+                }
+            }
+            
+            if (gp_index_ != -1 &&  gp_ == null) {
+                try {
+                    if (use_new_gamepad_)
+                        gp_ = new NewDriveGamepad(this, gp_index_, db_) ;
+                    else
+                        gp_ = new TankDriveGamepad(this, gp_index_, db_) ;
+                    addHIDDevice(gp_);
+
+                    logger.startMessage(MessageType.Info) ;
+                    logger.add("driver gamepad HID device was sucessfully created ").endMessage();
+                    logger.endMessage();
+                }
+                catch(Exception ex) {
+                    if (getRobot().getTime() - last_time_ > 10.0) {
+                        logger.startMessage(MessageType.Error) ;
+                        logger.add("driver gamepad HID device was not created ").endMessage();
+                        logger.endMessage();
+
+                        last_time_ = getRobot().getTime() ;
+                    }
+                    gp_ = null ;
+                }
+            }
+        }
+    }
+}
