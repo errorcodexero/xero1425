@@ -56,7 +56,7 @@ public class OISubsystem extends Subsystem {
 
     /// \brief return the gamepad
     /// \returs the gamepad
-    public TankDriveGamepad getGamePad() {
+    public Gamepad getGamePad() {
         return gp_ ;
     }
 
