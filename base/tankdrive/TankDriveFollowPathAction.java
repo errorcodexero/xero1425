@@ -28,7 +28,7 @@ public class TankDriveFollowPathAction extends TankDriveAction {
         "time", 
         "ltpos", "lapos", "ltvel", "lavel", "ltaccel", "laaccel", "lout","lticks","lvout","laout","lpout","ldout","lerr",
         "rtpos", "rapos", "rtvel", "ravel", "rtaccel", "raaccel", "rout","rticks","rvout","raout","rpout","rdout","rerr",
-        "thead", "ahead", "angcorr"
+        "thead", "ahead", "angcorr","angerr"
     } ;
 
     private final int LeftSide = 0 ;
@@ -161,6 +161,7 @@ public class TankDriveFollowPathAction extends TankDriveAction {
             plot_data_[27] = thead ;
             plot_data_[28] = ahead ;
             plot_data_[29] = turn ;
+            plot_data_[30] = angerr ;
 
             td.addPlotData(plot_id_, plot_data_);
         }
