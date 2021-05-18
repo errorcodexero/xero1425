@@ -6,6 +6,11 @@ import edu.wpi.first.wpilibj.DriverStation ;
 
 public abstract class Gamepad extends HIDDevice
 {
+    private XboxController controller_ ;
+    private double start_ ;
+    private double duration_ ;
+    private boolean rumbling_ ;
+    
     public Gamepad(OISubsystem oi, int index) {
         super(oi, index) ;
 
@@ -146,8 +151,4 @@ public abstract class Gamepad extends HIDDevice
         }
     } ;    
 
-    private XboxController controller_ ;
-    private double start_ ;
-    private double duration_ ;
-    private boolean rumbling_ ;
 }
