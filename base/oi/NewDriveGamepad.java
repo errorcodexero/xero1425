@@ -131,7 +131,7 @@ public class NewDriveGamepad extends Gamepad {
         DriverStation ds = DriverStation.getInstance() ;
         double throttle = ds.getStickAxis(getIndex(), throttle_stick_) ;
         double wheel = ds.getStickAxis(getIndex(), wheel_stick_) ;
-        boolean quickturn = isRJoyButtonPressed() ;
+        boolean quickturn = isRBackButtonPressed() ;
 
         if (Math.abs(wheel) < wheel_deadband_)
             wheel = 0.0 ;
@@ -144,6 +144,12 @@ public class NewDriveGamepad extends Gamepad {
             wheel = Math.sin(Math.PI / 2.0 * wheel_non_linearity_ * wheel) ;
             wheel = Math.sin(Math.PI / 2.0 * wheel_non_linearity_ * wheel) ;
             wheel = wheel / (demoninator_ * demoninator_) * Math.abs(throttle) ;
+        }
+        else
+        {
+            MessageLogger logger = getSubsystem().getRobot().getMessageLogger() ;
+            logger.add("QUick Turn") ;
+            logger.endMessage();
         }
 
         wheel *= wheel_gain_ ;
