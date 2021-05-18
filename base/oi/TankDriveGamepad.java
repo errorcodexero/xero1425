@@ -54,6 +54,25 @@ import org.xero1425.misc.SettingsParser;
 ///      driver:zerolevel                                                        0.1
 ///
 public class TankDriveGamepad extends Gamepad {
+    
+    private TankDriveSubsystem db_ ;
+    private Action nudge_forward_ ;
+    private Action nudge_backward_ ;
+    private Action nudge_clockwise_ ;
+    private Action nudge_counter_clockwise_ ;
+    private int pov_ ;
+
+    private double default_power_ ;
+    private double max_power_ ;
+    private double turn_power_ ;
+    private double turn_max_power_ ;
+    private double slow_factor_ ;
+    private double zero_level_ ;
+    private double tolerance_ ;
+
+    double left_ ;
+    double right_ ;
+
     public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
         super(oi, index);
 
@@ -182,22 +201,4 @@ public class TankDriveGamepad extends Gamepad {
         double slowdown = slow ? turn_power_ * slow_factor_ : 0.0 ;
         return axis * (base - slowdown) ;
     }
-
-    private TankDriveSubsystem db_ ;
-    private Action nudge_forward_ ;
-    private Action nudge_backward_ ;
-    private Action nudge_clockwise_ ;
-    private Action nudge_counter_clockwise_ ;
-    private int pov_ ;
-
-    private double default_power_ ;
-    private double max_power_ ;
-    private double turn_power_ ;
-    private double turn_max_power_ ;
-    private double slow_factor_ ;
-    private double zero_level_ ;
-    private double tolerance_ ;
-
-    double left_ ;
-    double right_ ;
 }
