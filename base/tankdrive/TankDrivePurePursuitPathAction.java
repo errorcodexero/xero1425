@@ -206,7 +206,7 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
 
             LineSegment ls = new LineSegment(seg0.getX(), seg0.getY(), seg1.getX(), seg1.getY()) ;
             Translation2d closest = ls.closest(pos.getTranslation()) ;
-            double clpcnt = ls.dotProdParam(pos.getTranslation()) ;
+            double clpcnt = ls.dotProd(pos.getTranslation()) / ls.length() ;
 
             double ptdist = closest.getDistance(pos.getTranslation()) ;
             if (ptdist < dist)
