@@ -153,7 +153,7 @@ public class NewDriveGamepad extends Gamepad {
         }
 
         wheel *= wheel_gain_ ;
-        Translation2d drive = inverseKinematics(new Twist2d(throttle, 0.0, wheel)) ;
+        TankDriveVelocities drive = inverseKinematics(new Twist2d(throttle, 0.0, wheel)) ;
         double maxleftright = Math.max(Math.abs(drive.getX()), Math.abs(drive.getY())) ;
         double scale = Math.max(1.0, maxleftright) ;
 
@@ -169,11 +169,11 @@ public class NewDriveGamepad extends Gamepad {
         }
     }
 
-    Translation2d inverseKinematics(Twist2d velocity) {
+    TankDriveVelocities inverseKinematics(Twist2d velocity) {
         if (Math.abs(velocity.dtheta) < kEpsilon) {
-            return new Translation2d(velocity.dx, velocity.dx);
+            return new TankDriveVelocities(velocity.dx, velocity.dx);
         }
         double delta_v = db_.getWidth() * velocity.dtheta / (2 * db_.getScrub());
-        return new Translation2d(velocity.dx - delta_v, velocity.dx + delta_v);
+        return new TankDriveVelocities(velocity.dx - delta_v, velocity.dx + delta_v);
     }
 }

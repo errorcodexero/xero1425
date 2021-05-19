@@ -59,6 +59,7 @@ public class XeroPathManager
     /// \brief create the path manager
     /// \param logger the message logger
     /// \param basedir the base directory where all paths are found
+    /// \param type the type of path algorithm used
     public XeroPathManager(MessageLogger logger, String basedir, XeroPathType type) {
         path_type_ = type ;
         basedir_ = basedir ;

@@ -26,6 +26,7 @@ public class XeroPath
 
     /// \brief create a new path with the name given
     /// \param name the name of the path
+    /// \param dtype the type of path algorithm used
     public XeroPath(String name, XeroPathType dtype) throws Exception {
         name_ = name ;
         dtype_ = dtype ;

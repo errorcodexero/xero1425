@@ -1,5 +1,8 @@
 package org.xero1425.base.tankdrive;
 
+/// \file
+
+/// \brief This class stores velocities for the left and right wheels of a tank drive
 public class TankDriveVelocities {
     private double left_ ;
     private double right_ ;

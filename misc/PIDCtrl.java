@@ -8,23 +8,34 @@ package org.xero1425.misc ;
 public class PIDCtrl
 {
     //
-    // The P constant
+    // The PIDP constants
     //
     private double kp_ ;
     private double ki_ ;
     private double kd_ ;
     private double kf_ ;
+
+    // The max and min values output
     private double kmin_ ;
     private double kmax_;
+
+    // The max accumulated value for the I term
     private double kimax_;
 
+    // If true, we are managing an angle
     private boolean is_angle_;
 
+    // If true, we have a last error value
     private boolean has_last_error_;
+
+    // The last error
     private double last_error_;
 
+    // The accumulated I term
     private double integral_;
 
+    /// \brief create a new PIDCtrl object with all parameters set to zero
+    /// \param isangle if true this PIDCtrl object manages an angular quantity
     public PIDCtrl(boolean isangle) {
         kp_ = 0 ;
         ki_ = 0 ;

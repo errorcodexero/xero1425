@@ -1,5 +1,7 @@
 package org.xero1425.base.utils;
 
+/// \file
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -11,26 +13,69 @@ import org.xero1425.misc.SettingsValue;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
+/// \brief this class represents an XY function that consists of a series of line segments
 public class PieceWiseLinear {
     private List<Translation2d> points_;
 
+    /// \brief This constructor creates the PieceWiseLinear object from the settings file.
+    /// The data will be stored in the file as "basename:#:x" and "basename:#:y" where
+    /// the # value starts at 1 is incremented for each data point that makes up the
+    /// piecewise linear value.  The points are sorted on the X value so they do not have
+    /// to be in order.
+    ///
+    ///      # Example data files for settings file
+    ///      shooter:down:pwl:1:x                                            119
+    ///      shooter:down:pwl:1:y                                            6650
+    ///      shooter:down:pwl:2:x                                            134
+    ///      shooter:down:pwl:2:y                                            6000
+    ///      shooter:down:pwl:3:x                                            153
+    ///      shooter:down:pwl:3:y                                            5780
+    ///      shooter:down:pwl:4:x                                            188
+    ///      shooter:down:pwl:4:y                                            5570
+    ///      shooter:down:pwl:5:x                                            202
+    ///      shooter:down:pwl:5:y                                            5620
+    ///      shooter:down:pwl:6:x                                            227
+    ///      shooter:down:pwl:6:y                                            5700
+    ///      shooter:down:pwl:7:x                                            253.5
+    ///      shooter:down:pwl:7:y                                            5770
+    ///      shooter:down:pwl:8:x                                            316
+    ///      shooter:down:pwl:8:y                                            5910
+    /// \param settings settings parser used to extract values from settings file
+    /// \param basename the base name of the data
     public PieceWiseLinear(SettingsParser settings, String basename) throws Exception {
         List<Translation2d> points = readFromSettings(settings, basename);
         init(points) ;
     }
 
+    /// \brief This constructor creates the PieceWiseLinear object from a set of points given.
+    /// The points are sorted on the X value so they do not have to be in order.
+    /// \param points the set of points provided
     public PieceWiseLinear(List<Translation2d> points) throws Exception {
         init(points) ;
     }
 
+    /// \brief This method returns the number of points that make up the piece wise linear function
+    /// \returns the number of points that make up the piece wise linear function
     public int size() {
         return points_.size();
     }
 
+    /// \brief This method returns a point given its index.
+    /// Note, this function returns the point after sorting, so the values returned will not
+    /// match the values provided if the original values were not sorted on the X value.
+    /// \returns a point given its index
     public Translation2d get(int i) {
         return points_.get(i);
     }
 
+    /// \brief This method returns a Y value given an X value.
+    /// If the X value supplied is before the first X value of the piece wise linear function, the
+    /// Y value of the first point is returned.  If the X value supplied is after the X value of the
+    /// last X value of the piece wise linear function, the Y value of the last point is returned.  If
+    /// the X value supplied is within the points of the piece wise linear function, the segment containing
+    /// the X value is found an a Y value is retured based on linear interpolation between the start and end
+    /// of the containing segment.
+    /// \returns the Y value given the X value.
     public double getValue(double x) {
         double ret;
 

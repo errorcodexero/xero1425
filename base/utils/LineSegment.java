@@ -1,39 +1,51 @@
 package org.xero1425.base.utils;
 
+/// \file
+
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
+/// \brief This class represents a line segment with a start end end point
 public class LineSegment {
     private Translation2d p1_ ;
     private Translation2d p2_ ;
 
+    /// \brief Create a line segment given two points
+    /// \param p1 the starting point for the segment
+    /// \param p2 the ending point for the segment
     public LineSegment(Translation2d p1, Translation2d p2) {
         p1_ = new Translation2d(p1.getX(), p1.getY()) ;
         p2_ = new Translation2d(p2.getX(), p2.getY());
     }
 
-    public LineSegment(double d, double e, double f, double g) {
-        p1_ = new Translation2d(d, e) ;
-        p2_ = new Translation2d(f, g) ;
+    /// \brief Create a line segment given two points
+    /// \param x1 the X value for the starting point for the segment
+    /// \param y1 the Y value for the starting point for the segment
+    /// \param x2 the X value for the ending point for the segment
+    /// \param y2 the Y value for the ending point for the segment            
+    public LineSegment(double x1, double y1, double x2, double y2) {
+        p1_ = new Translation2d(x1, y1) ;
+        p2_ = new Translation2d(x2, y2) ;
     }
 
+    /// \brief returns the length of the segment
+    /// \returns the length of the segment
     public double length() {
         return p1_.getDistance(p2_) ;
     }
 
-    public double dotProdParam(Translation2d pt)
+    /// \brief returns the dot product of the line segment and a vector from the first point of the line segment and the point provided
+    /// \param pt the point defining the second vector
+    /// \returns the doc product of the linesegment and a point, returns -1 if the dot product is not defined
+    public double dotProd(Translation2d pt)
     {
         Translation2d pt_p1 = pt.minus(p1_) ;
         Translation2d p2_p1 = p2_.minus(p1_) ;
-        double dot = pt_p1.getX() * p2_p1.getX() + pt_p1.getY() * p2_p1.getY() ;
-        double lensq = p2_p1.getX() * p2_p1.getX() + p2_p1.getY() * p2_p1.getY() ;
-        double param = -1 ;
-
-        if (lensq != 0.0)
-            param = dot / lensq ;
-
-        return param ;
+        return pt_p1.getX() * p2_p1.getX() + pt_p1.getY() * p2_p1.getY() ;
     }
 
+    /// \brief returns the point on the line segment closest to the point given
+    /// \param pt the point we are supplied
+    /// \returns the point on the line segment closest to the point supplied
     public Translation2d closest(Translation2d pt) {
         Translation2d ret = null ;
         Translation2d pt_p1 = pt.minus(p1_) ;

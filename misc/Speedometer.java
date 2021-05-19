@@ -130,6 +130,8 @@ public class Speedometer
         return accel_ ;
     }
 
+    /// \brief return the average of the distance samples stored
+    /// \returns the average of the distance samples stored
     public double getAverage() {
         double total = 0 ;
         for(int i = 0 ; i < distances_.size() ; i++)

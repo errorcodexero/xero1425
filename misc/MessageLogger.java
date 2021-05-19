@@ -61,6 +61,7 @@ public final class MessageLogger
     // Number of error messages printed
     private int error_count_ ;
 
+    /// \brief the subsystem value that means there is no subsystem
     public static final int NOSUBSYSTEM = 0 ;
 
     /// \brief Create a new message logger object
@@ -89,6 +90,8 @@ public final class MessageLogger
         error_count_ = 0 ;
     }
 
+    /// \brief returns the total error count
+    /// \returns the total error count
     public int getErrorMessageCount() {
         return error_count_ ;
     }
