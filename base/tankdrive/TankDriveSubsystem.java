@@ -82,6 +82,10 @@ public class TankDriveSubsystem extends Subsystem {
 
     private Map<String, Double> trips_ ;
 
+    /// \brief create a new tankdrive subsystem
+    /// \param parent the parent subsystem
+    /// \param name the name of the subsystem
+    /// \param config the string prefix to use when searching for settings file entries
     public TankDriveSubsystem(Subsystem parent, String name, String config)
             throws BadParameterTypeException, MissingParameterException, BadMotorRequestException {
         super(parent, name);
@@ -146,22 +150,40 @@ public class TankDriveSubsystem extends Subsystem {
         attachHardware();
     }
 
+    /// \brief returns true to indicate this is a drivebase
+    /// \returns true to indicate this is a drivebase
     public boolean isDB() {
         return true ;
     }
 
+    /// \brief returns the width of the robot
+    /// This width is the track width which is basically from the center of the left 
+    /// wheels to the center of the right wheels.
+    /// \returns the width of the robot
     public double getWidth() {
         return tracker_.getWidth() ;
     }
 
+    /// \brief returns the scrub value for the robot
+    /// \returns the scrub value for the robot
     public double getScrub() {
         return tracker_.getScrub() ;
     }
 
+    /// \brief start a new trip with the given name
+    /// A trip measures the distance traveled since a given point in time.  The trip is named and
+    /// the name is used to reference the given trip.  This method starts a trip with the given name.
+    /// The name can be used in a call to getTripDistance() to see how far the robot has traveled since
+    /// the trip was started.
+    /// \param name the name of the trip
     public void startTrip(String name) {
         trips_.put(name, getDistance());
     }
 
+    /// \brief returns the distance traveled by the robot since the trip given was started
+    /// \param name the name of the trip of interest
+    /// \sa startTrip
+    /// \returns the distance traveled by the left sdie of the robot 
     public double getTripDistance(String name) {
         if (!trips_.containsKey(name))
             return 0.0;
@@ -169,54 +191,81 @@ public class TankDriveSubsystem extends Subsystem {
         return trips_.get(name);
     }
 
+    /// \brief returns the distance traveled by the left sdie of the robot
+    /// \returns the distance traveled by the left sdie of the robot     
     public double getLeftDistance() {
         return dist_l_;
     }
 
+    /// \brief returns the distance traveled by the right sdie of the robot
+    /// \returns the distance traveled by the right sdie of the robot 
     public double getRightDistance() {
         return dist_r_;
     }
 
+    /// \brief returns the distance traveled by the robot
+    /// \returns the distance traveled by the robot
     public double getDistance() {
         return (getLeftDistance() + getRightDistance()) / 2.0;
     }
 
+    /// \brief returns the velocity of the left side of the robot
+    /// \returns the velocity of the left side of the robot    
     public double getLeftVelocity() {
         return left_linear_.getVelocity() ;
     }
 
+    /// \brief returns the velocity of the right side of the robot
+    /// \returns the velocity of the right side of the robot    
     public double getRightVelocity() {
         return right_linear_.getVelocity() ;
     }
 
+    /// \brief returns the velocity of the robot
+    /// \returns the velocity of the robot
     public double getVelocity() {
         return (left_linear_.getVelocity() + right_linear_.getVelocity()) / 2.0 ;
     }
 
+    /// \brief returns the acceleration of the left side of the robot
+    /// \returns the acceleration of the left side of the robot
     public double getLeftAcceleration() {
         return left_linear_.getAcceleration() ;
     }
 
+    /// \brief returns the acceleration of the right side of the robot
+    /// \returns the acceleration of the right side of the robot
     public double getRightAcceleration() {
         return right_linear_.getAcceleration() ;
     }    
 
+    /// \brief returns the acceleration of the robot
+    /// \returns the acceleration of the robot
     public double getAcceleration() {
         return (left_linear_.getAcceleration() + right_linear_.getAcceleration()) / 2.0 ;
     }
 
+    /// \brief returns the left side ticks value from the encoder
+    /// \returns the left side ticks value from the encoder
     public int getLeftTick() {
         return ticks_left_ ;
     }
 
+    /// \brief returns the right side ticks value from the encoder
+    /// \returns the right side ticks value from the encoder
     public int getRightTick() {
         return ticks_right_ ;
     }
 
+    /// \brief returns the current angle in degrees of the robot
+    /// \returns the current angle of the robot
     public double getAngle() {
         return angular_.getDistance() ;
     }
 
+    /// \brief returns the net total angle in degrees the robot has rotated since the drivebase was initialization
+    /// If the robot has rotated in place two complete revolutions, this would return 720 degrees
+    /// \returns the net total angle the robot has rotated since the drivebase was initialization
     public double getTotalAngle() {
         return total_angle_ ;
     }
@@ -260,14 +309,16 @@ public class TankDriveSubsystem extends Subsystem {
         }
     }
 
-    public void run() throws Exception {
-        super.run();
-    }
-
+    /// \brief set the pose (x and y location plus heading) of the robot
+    /// \param pose the pose for the robot
     public void setPose(Pose2d pose) {
         tracker_.setPose(pose);
     }
 
+    /// \brief get the pose for the robot
+    /// This method returns the current pose based on the position tracker
+    /// assigned to the drivebase.
+    /// \returns the current pose for the robot
     public Pose2d getPose() {
         return tracker_.getPose() ;
     }

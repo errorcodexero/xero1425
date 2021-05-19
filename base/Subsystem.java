@@ -151,6 +151,9 @@ public class Subsystem {
         }
     }
 
+    /// \brief Create a new subsystem with no parent
+    /// \param robot the robot this subsystem belongs to
+    /// \param name the name of hte subsystem
     public Subsystem(XeroRobot robot, final String name) {
         this(robot, null, name) ;
     }

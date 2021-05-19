@@ -8,7 +8,7 @@ import org.xero1425.misc.MessageType;
 /// \brief This is the base classs for an action that is executed by a Subsystem.
 public abstract class Action
 {
-    // The name of the messages in the logger
+    /// \brief the name to use with the message logger for actions
     public static final String LoggerName = "actions" ;
     
     // If true, the action is complete
