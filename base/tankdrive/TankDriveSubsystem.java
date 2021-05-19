@@ -309,6 +309,7 @@ public class TankDriveSubsystem extends Subsystem {
         putDashboard("dbangle", DisplayType.Verbose, angular_.getDistance());        
     }
 
+    /// \brief set the power for the tank drive
     protected void setPower(double left, double right) {
         left_power_ = left ;
         right_power_ = right ;
