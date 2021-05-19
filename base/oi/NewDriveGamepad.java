@@ -156,11 +156,11 @@ public class NewDriveGamepad extends Gamepad {
 
         wheel *= wheel_gain_ ;
         TankDriveVelocities drive = inverseKinematics(new Twist2d(throttle, 0.0, wheel)) ;
-        double maxleftright = Math.max(Math.abs(drive.getX()), Math.abs(drive.getY())) ;
+        double maxleftright = Math.max(Math.abs(drive.c()), Math.abs(drive.getRight())) ;
         double scale = Math.max(1.0, maxleftright) ;
 
-        double left = drive.getX() / scale ;
-        double right = drive.getY() / scale ;
+        double left = drive.getLeft() / scale ;
+        double right = drive.getRight() / scale ;
 
         if (Math.abs(left - left_) > delta_power_ || Math.abs(right - right_) > delta_power_)
         {
