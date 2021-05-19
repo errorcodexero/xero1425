@@ -12,11 +12,11 @@ public class TankDriveVelocities {
         right_ = r ;
     }
 
-    double getLeft() {
+    public double getLeft() {
         return left_ ;
     }
 
-    double getRight() {
+    public double getRight() {
         return right_ ;
     }
 }
