@@ -11,8 +11,8 @@ public abstract class Gamepad extends HIDDevice
     private double duration_ ;
     private boolean rumbling_ ;
     
-    public Gamepad(OISubsystem oi, int index) {
-        super(oi, index) ;
+    public Gamepad(OISubsystem oi, String name, int index) {
+        super(oi, name, index) ;
 
         controller_ = new XboxController(index) ;
         rumbling_ = false ;

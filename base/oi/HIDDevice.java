@@ -6,10 +6,19 @@ import org.xero1425.base.actions.SequenceAction;
 
 public abstract class HIDDevice
 {
-    public HIDDevice(OISubsystem sub, int index) {
+    private String name_ ;
+    private boolean enabled_ ;
+    private OISubsystem sub_ ;
+    private int index_ ;
+
+    public HIDDevice(OISubsystem sub, String name, int index) {
         sub_ = sub ;
         index_ = index ;
         enabled_ = true ;
+    }
+
+    public String getName() {
+        return name_ ;
     }
 
     public OISubsystem getSubsystem() {
@@ -40,7 +49,4 @@ public abstract class HIDDevice
         return enabled_ ;
     }
 
-    private boolean enabled_ ;
-    private OISubsystem sub_ ;
-    private int index_ ;
 }

@@ -11,8 +11,8 @@ import org.xero1425.base.actions.SequenceAction;
 
 public class OIPanel extends HIDDevice
 {
-    public OIPanel(OISubsystem sub, int index) {
-        super(sub, index) ;
+    public OIPanel(OISubsystem sub, String name, int index) {
+        super(sub, name, index) ;
 
         items_ = new HashMap<Integer, OIPanelItem>() ;
         next_handle_ = 1 ;

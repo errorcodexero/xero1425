@@ -8,8 +8,6 @@ import org.xero1425.base.actions.SequenceAction;
 import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.base.tankdrive.TankDrivePowerAction;
 import org.xero1425.misc.BadParameterTypeException;
-import org.xero1425.misc.MessageLogger;
-import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 
@@ -74,24 +72,14 @@ public class TankDriveGamepad extends Gamepad {
     double right_ ;
 
     public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
-        super(oi, index);
+        super(oi, "Xero1425GamePad", index);
 
         DriverStation ds = DriverStation.getInstance();
         if (ds.getStickPOVCount(getIndex()) == 0) {
-            MessageLogger logger = oi.getRobot().getMessageLogger();
-            logger.startMessage(MessageType.Error);
-            logger.add("driver gamepad does not have POV control - nudges are disabled");
-            logger.endMessage();
-            pov_ = -1;
-        } else {
-            pov_ = 0;
+            throw new Exception("invalid gamepad for TankDriveGamepad");
         }
 
         if (ds.getStickAxisCount(getIndex()) <= AxisNumber.RIGHTX.value) {
-            MessageLogger logger = oi.getRobot().getMessageLogger();
-            logger.startMessage(MessageType.Error);
-            logger.add("driver gamepad does not have required number of axis, must have six");
-            logger.endMessage();
             throw new Exception("invalid gamepad for TankDriveGamepad");
         }
 

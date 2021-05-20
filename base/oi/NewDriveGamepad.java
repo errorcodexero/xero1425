@@ -15,7 +15,6 @@ import org.xero1425.misc.SettingsParser;
 
 
 import edu.wpi.first.wpilibj.DriverStation;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
 
 public class NewDriveGamepad extends Gamepad {
@@ -39,7 +38,7 @@ public class NewDriveGamepad extends Gamepad {
     private double delta_power_ ;
 
     public NewDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
-        super(oi, index);
+        super(oi, "NewDriveGamepad", index);
 
         SettingsParser settings = drive_.getRobot().getSettingsParser() ;
         DriverStation ds = DriverStation.getInstance();

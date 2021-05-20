@@ -75,6 +75,14 @@ public class OISubsystem extends Subsystem {
 
     @Override
     public void computeMyState() throws Exception {
+        if (gp_ == null) {
+            addTankDriveGamePad() ;
+
+            if (gp_ != null) {
+                gp_.createStaticActions();
+            }
+        }
+
         for (HIDDevice dev : devices_) {
             if (dev.isEnabled())
                 dev.computeState();
@@ -83,13 +91,14 @@ public class OISubsystem extends Subsystem {
 
     public void generateActions(SequenceAction seq) throws InvalidActionRequest {
         for(HIDDevice dev : devices_)
+        {
             dev.generateActions(seq) ;
+        }
     }
 
     @Override
-    public void run() {
-        if (gp_ == null)
-            addTankDriveGamePad() ;
+    public void run() throws Exception {
+        super.run() ;
     }
 
     @Override
@@ -143,6 +152,7 @@ public class OISubsystem extends Subsystem {
                         gp_ = new NewDriveGamepad(this, gp_index_, db_) ;
                     else
                         gp_ = new TankDriveGamepad(this, gp_index_, db_) ;
+                        
                     addHIDDevice(gp_);
 
                     logger.startMessage(MessageType.Info) ;
