@@ -30,7 +30,7 @@ import org.xero1425.misc.SimArgs;
 import org.xero1425.misc.XeroPathManager;
 import org.xero1425.misc.XeroPathType;
 import org.xero1425.base.motors.MotorFactory;
-import org.xero1425.base.tankdrive.TankDriveFollowPathAction;
+import org.xero1425.base.tankdrive.TankDrivePathFollowerAction;
 import org.xero1425.base.actions.Action;
 import org.xero1425.base.controllers.*;
 
@@ -696,8 +696,8 @@ public abstract class XeroRobot extends TimedRobot {
             actions.clear(); ;
             mode.getAllChildren(actions);
             for(Action act : actions) {
-                if (act instanceof TankDriveFollowPathAction) {
-                    TankDriveFollowPathAction pa = (TankDriveFollowPathAction)act ;
+                if (act instanceof TankDrivePathFollowerAction) {
+                    TankDrivePathFollowerAction pa = (TankDrivePathFollowerAction)act ;
                     logger_.startMessage(MessageType.Debug, logger_id_) ;
                     logger_.add("    processing path ").addQuoted(pa.getPathName()).endMessage();
 

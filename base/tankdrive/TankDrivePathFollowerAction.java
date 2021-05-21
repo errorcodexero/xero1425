@@ -6,17 +6,14 @@ import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.MissingPathException;
 import org.xero1425.misc.PIDACtrl;
 import org.xero1425.misc.XeroMath;
-import org.xero1425.misc.XeroPath;
 import org.xero1425.misc.XeroPathSegment;
 
-public class TankDriveFollowPathAction extends TankDriveAction {    
+public class TankDrivePathFollowerAction extends TankDrivePathAction {    
     private int index_ ;
     private double left_start_ ;
     private double right_start_ ;
     private double start_time_ ;
     double angle_correction_ ;
-    XeroPath path_ ;
-    String path_name_ ;
     PIDACtrl left_follower_ ;
     PIDACtrl right_follower_ ;
     boolean reverse_ ;
@@ -34,13 +31,11 @@ public class TankDriveFollowPathAction extends TankDriveAction {
     private final int LeftSide = 0 ;
     private final int RightSide = 1 ;
 
-    public TankDriveFollowPathAction(TankDriveSubsystem drive, String path, boolean reverse)
+    public TankDrivePathFollowerAction(TankDriveSubsystem drive, String path, boolean reverse)
             throws MissingPathException, BadParameterTypeException, MissingParameterException {
-        super(drive) ;
+        super(drive, path) ;
 
         reverse_ = reverse ;
-        path_name_ = path ;
-
 
         left_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:left", false) ;
         right_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:right", false) ;
@@ -50,15 +45,9 @@ public class TankDriveFollowPathAction extends TankDriveAction {
         plot_data_ = new Double[plot_columns_.length] ;
     }
 
-    public String getPathName() {
-        return path_name_ ;
-    }
-
     @Override
     public void start() throws Exception {
         super.start() ;
-
-        path_ = getSubsystem().getRobot().getPathManager().getPath(path_name_) ;
 
         left_start_ = getSubsystem().getLeftDistance() ;
         right_start_ = getSubsystem().getRightDistance() ;
@@ -66,7 +55,7 @@ public class TankDriveFollowPathAction extends TankDriveAction {
         index_ = 0 ;
         start_time_ = getSubsystem().getRobot().getTime() ;
         start_angle_ = getSubsystem().getAngle() ;
-        target_start_angle_ = path_.getSegment(LeftSide, 0).getHeading() ;
+        target_start_angle_ = getPath().getSegment(LeftSide, 0).getHeading() ;
 
         getSubsystem().startPlot(plot_id_, plot_columns_);
         getSubsystem().startTrip("pathfollower") ;
@@ -79,11 +68,11 @@ public class TankDriveFollowPathAction extends TankDriveAction {
         TankDriveSubsystem td = getSubsystem();
         XeroRobot robot = td.getRobot() ;
 
-        if (index_ < path_.getSize())
+        if (index_ < getPath().getSize())
         {
             double dt = robot.getDeltaTime();
-            XeroPathSegment lseg = path_.getSegment(LeftSide, index_) ;
-            XeroPathSegment rseg = path_.getSegment(RightSide, index_) ;
+            XeroPathSegment lseg = getPath().getSegment(LeftSide, index_) ;
+            XeroPathSegment rseg = getPath().getSegment(RightSide, index_) ;
 
             double laccel, lvel, lpos ;
             double raccel, rvel, rpos ;
@@ -167,7 +156,7 @@ public class TankDriveFollowPathAction extends TankDriveAction {
         }
         index_++ ;
 
-        if (index_ == path_.getSize())
+        if (index_ == getPath().getSize())
         {
             td.endPlot(plot_id_);
             td.setPower(0.0, 0.0) ;
@@ -178,7 +167,7 @@ public class TankDriveFollowPathAction extends TankDriveAction {
     @Override
     public void cancel() {
         super.cancel() ;
-        index_ = path_.getSize() ;
+        index_ = getPath().getSize() ;
 
         getSubsystem().setPower(0.0, 0.0) ;
         getSubsystem().endPlot(plot_id_);
@@ -186,8 +175,7 @@ public class TankDriveFollowPathAction extends TankDriveAction {
 
     @Override
     public String toString(int indent) {
-        String ret = prefix(indent) + "TankDriveFollowPath-" + path_name_ ;
+        String ret = prefix(indent) + "TankDriveFollowPath-" + getPathName() ;
         return ret ;
     }
-
 }
