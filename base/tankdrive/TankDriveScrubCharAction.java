@@ -1,9 +1,19 @@
 package org.xero1425.base.tankdrive;
 
+/// \file
+
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 
+/// \brief This action is used to characterize the scrub factor for a tankdrive base
+/// This action rotates the robot in place through a given angle and measures the distance the wheels
+/// traveled in a circle.  It compute the scrub factor which is the ratio of the actual distance traveled
+/// versus the ideal distance traveled if the wheels had not friction. 
 public class TankDriveScrubCharAction extends TankDriveAction {
+    /// \brief Create the scrub action
+    /// \param drive the tankdrive subsystem
+    /// \param the power to use in the action
+    /// \param the total angle to traverse
     public TankDriveScrubCharAction(final TankDriveSubsystem drive, final double power, final double total) {
         super(drive);
         power_ = power;
@@ -12,6 +22,10 @@ public class TankDriveScrubCharAction extends TankDriveAction {
         plot_id_ = drive.initPlot("tankdrivescrub");
     }
 
+    /// \brief start the action
+    /// Applies power to the robot wheel in the opposite directions to cause the robot to rotate.  The robot rotates
+    /// until the total angle given in the constructor has been covered.
+    /// \throws Exception only if underlying hardware (like gyro) throws an exception
     @Override
     public void start() throws Exception {
         super.start();
@@ -37,12 +51,14 @@ public class TankDriveScrubCharAction extends TankDriveAction {
             final double avgc = (distl - distr) / 2.0;
             final double revs = angle / 360.0;
             final double effr = avgc / (Math.PI * revs);
+            final double scrub = effr / getSubsystem().getWidth() ;
 
             logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID());
             logger.add("Total Angle (NaVX) ").add(angle);
             logger.add(", left ").add(distl);
             logger.add(", right ").add(distr);
             logger.add(", effective Width ").add(effr * 2.0);
+            logger.add(", scrub", scrub) ;
             logger.endMessage();
         } else {
             final Double[] data = new Double[7];
