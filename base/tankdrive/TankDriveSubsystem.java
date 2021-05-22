@@ -4,6 +4,8 @@ import java.util.Map;
 import java.util.HashMap;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Twist2d;
+
 import org.xero1425.base.LoopType;
 import org.xero1425.base.PositionTracker;
 import org.xero1425.base.Subsystem;
@@ -81,6 +83,8 @@ public class TankDriveSubsystem extends Subsystem {
     private Encoder right_encoder_ ;
 
     private Map<String, Double> trips_ ;
+
+    private final static double kEpsilon = 1e-9 ;
 
     /// \brief create a new tankdrive subsystem
     /// \param parent the parent subsystem
@@ -323,6 +327,10 @@ public class TankDriveSubsystem extends Subsystem {
         return tracker_.getPose() ;
     }
 
+    /// \brief compute the state of the drivebase.
+    /// This method reads the encoders for the left and right sides of the drivebase
+    /// and reads the gyro as well.  These three are used to compute the current state
+    /// of the robot and to update the position tracker for the robot.
     public void computeMyState() {
         double angle = 0.0;
 
@@ -358,6 +366,15 @@ public class TankDriveSubsystem extends Subsystem {
         putDashboard("dbleft", DisplayType.Verbose, left_linear_.getDistance());
         putDashboard("dbright", DisplayType.Verbose, right_linear_.getDistance());
         putDashboard("dbangle", DisplayType.Verbose, angular_.getDistance());        
+    }
+
+    
+    public TankDriveVelocities inverseKinematics(Twist2d velocity) {
+        if (Math.abs(velocity.dtheta) < kEpsilon) {
+            return new TankDriveVelocities(velocity.dx, velocity.dx);
+        }
+        double delta_v = getWidth() * velocity.dtheta / (2 * getScrub());
+        return new TankDriveVelocities(velocity.dx - delta_v, velocity.dx + delta_v);
     }
 
     /// \brief set the power for the tank drive

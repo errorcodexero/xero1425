@@ -18,7 +18,6 @@ import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
 
 public class NewDriveGamepad extends Gamepad {
-    private final static double kEpsilon = 1e-9 ;
     private TankDriveSubsystem db_ ;
     private double left_ ;
     private double right_ ;
@@ -154,7 +153,7 @@ public class NewDriveGamepad extends Gamepad {
         }
 
         wheel *= wheel_gain_ ;
-        TankDriveVelocities drive = inverseKinematics(new Twist2d(throttle, 0.0, wheel)) ;
+        TankDriveVelocities drive = db_.inverseKinematics(new Twist2d(throttle, 0.0, wheel)) ;
         double maxleftright = Math.max(Math.abs(drive.getLeft()), Math.abs(drive.getRight())) ;
         double scale = Math.max(1.0, maxleftright) ;
 
@@ -168,13 +167,5 @@ public class NewDriveGamepad extends Gamepad {
             left_ = left ;
             right_ = right ;
         }
-    }
-
-    TankDriveVelocities inverseKinematics(Twist2d velocity) {
-        if (Math.abs(velocity.dtheta) < kEpsilon) {
-            return new TankDriveVelocities(velocity.dx, velocity.dx);
-        }
-        double delta_v = db_.getWidth() * velocity.dtheta / (2 * db_.getScrub());
-        return new TankDriveVelocities(velocity.dx - delta_v, velocity.dx + delta_v);
     }
 }

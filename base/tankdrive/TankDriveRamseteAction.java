@@ -2,6 +2,7 @@ package org.xero1425.base.tankdrive;
 
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
+import org.xero1425.misc.PIDCtrl;
 import org.xero1425.misc.XeroPathSegment;
 
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -14,16 +15,21 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
     private RamseteController ctrl_;
     private boolean reverse_ ;
     private int index_ ;
+    private PIDCtrl left_pid_ ;
+    private PIDCtrl right_pid_ ;
 
     private final int MainRobot = 0;
     private final double inchesToMeters = 0.0254 ;
-    private final double kEpsilon = 1e-9 ;
 
-    public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse, double b, double zeta) {
+    public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse, double b, double zeta)
+            throws MissingParameterException, BadParameterTypeException {
         super(sub, pathname);
 
         reverse_ = reverse ;
         ctrl_ = new RamseteController(b, zeta);
+        
+        left_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":left", false) ;
+        right_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":right", false) ;
     }
 
     public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse) throws BadParameterTypeException, MissingParameterException {
@@ -47,20 +53,38 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
 
         if (index_ < getPath().getSize())
         {
-            Pose2d currentPose = convertToMeters(getSubsystem().getPose()) ;
+            // Current pose in inches
+            Pose2d currentPose = inchesToMeters(getSubsystem().getPose()) ;
+
+            // Current segment in inches
             XeroPathSegment seg = getPath().getSegment(MainRobot, index_) ;
-            Pose2d desiredPose = convertToMeters(new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading()))) ;
-            double linearVelocityRefMeters = convertToMeters(seg.getVelocity()) ;
+
+            // Desired pose in meters
+            Pose2d desiredPose = inchesToMeters(new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading()))) ;
+
+            // The desired linear velocity in meters
+            double linearVelocityRefMeters = inchesToMeters(seg.getVelocity()) ;
+
+            // The desired angular velocity in radians per second
             double angularVelocityRefRadiansPerSecond = 0.0 ;
 
             if (index_ != 0) {
                 XeroPathSegment prev = getPath().getSegment(MainRobot, index_) ;
+
+                // Compute the angular velocity in radians per second
                 angularVelocityRefRadiansPerSecond = (seg.getHeading() - prev.getHeading()) / getSubsystem().getRobot().getPeriod() / 180.0 * Math.PI ;
             }
 
+            // Robot speed in meters per second
             ChassisSpeeds speeds = ctrl_.calculate(currentPose, desiredPose, linearVelocityRefMeters, angularVelocityRefRadiansPerSecond) ;
-            TankDriveVelocities vel = inverseKinematics(new Twist2d(speeds.vxMetersPerSecond, 0.0, speeds.omegaRadiansPerSecond)) ;
-            getSubsystem().setPower(vel.getLeft(), vel.getRight()) ;
+
+            // Robot speed as a Twist2d in inches per second
+            Twist2d twist = new Twist2d(metersToInches(speeds.vxMetersPerSecond), 0.0, speeds.omegaRadiansPerSecond) ;
+
+            // Left and right speed in inches per second
+            TankDriveVelocities vel = getSubsystem().inverseKinematics(twist) ;
+
+            setVelocity(vel.getLeft(), vel.getRight()) ;
             index_++ ;
         }
 
@@ -84,11 +108,20 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         return ret ;
     }
 
-    private double convertToMeters(double v) {
+    //
+    // Set the left and right wheel velocities in inches per second
+    //
+    private void setVelocity(double leftvel, double rightvel) {
+        double left = left_pid_.getOutput(leftvel, getSubsystem().getLeftVelocity(), getSubsystem().getRobot().getDeltaTime()) ;
+        double right = right_pid_.getOutput(rightvel, getSubsystem().getLeftVelocity(), getSubsystem().getRobot().getDeltaTime()) ;
+        getSubsystem().setPower(left, right) ;
+    }
+
+    private double inchesToMeters(double v) {
         return v * inchesToMeters ;
     }
 
-    private Pose2d convertToMeters(Pose2d input) {
+    private Pose2d inchesToMeters(Pose2d input) {
 
         double x = input.getX() * inchesToMeters ;
         double y = input.getY() * inchesToMeters ;
@@ -96,11 +129,7 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         return new Pose2d(x, y, input.getRotation()) ;
     }
 
-    private TankDriveVelocities inverseKinematics(Twist2d velocity) {
-        if (Math.abs(velocity.dtheta) < kEpsilon) {
-            return new TankDriveVelocities(velocity.dx, velocity.dx);
-        }
-        double delta_v = getSubsystem().getWidth() * velocity.dtheta / (2 * getSubsystem().getScrub());
-        return new TankDriveVelocities(velocity.dx - delta_v, velocity.dx + delta_v);
+    private double metersToInches(double v) {
+        return v / inchesToMeters ;
     }
 }
