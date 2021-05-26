@@ -526,7 +526,7 @@ public abstract class XeroRobot extends TimedRobot {
         logger_.add("    Location: ").add(ds.getLocation()).endMessage();
 
         logger_.startMessage(MessageType.Info) ;
-        logger_.add("    Location: ").add(game_data_).endMessage();   
+        logger_.add("    GameData: '").add(game_data_).add("'").endMessage();   
         
         logger_.startMessage(MessageType.Info) ;
         logger_.add("    EventName: ").add(ds.getEventName()).endMessage();

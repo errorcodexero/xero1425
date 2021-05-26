@@ -2,6 +2,8 @@ package org.xero1425.base.tankdrive;
 
 import org.xero1425.base.XeroRobot;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.MissingPathException;
 import org.xero1425.misc.PIDACtrl;
@@ -13,7 +15,8 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
     private double left_start_ ;
     private double right_start_ ;
     private double start_time_ ;
-    double angle_correction_ ;
+    double angle_correction_clockwise ;
+    double angle_correction_counter_clockwise ;
     PIDACtrl left_follower_ ;
     PIDACtrl right_follower_ ;
     boolean reverse_ ;
@@ -39,7 +42,8 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
 
         left_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:left", false) ;
         right_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:right", false) ;
-        angle_correction_ = drive.getRobot().getSettingsParser().get("tankdrive:follower:angle_correction").getDouble() ;
+        angle_correction_clockwise = drive.getRobot().getSettingsParser().get("tankdrive:follower:angle_correction:clockwise").getDouble() ;
+        angle_correction_counter_clockwise = drive.getRobot().getSettingsParser().get("tankdrive:follower:angle_correction:counter_clockwise").getDouble() ;
 
         plot_id_ = drive.initPlot(toString(0)) ;
         plot_data_ = new Double[plot_columns_.length] ;
@@ -67,6 +71,10 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
     public void run() {
         TankDriveSubsystem td = getSubsystem();
         XeroRobot robot = td.getRobot() ;
+
+        MessageLogger logger = robot.getMessageLogger();
+        logger.startMessage(MessageType.Debug) ;
+        logger.add("index", index_) ;
 
         if (index_ < getPath().getSize())
         {
@@ -108,12 +116,39 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
             double lout = left_follower_.getOutput(laccel, lvel, lpos, ldist, dt) ;
             double rout = right_follower_.getOutput(raccel, rvel, rpos, rdist, dt) ;
 
+            //
+            // Negative angle is clockwise
+            //
             double angerr = XeroMath.normalizeAngleDegrees(thead - ahead) ;
-            double turn = angle_correction_ * angerr ;
-            lout += turn ;
-            rout -= turn ;
+
+            double angcorr = 0.0 ;
+            if (angerr > 0.0)
+            {
+                //
+                // Angle is negative, clockwise to desired heading.  Expect the param from
+                // the params file to be negative so we reduce the left side power and increase
+                // the right side power
+                //
+                angcorr = angle_correction_counter_clockwise * angerr ;
+            }
+            else
+            {
+                //
+                // Angle is positive, counter-clockwise to desired heading.  Expect the param from
+                // the params file to be positive so we increase the left side power and reduce
+                // the right side power
+                //
+                angcorr = angle_correction_clockwise * angerr ;
+            }
+
+            lout += angcorr ;
+            rout -= angcorr ;
 
             td.setPower(lout, rout) ;
+            logger.add(", left", lout) ;
+            logger.add(", right", rout) ;
+            logger.add(", angerr(degs)", angerr) ;
+            logger.add(", angcorr(v)", angcorr) ;
 
             plot_data_[0] = robot.getTime() - start_time_ ;
 
@@ -149,11 +184,12 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
 
             plot_data_[27] = thead ;
             plot_data_[28] = ahead ;
-            plot_data_[29] = turn ;
+            plot_data_[29] = angcorr ;
             plot_data_[30] = angerr ;
 
             td.addPlotData(plot_id_, plot_data_);
         }
+        logger.endMessage();
         index_++ ;
 
         if (index_ == getPath().getSize())

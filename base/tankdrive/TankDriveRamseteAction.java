@@ -28,8 +28,8 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         reverse_ = reverse ;
         ctrl_ = new RamseteController(b, zeta);
         
-        left_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":left", false) ;
-        right_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":right", false) ;
+        left_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":ramsets:left", false) ;
+        right_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":ramsets:right", false) ;
     }
 
     public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse) throws BadParameterTypeException, MissingParameterException {
