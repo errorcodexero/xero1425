@@ -4,6 +4,8 @@
 
 package org.xero1425.base.gyro ;
 
+import org.xero1425.misc.XeroMath;
+
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
@@ -139,7 +141,7 @@ public class RomiGyro implements Gyro, XeroGyro {
 
   @Override
   public double getAngle() {
-    return getAngleZ();
+    return -getAngleZ();
   }
 
   @Override
@@ -149,7 +151,7 @@ public class RomiGyro implements Gyro, XeroGyro {
  
   @Override
   public double getYaw() {
-    return -getAngleZ();
+    return XeroMath.normalizeAngleDegrees(-getAngleZ()) ;
   }
 
   @Override

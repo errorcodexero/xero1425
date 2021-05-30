@@ -30,9 +30,13 @@ public class PositionTracker {
         return scrub_ ;
     }
         
-    public void updatePosition(double dleft, double dright, double angle) {
+    public void updatePosition(double dleft, double dright, double dangle) {
 
         double xpos, ypos ;
+
+
+
+        double angle = dangle * Math.PI / 180.0 ;
 
         if (Math.abs(dleft - dright) < 1e-6) {
             xpos = pose_.getX() +  dleft * Math.cos(angle) ;

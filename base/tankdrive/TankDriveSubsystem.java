@@ -65,6 +65,8 @@ public class TankDriveSubsystem extends Subsystem {
     private int ticks_right_ ;
     private double dist_l_ ;
     private double dist_r_ ;
+    private double last_dist_l_ ;
+    private double last_dist_r_ ;
     private double left_inches_per_tick_ ;
     private double right_inches_per_tick_ ;
     private double total_angle_ ;
@@ -82,6 +84,9 @@ public class TankDriveSubsystem extends Subsystem {
     private Encoder left_encoder_ ;
     private Encoder right_encoder_ ;
 
+    private boolean recording_ ;
+    private double recording_start_ ;
+
     private Map<String, Double> trips_ ;
 
     private final static double kEpsilon = 1e-9 ;
@@ -97,12 +102,16 @@ public class TankDriveSubsystem extends Subsystem {
         MessageLogger logger = getRobot().getMessageLogger();
         SettingsParser settings = getRobot().getSettingsParser() ;
 
+        recording_ = false ;
+
         double width = settings.get("tankdrive:width").getDouble() ;
         double scrub = settings.get("tankdrive:scrub").getDouble() ;
         tracker_ = new PositionTracker(width, scrub) ;
 
         dist_l_ = 0.0;
         dist_r_ = 0.0;
+        last_dist_l_ = 0.0 ;
+        last_dist_r_ = 0.0 ;
 
         left_inches_per_tick_ = getRobot().getSettingsParser().get("tankdrive:inches_per_tick").getDouble();
         right_inches_per_tick_ = left_inches_per_tick_;
@@ -152,6 +161,16 @@ public class TankDriveSubsystem extends Subsystem {
         trips_ = new HashMap<String, Double>();
 
         attachHardware();
+    }
+
+    /// \brief sets the recording flag for the drive base.  
+    /// When the recording flag is set, the drivebase subsystem writes the pose for the drivebase
+    /// into the network tables at the location /Smartdashboard/db-trk-t, /Smartdashboard/db-trk-x, 
+    /// /Smartdashboard/db-trk-y,and /Smartdashboard/db-trk-a.  The time is relative to when setRecording
+    /// was called with a value of true.  The angle is in degrees.
+    public void setRecording(boolean v) {
+        recording_ = v ;
+        recording_start_ = getRobot().getTime() ;
     }
 
     /// \brief returns true to indicate this is a drivebase
@@ -274,6 +293,9 @@ public class TankDriveSubsystem extends Subsystem {
         return total_angle_ ;
     }
 
+    /// \brief This method is called when the robot enters the disabled state.
+    /// It is used in this subsystem to set the neutral mode of the drivebase
+    /// motors.
     public void reset() {
         super.reset();
 
@@ -284,6 +306,9 @@ public class TankDriveSubsystem extends Subsystem {
         }
     }
 
+    /// \brief This method is called when the robot enters one of its specifc modes.
+    /// The modes are Autonomous, Teleop, Test, or Disabled.  It is used to set the
+    /// neutral mode specifically for the robot mode.
     public void init(LoopType ltype) {
         super.init(ltype);
 
@@ -351,11 +376,14 @@ public class TankDriveSubsystem extends Subsystem {
                 angular_.update(getRobot().getDeltaTime(), angle);
             }
 
-            tracker_.updatePosition(dist_l_, dist_r_, angle);
+            tracker_.updatePosition(dist_l_ - last_dist_l_, dist_r_ - last_dist_r_, angle);
             left_linear_.update(getRobot().getDeltaTime(), getLeftDistance());
             right_linear_.update(getRobot().getDeltaTime(), getRightDistance());
 
             total_angle_ = gyro_.getAngle() ;
+
+            last_dist_l_ = dist_l_ ;
+            last_dist_r_ = dist_r_ ;
 
         } catch (Exception ex) {
             //
@@ -363,9 +391,12 @@ public class TankDriveSubsystem extends Subsystem {
             //
         }
 
-        putDashboard("dbleft", DisplayType.Verbose, left_linear_.getDistance());
-        putDashboard("dbright", DisplayType.Verbose, right_linear_.getDistance());
-        putDashboard("dbangle", DisplayType.Verbose, angular_.getDistance());        
+        if (recording_) {
+            putDashboard("db-trk-t", DisplayType.Verbose, getRobot().getTime() - recording_start_) ;
+            putDashboard("db-trk-x", DisplayType.Verbose, tracker_.getPose().getX());
+            putDashboard("db-trk-y", DisplayType.Verbose, tracker_.getPose().getY()) ;
+            putDashboard("db-trk-a", DisplayType.Verbose, tracker_.getPose().getRotation().getDegrees());
+        }
     }
 
     

@@ -34,6 +34,11 @@ public class PIDCtrl
     // The accumulated I term
     private double integral_;
 
+    private double dout_ ;
+    private double iout_ ;
+    private double pout_ ;
+    private double fout_ ;
+
     /// \brief create a new PIDCtrl object with all parameters set to zero
     /// \param isangle if true this PIDCtrl object manages an angular quantity
     public PIDCtrl(boolean isangle) {
@@ -97,6 +102,22 @@ public class PIDCtrl
         kimax_ = settings.get(name + ":imax").getDouble() ;                                        
     }
 
+    public double getPComponent() {
+        return pout_ ;
+    }
+
+    public double getIComponent() {
+        return iout_ ;
+    }
+
+    public double getDComponent() {
+        return dout_ ;
+    }
+
+    public double getFComponent() {
+        return fout_ ;
+    }
+
     /// \brief get the output by using variables & performing the PID calculations
     /// \param target the target position
     /// \param current the current position
@@ -104,8 +125,9 @@ public class PIDCtrl
     /// \returns the output applied to motors/etc. after performing calculations
     public double getOutput(double target, double current, double dt) {
         double error = calcError(target, current) ;
-        double pOut = kp_ * error;
         double derivative = 0;
+
+        pout_ = kp_ * error;
 
         // dt is difference in time (telta time)
         // "if" statement takes into account whether 1 robot loop has passed since program started
@@ -119,7 +141,7 @@ public class PIDCtrl
         has_last_error_ = true;
 
         // output for derivative * D-constant calculated
-        double dOut = kd_ * derivative;
+        dout_ = kd_ * derivative;
         
         // calculates the integral value by taking a summation of error * difference in time
         integral_ += error * dt ;
@@ -131,11 +153,12 @@ public class PIDCtrl
             integral_ = -kimax_ ;
         
         // output fot integral * I-constant calculated 
-        double iOut = ki_ * integral_;
+        iout_ = ki_ * integral_;
+        fout_ = kf_ * target ;
         
         // output sum of proportional, integral, and derivative calculations
         // add the feedforward term * target
-        double output = pOut + iOut + dOut + kf_ * target ;
+        double output = pout_ + iout_ + dout_ + fout_ ;
     
         // make sure output isn't too big or small
         // if it is, assign it to the min/max outputs

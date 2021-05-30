@@ -1,6 +1,7 @@
 package org.xero1425.base.tankdrive;
 
 import org.xero1425.base.XeroRobot;
+import org.xero1425.base.Subsystem.DisplayType;
 import org.xero1425.base.utils.LineSegment;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
@@ -64,6 +65,8 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
 
         getSubsystem().startPlot(plot_id_, plot_columns_);
 
+        getSubsystem().setRecording(true);
+
         cycle_ = 0 ;
     }
 
@@ -94,6 +97,11 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         // Find point at the look ahead distance from here to the robot
         //
         LookAheadPoint look = findLookAheadPoint(closest) ;
+
+        getSubsystem().putDashboard("db-path-t", DisplayType.Verbose, getSubsystem().getRobot().getTime()) ;
+        getSubsystem().putDashboard("db-path-x", DisplayType.Verbose, look.getPose().getX()) ;
+        getSubsystem().putDashboard("db-path-y", DisplayType.Verbose, look.getPose().getY()) ;
+        getSubsystem().putDashboard("db-path-a", DisplayType.Verbose, look.getPose().getRotation().getDegrees()) ;
 
         if (!look.atEnd())
         {
@@ -151,6 +159,7 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         }
         else
         {
+            getSubsystem().setRecording(false);
             setDone() ;
         }
 

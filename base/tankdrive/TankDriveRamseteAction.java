@@ -1,8 +1,10 @@
 package org.xero1425.base.tankdrive;
 
+import org.xero1425.base.Subsystem.DisplayType;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.PIDCtrl;
+import org.xero1425.misc.XeroMath;
 import org.xero1425.misc.XeroPathSegment;
 
 import edu.wpi.first.wpilibj.controller.RamseteController;
@@ -46,6 +48,8 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         XeroPathSegment seg = getPath().getSegment(MainRobot, 0) ;
         Pose2d start = new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading())) ;
         getSubsystem().setPose(start);
+        
+        getSubsystem().setRecording(true);
     }
 
     @Override
@@ -59,6 +63,12 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
             // Current segment in inches
             XeroPathSegment seg = getPath().getSegment(MainRobot, index_) ;
 
+            // Publish the desired path time and pose for external tools
+            getSubsystem().putDashboard("db-path-t", DisplayType.Verbose, getSubsystem().getRobot().getTime()) ;
+            getSubsystem().putDashboard("db-path-x", DisplayType.Verbose, seg.getX()) ;
+            getSubsystem().putDashboard("db-path-y", DisplayType.Verbose, seg.getY()) ;
+            getSubsystem().putDashboard("db-path-a", DisplayType.Verbose, seg.getHeading()) ;
+
             // Desired pose in meters
             Pose2d desiredPose = inchesToMeters(new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading()))) ;
 
@@ -69,10 +79,10 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
             double angularVelocityRefRadiansPerSecond = 0.0 ;
 
             if (index_ != 0) {
-                XeroPathSegment prev = getPath().getSegment(MainRobot, index_) ;
+                XeroPathSegment prev = getPath().getSegment(MainRobot, index_ - 1) ;
 
                 // Compute the angular velocity in radians per second
-                angularVelocityRefRadiansPerSecond = (seg.getHeading() - prev.getHeading()) / getSubsystem().getRobot().getPeriod() / 180.0 * Math.PI ;
+                angularVelocityRefRadiansPerSecond = XeroMath.normalizeAngleDegrees(seg.getHeading() - prev.getHeading()) / getSubsystem().getRobot().getPeriod() / 180.0 * Math.PI ;
             }
 
             // Robot speed in meters per second
@@ -92,6 +102,7 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         {
             getSubsystem().setPower(0.0, 0.0) ;
             setDone() ;
+            getSubsystem().setRecording(false);
         }
     }
 
