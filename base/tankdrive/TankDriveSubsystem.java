@@ -6,12 +6,10 @@ import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
 
+import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.LoopType;
 import org.xero1425.base.PositionTracker;
 import org.xero1425.base.Subsystem;
-import org.xero1425.base.gyro.RomiGyro;
-import org.xero1425.base.gyro.NavxGyro;
-import org.xero1425.base.gyro.XeroGyro;
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.MotorRequestFailedException;
@@ -56,7 +54,7 @@ import org.xero1425.misc.Speedometer;
 ///
 ///      tankdrive:follower:angle_correction                                     0.0
 ///
-public class TankDriveSubsystem extends Subsystem {
+public class TankDriveSubsystem extends DriveBaseSubsystem {
 
     private PositionTracker tracker_ ;
     private double left_power_ ;
@@ -70,10 +68,6 @@ public class TankDriveSubsystem extends Subsystem {
     private double left_inches_per_tick_ ;
     private double right_inches_per_tick_ ;
     private double total_angle_ ;
-    private XeroGyro gyro_ ;
-    private MotorController.NeutralMode automode_neutral_ ;
-    private MotorController.NeutralMode teleop_neutral_ ;
-    private MotorController.NeutralMode disabled_neutral_ ;
 
     private Speedometer angular_ ;
     private Speedometer left_linear_ ;
@@ -99,7 +93,6 @@ public class TankDriveSubsystem extends Subsystem {
             throws BadParameterTypeException, MissingParameterException, BadMotorRequestException {
         super(parent, name);
 
-        MessageLogger logger = getRobot().getMessageLogger();
         SettingsParser settings = getRobot().getSettingsParser() ;
 
         recording_ = false ;
@@ -132,31 +125,6 @@ public class TankDriveSubsystem extends Subsystem {
         angular_ = new Speedometer("angles", angularsamples, true);
         left_linear_ = new Speedometer("left", linearsamples, false);
         right_linear_ = new Speedometer("right", linearsamples, false);
-
-        automode_neutral_ = MotorController.NeutralMode.Brake;
-        teleop_neutral_ = MotorController.NeutralMode.Brake;
-        disabled_neutral_ = MotorController.NeutralMode.Coast;
-
-        String gyrotype = getRobot().getSettingsParser().get("hw:tankdrive:gyro").getString() ;
-        if (gyrotype.equals("navx")) {
-            gyro_ = new NavxGyro() ;
-        }
-        else if (gyrotype.equals("LSM6DS33")) {
-            gyro_ = new RomiGyro() ;
-        }
-
-        double start = getRobot().getTime() ;
-        while (getRobot().getTime() - start < 3.0) {
-            if (gyro_.isConnected())
-                break ;
-        }
-
-        if (!gyro_.isConnected()) {
-            logger.startMessage(MessageType.Error);
-            logger.add("NavX is not connected - cannot perform tankdrive path following functions");
-            logger.endMessage();
-            gyro_ = null;
-        }
 
         trips_ = new HashMap<String, Double>();
 
@@ -300,8 +268,8 @@ public class TankDriveSubsystem extends Subsystem {
         super.reset();
 
         try {
-            left_motors_.setNeutralMode(disabled_neutral_);
-            right_motors_.setNeutralMode(disabled_neutral_);
+            left_motors_.setNeutralMode(disabledModeNeutral());
+            right_motors_.setNeutralMode(disabledModeNeutral());
         } catch (Exception ex) {
         }
     }
@@ -315,23 +283,23 @@ public class TankDriveSubsystem extends Subsystem {
         try {
             switch (ltype) {
             case Autonomous:
-                left_motors_.setNeutralMode(automode_neutral_);
-                right_motors_.setNeutralMode(automode_neutral_);
+                left_motors_.setNeutralMode(autoModeNeutral());
+                right_motors_.setNeutralMode(autoModeNeutral());
                 break;
 
             case Teleop:
-                left_motors_.setNeutralMode(teleop_neutral_);
-                right_motors_.setNeutralMode(teleop_neutral_);
+                left_motors_.setNeutralMode(teleopModeNeutral());
+                right_motors_.setNeutralMode(teleopModeNeutral());
                 break;
 
             case Test:
-                left_motors_.setNeutralMode(disabled_neutral_);
-                right_motors_.setNeutralMode(disabled_neutral_);
+                left_motors_.setNeutralMode(disabledModeNeutral());
+                right_motors_.setNeutralMode(disabledModeNeutral());
                 break;
 
             case Disabled:
-                left_motors_.setNeutralMode(disabled_neutral_);
-                right_motors_.setNeutralMode(disabled_neutral_);            
+                left_motors_.setNeutralMode(disabledModeNeutral());
+                right_motors_.setNeutralMode(disabledModeNeutral());            
                 break ;
             }
         } catch (Exception ex) {
@@ -371,8 +339,8 @@ public class TankDriveSubsystem extends Subsystem {
 
             dist_l_ = ticks_left_ * left_inches_per_tick_;
             dist_r_ = ticks_right_ * right_inches_per_tick_;
-            if (gyro_ != null) {
-                angle = gyro_.getYaw();
+            if (gyro() != null) {
+                angle = gyro().getYaw();
                 angular_.update(getRobot().getDeltaTime(), angle);
             }
 
@@ -380,7 +348,7 @@ public class TankDriveSubsystem extends Subsystem {
             left_linear_.update(getRobot().getDeltaTime(), getLeftDistance());
             right_linear_.update(getRobot().getDeltaTime(), getRightDistance());
 
-            total_angle_ = gyro_.getAngle() ;
+            total_angle_ = gyro().getAngle() ;
 
             last_dist_l_ = dist_l_ ;
             last_dist_r_ = dist_r_ ;
