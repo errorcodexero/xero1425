@@ -5,13 +5,10 @@ import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.base.tankdrive.TankDriveSubsystem;
 
 public class RobotSubsystem extends Subsystem
-{
-    public enum SubsystemType
-    {
-        DriveBase,
-        OI,
-        Other
-    };
+{   
+    private OISubsystem oi_ ;
+    private DriveBaseSubsystem db_ ;
+    private AlarmSubsystem alarms_;
 
     public RobotSubsystem(XeroRobot robot, String name) throws Exception {
         super(robot, name) ;
@@ -43,7 +40,7 @@ public class RobotSubsystem extends Subsystem
         return oi_ ;
     }
 
-    public TankDriveSubsystem getDB() {
+    public DriveBaseSubsystem getDB() {
         return db_ ;
     }
 
@@ -51,7 +48,4 @@ public class RobotSubsystem extends Subsystem
         return alarms_ ;
     }
 
-    private OISubsystem oi_ ;
-    private TankDriveSubsystem db_ ;
-    private AlarmSubsystem alarms_;
 } ;
