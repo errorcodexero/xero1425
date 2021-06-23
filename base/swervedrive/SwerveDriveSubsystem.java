@@ -4,6 +4,9 @@ import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.LoopType;
 import org.xero1425.base.Subsystem;
 import org.xero1425.base.motors.MotorController;
+import org.xero1425.base.oi.Gamepad;
+import org.xero1425.base.oi.OISubsystem;
+import org.xero1425.base.oi.SwerveDriveGamepad;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
@@ -40,7 +43,17 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         }
     }
 
-        /// \brief This method is called when the robot enters one of its specifc modes.
+    public Gamepad createGamePad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception {
+        return new SwerveDriveGamepad(oi, index, drive);
+    }
+
+    /// \brief returns true to indicate this is a drivebase
+    /// \returns true to indicate this is a drivebase
+    public boolean isDB() {
+        return true ;
+    }    
+
+    /// \brief This method is called when the robot enters one of its specifc modes.
     /// The modes are Autonomous, Teleop, Test, or Disabled.  It is used to set the
     /// neutral mode specifically for the robot mode.
     public void init(LoopType ltype) {

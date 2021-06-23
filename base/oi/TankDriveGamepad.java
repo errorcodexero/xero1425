@@ -1,6 +1,8 @@
 package org.xero1425.base.oi;
 
 import edu.wpi.first.wpilibj.DriverStation;
+
+import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.LoopType;
 import org.xero1425.base.actions.Action;
 import org.xero1425.base.actions.InvalidActionRequest;
@@ -71,7 +73,7 @@ public class TankDriveGamepad extends Gamepad {
     double left_ ;
     double right_ ;
 
-    public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
+    public TankDriveGamepad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception {
         super(oi, "Xero1425GamePad", index);
 
         DriverStation ds = DriverStation.getInstance();
@@ -83,7 +85,7 @@ public class TankDriveGamepad extends Gamepad {
             throw new Exception("invalid gamepad for TankDriveGamepad");
         }
 
-        db_ = drive_;
+        db_ = (TankDriveSubsystem)drive;
     }
 
     @Override

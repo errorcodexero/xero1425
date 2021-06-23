@@ -3,10 +3,12 @@ package org.xero1425.base.oi;
 import java.util.List;
 import java.util.ArrayList;
 
+import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.LoopType;
 import org.xero1425.base.Subsystem;
 import org.xero1425.base.actions.InvalidActionRequest;
 import org.xero1425.base.actions.SequenceAction;
+import org.xero1425.base.swervedrive.SwerveDriveSubsystem;
 import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
@@ -27,19 +29,19 @@ import org.xero1425.misc.SettingsValue;
 public class OISubsystem extends Subsystem {
     
     private List<HIDDevice> devices_ ;
-    private TankDriveSubsystem db_ ;
     private Gamepad gp_ ;
     private int gp_index_ ;
     private double last_time_ ;
     private boolean use_new_gamepad_ ;
+    private DriveBaseSubsystem db_ ;
     
     private final static String DriverGamepadHIDIndexName = "hw:driverstation:hid:driver";
 
-    public OISubsystem(Subsystem parent, String name, TankDriveSubsystem db) {
+    public OISubsystem(Subsystem parent, String name, DriveBaseSubsystem db) {
         super(parent, name);
 
-        devices_ = new ArrayList<HIDDevice>();
         db_ = db ;
+        devices_ = new ArrayList<HIDDevice>();
         gp_index_ = -1 ;
         last_time_ = 0.0 ;
 
@@ -51,7 +53,7 @@ public class OISubsystem extends Subsystem {
         } catch (BadParameterTypeException e) {
         }
 
-        addTankDriveGamePad();
+        addDriveBaseGamePad();
     }
 
     /// \brief return the gamepad
@@ -76,7 +78,7 @@ public class OISubsystem extends Subsystem {
     @Override
     public void computeMyState() throws Exception {
         if (gp_ == null) {
-            addTankDriveGamePad() ;
+            addDriveBaseGamePad() ;
 
             if (gp_ != null) {
                 gp_.createStaticActions();
@@ -126,7 +128,7 @@ public class OISubsystem extends Subsystem {
         devices_.add(dev) ;
     }
 
-    private void addTankDriveGamePad() {
+    private void addDriveBaseGamePad() {
         if (db_ != null) {           
             MessageLogger logger = getRobot().getMessageLogger() ;
 
@@ -148,11 +150,7 @@ public class OISubsystem extends Subsystem {
             
             if (gp_index_ != -1 &&  gp_ == null) {
                 try {
-                    if (use_new_gamepad_)
-                        gp_ = new NewDriveGamepad(this, gp_index_, db_) ;
-                    else
-                        gp_ = new TankDriveGamepad(this, gp_index_, db_) ;
-                        
+                    gp_ = db_.createGamePad(this, gp_index_, db_) ;
                     addHIDDevice(gp_);
 
                     logger.startMessage(MessageType.Info) ;

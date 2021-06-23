@@ -13,6 +13,9 @@ import org.xero1425.base.Subsystem;
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.MotorRequestFailedException;
+import org.xero1425.base.oi.Gamepad;
+import org.xero1425.base.oi.OISubsystem;
+import org.xero1425.base.oi.TankDriveGamepad;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
@@ -56,70 +59,71 @@ import org.xero1425.misc.Speedometer;
 ///
 public class TankDriveSubsystem extends DriveBaseSubsystem {
 
-    private PositionTracker tracker_ ;
-    private double left_power_ ;
-    private double right_power_ ;
-    private int ticks_left_ ;
-    private int ticks_right_ ;
-    private double dist_l_ ;
-    private double dist_r_ ;
-    private double last_dist_l_ ;
-    private double last_dist_r_ ;
-    private double left_inches_per_tick_ ;
-    private double right_inches_per_tick_ ;
-    private double total_angle_ ;
+    private PositionTracker tracker_;
+    private double left_power_;
+    private double right_power_;
+    private int ticks_left_;
+    private int ticks_right_;
+    private double dist_l_;
+    private double dist_r_;
+    private double last_dist_l_;
+    private double last_dist_r_;
+    private double left_inches_per_tick_;
+    private double right_inches_per_tick_;
+    private double total_angle_;
 
-    private Speedometer angular_ ;
-    private Speedometer left_linear_ ;
-    private Speedometer right_linear_ ;
+    private Speedometer angular_;
+    private Speedometer left_linear_;
+    private Speedometer right_linear_;
 
-    private MotorController left_motors_ ;
-    private MotorController right_motors_ ;
-    private Encoder left_encoder_ ;
-    private Encoder right_encoder_ ;
+    private MotorController left_motors_;
+    private MotorController right_motors_;
+    private Encoder left_encoder_;
+    private Encoder right_encoder_;
 
-    private boolean recording_ ;
-    private double recording_start_ ;
+    private boolean recording_;
+    private double recording_start_;
 
-    private Map<String, Double> trips_ ;
+    private Map<String, Double> trips_;
 
-    private final static double kEpsilon = 1e-9 ;
+    private final static double kEpsilon = 1e-9;
 
     /// \brief create a new tankdrive subsystem
     /// \param parent the parent subsystem
     /// \param name the name of the subsystem
-    /// \param config the string prefix to use when searching for settings file entries
+    /// \param config the string prefix to use when searching for settings file
+    /// entries
     public TankDriveSubsystem(Subsystem parent, String name, String config)
             throws BadParameterTypeException, MissingParameterException, BadMotorRequestException {
         super(parent, name);
 
-        SettingsParser settings = getRobot().getSettingsParser() ;
+        SettingsParser settings = getRobot().getSettingsParser();
 
-        recording_ = false ;
+        recording_ = false;
 
-        double width = settings.get("tankdrive:width").getDouble() ;
-        double scrub = settings.get("tankdrive:scrub").getDouble() ;
-        tracker_ = new PositionTracker(width, scrub) ;
+        double width = settings.get("tankdrive:width").getDouble();
+        double scrub = settings.get("tankdrive:scrub").getDouble();
+        tracker_ = new PositionTracker(width, scrub);
 
         dist_l_ = 0.0;
         dist_r_ = 0.0;
-        last_dist_l_ = 0.0 ;
-        last_dist_r_ = 0.0 ;
+        last_dist_l_ = 0.0;
+        last_dist_r_ = 0.0;
 
         left_inches_per_tick_ = getRobot().getSettingsParser().get("tankdrive:inches_per_tick").getDouble();
         right_inches_per_tick_ = left_inches_per_tick_;
 
-        int linearsamples = 2 ;
-        int angularsamples = 2 ;
-        String linear = "tankdrive:speedometer:linearsamples" ;
-        String angular = "tankdrive:speedometer:angularsamples" ;
+        int linearsamples = 2;
+        int angularsamples = 2;
+        String linear = "tankdrive:speedometer:linearsamples";
+        String angular = "tankdrive:speedometer:angularsamples";
 
         if (settings.isDefined(linear) && settings.get(linear).isInteger()) {
-            linearsamples = settings.get(linear).getInteger() ;
+            linearsamples = settings.get(linear).getInteger();
         }
 
         if (settings.isDefined(angular) && settings.get(angular).isInteger()) {
-            angularsamples = settings.get(angular).getInteger() ;
+            angularsamples = settings.get(angular).getInteger();
         }
 
         angular_ = new Speedometer("angles", angularsamples, true);
@@ -131,14 +135,21 @@ public class TankDriveSubsystem extends DriveBaseSubsystem {
         attachHardware();
     }
 
-    /// \brief sets the recording flag for the drive base.  
-    /// When the recording flag is set, the drivebase subsystem writes the pose for the drivebase
-    /// into the network tables at the location /Smartdashboard/db-trk-t, /Smartdashboard/db-trk-x, 
-    /// /Smartdashboard/db-trk-y,and /Smartdashboard/db-trk-a.  The time is relative to when setRecording
-    /// was called with a value of true.  The angle is in degrees.
+    /// \brief sets the recording flag for the drive base.
+    /// When the recording flag is set, the drivebase subsystem writes the pose for
+    /// the drivebase
+    /// into the network tables at the location /Smartdashboard/db-trk-t,
+    /// /Smartdashboard/db-trk-x,
+    /// /Smartdashboard/db-trk-y,and /Smartdashboard/db-trk-a. The time is relative
+    /// to when setRecording
+    /// was called with a value of true. The angle is in degrees.
     public void setRecording(boolean v) {
-        recording_ = v ;
-        recording_start_ = getRobot().getTime() ;
+        recording_ = v;
+        recording_start_ = getRobot().getTime();
+    }
+
+    public Gamepad createGamePad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception {
+        return new TankDriveGamepad(oi, index, drive);
     }
 
     /// \brief returns true to indicate this is a drivebase
