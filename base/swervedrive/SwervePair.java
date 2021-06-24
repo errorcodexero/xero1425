@@ -4,21 +4,30 @@ import org.xero1425.base.XeroRobot;
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.MotorRequestFailedException;
+import org.xero1425.base.motorsubsystem.EncoderConfigException;
+import org.xero1425.base.motorsubsystem.XeroEncoder;
+import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.MissingParameterException;
 
 public class SwervePair {
     private MotorController steer_;
     private MotorController drive_;
+    private XeroEncoder encoder_;
     private double steer_power_;
     private double drive_power_;
 
-    //
-    // name e.g. - hw:swervedrive:motors:fl
-    public SwervePair(XeroRobot robot, String name, String config) {
+    public SwervePair(XeroRobot robot, String name, String config) throws BadParameterTypeException,
+            MissingParameterException, EncoderConfigException, BadMotorRequestException {
         steer_ = robot.getMotorFactory().createMotor(name + "-steer", config + ":steer");
         drive_ = robot.getMotorFactory().createMotor(name + "-drive", config + ":drive");
+        encoder_ = new XeroEncoder(robot, config + ":encoder", true, null) ;
 
         drive_power_ = 0.0;
         steer_power_ = 0.0;
+    }
+
+    public double angle() {
+        return encoder_.getPosition() ;
     }
 
     public void setNeutralMode(MotorController.NeutralMode mode) throws BadMotorRequestException, MotorRequestFailedException {

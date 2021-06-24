@@ -7,8 +7,6 @@ import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.oi.Gamepad;
 import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.base.oi.SwerveDriveGamepad;
-import org.xero1425.misc.BadParameterTypeException;
-import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 
 public class SwerveDriveSubsystem extends DriveBaseSubsystem {
@@ -39,7 +37,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         pairs_  = new SwervePair[cname.length] ;
         for(int i = 0 ; i < cname.length ; i++) 
         {
-            pairs_[i] = new SwervePair(getRobot(), hname[i], config + ":motors:" + cname[i]) ;
+            pairs_[i] = new SwervePair(getRobot(), hname[i], config + ":"+ cname[i]) ;
         }
     }
 

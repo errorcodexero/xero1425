@@ -28,7 +28,7 @@ public abstract class DriveBaseSubsystem extends Subsystem {
         teleop_neutral_ = MotorController.NeutralMode.Brake;
         disabled_neutral_ = MotorController.NeutralMode.Coast;
 
-        String gyrotype = getRobot().getSettingsParser().get("hw:tankdrive:gyro").getString();
+        String gyrotype = getRobot().getSettingsParser().get("hw:gyro").getString();
         if (gyrotype.equals("navx")) {
             gyro_ = new NavxGyro();
         } else if (gyrotype.equals("LSM6DS33")) {
