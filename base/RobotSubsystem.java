@@ -2,7 +2,6 @@ package org.xero1425.base;
 
 import org.xero1425.base.alarms.AlarmSubsystem;
 import org.xero1425.base.oi.OISubsystem;
-import org.xero1425.base.tankdrive.TankDriveSubsystem;
 
 public class RobotSubsystem extends Subsystem
 {   
@@ -32,7 +31,7 @@ public class RobotSubsystem extends Subsystem
             if (db_ != null)
                 throw new Exception("multiple drivebase subsystems added to robot subsystem") ;
 
-            db_ = (TankDriveSubsystem)child ;
+            db_ = (DriveBaseSubsystem)child ;
         }
     }
 
