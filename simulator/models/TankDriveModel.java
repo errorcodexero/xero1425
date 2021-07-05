@@ -238,6 +238,7 @@ public class TankDriveModel extends SimulationModel {
     /// Model creation is a two step process. The constructor does very basic variable initialization.  This
     /// method completes the model creation process.  This method can rely on all of the other models required being in
     /// place.  However, the create() function on other models may or may not have been called.
+    @Override
     public boolean create() {
         MessageLogger logger = getEngine().getMessageLogger() ;
 
@@ -464,6 +465,7 @@ public class TankDriveModel extends SimulationModel {
 
     /// \brief run on simlator loop
     /// \param dt the amount of time that has passed since the last simulator loop
+    @Override
     public void run(double dt) {
 
         //

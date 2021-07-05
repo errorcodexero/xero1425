@@ -1,6 +1,5 @@
 package org.xero1425.base;
 
-import org.xero1425.base.Subsystem;
 import org.xero1425.base.gyro.NavxGyro;
 import org.xero1425.base.gyro.RomiGyro;
 import org.xero1425.base.gyro.XeroGyro;

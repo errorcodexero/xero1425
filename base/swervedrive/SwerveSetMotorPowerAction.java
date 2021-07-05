@@ -75,8 +75,9 @@ public class SwerveSetMotorPowerAction extends SwerveDriveAction {
     }
 
     public String toString(int indent) {
-        String ret = prefix(indent) + "TankDrivePowerAction" ;
-        ret += getSubsystem().getPairName(which_, true) ;
+        String ret = prefix(indent) + "SwerveDrivePowerAction" ;
+        ret += " module='" + getSubsystem().getPairName(which_, true) + "'" ;
+        ret += "'" ;
         ret += " steer=" + Double.toString(steer_power_) ;
         ret += " drive=" + Double.toString(drive_power_) ;
         if (timed_)

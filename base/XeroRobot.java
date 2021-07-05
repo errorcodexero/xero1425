@@ -602,6 +602,8 @@ public abstract class XeroRobot extends TimedRobot {
         logger_ = new MessageLogger();
         logger_.setTimeSource(new RobotTimeSource());
 
+        System.out.println("LOGFILE '" + logfile + "'") ;
+
         if (logfile != null) {
             dest = new MessageDestinationFile(logfile) ;
         }

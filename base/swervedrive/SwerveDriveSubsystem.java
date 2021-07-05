@@ -7,6 +7,8 @@ import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.oi.Gamepad;
 import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.base.oi.SwerveDriveGamepad;
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsParser;
 
 public class SwerveDriveSubsystem extends DriveBaseSubsystem {
@@ -39,6 +41,14 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         {
             pairs_[i] = new SwervePair(getRobot(), hname[i], config + ":"+ cname[i]) ;
         }
+    }
+
+    public double getWidth() {
+        return width_ ;
+    }
+
+    public double getLength() {
+        return length_ ;
     }
 
     public Gamepad createGamePad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception {
@@ -82,11 +92,20 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     }
 
     public void computeMyState() {
+        MessageLogger logger = getRobot().getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, getLoggerID()) ;
 
+        logger.add("SwerveDrivePower:") ;
+        for(int i = 0 ; i < cname.length ; i++) 
+        {
+            logger.add(cname[i] + "steer", pairs_[FL].steerPower()) ;
+            logger.add(cname[i] + "drive", pairs_[FL].drivePower()) ;
+        }
+        logger.endMessage();
     }
 
     public void setPower(int which, double steer, double drive) throws Exception {
-        if (which < 0 || which > BL)
+        if (which < 0 || which > BR)
             throw new Exception("invalid swerve pair address") ;
        
         pairs_[which].set(steer, drive) ;
@@ -94,7 +113,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     
     public void setSteer(int which, double steer) throws Exception {
-        if (which < 0 || which > BL)
+        if (which < 0 || which > BR)
             throw new Exception("invalid swerve pair address") ;
        
         pairs_[which].setSteerPower(steer) ;
@@ -102,7 +121,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     
     public void setDrive(int which, double drive) throws Exception {
-        if (which < 0 || which > BL)
+        if (which < 0 || which > BR)
             throw new Exception("invalid swerve pair address") ;
        
         pairs_[which].setDrivePower(drive) ;

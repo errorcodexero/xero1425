@@ -176,7 +176,7 @@ public final class MessageLogger
 
         for (final Integer key : subsystems_.keySet()) {
             final String subname = subsystems_.get(key);
-            if (subname == name) {
+            if (subname.equals(name)) {
                 enableLoggerID(key);
                 ret = true;
                 break;

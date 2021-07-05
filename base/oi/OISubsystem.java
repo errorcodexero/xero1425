@@ -8,13 +8,10 @@ import org.xero1425.base.LoopType;
 import org.xero1425.base.Subsystem;
 import org.xero1425.base.actions.InvalidActionRequest;
 import org.xero1425.base.actions.SequenceAction;
-import org.xero1425.base.swervedrive.SwerveDriveSubsystem;
-import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsValue;
 
 /// \brief This class controls the various OI devices that are used to control the robot.
 /// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
@@ -32,7 +29,6 @@ public class OISubsystem extends Subsystem {
     private Gamepad gp_ ;
     private int gp_index_ ;
     private double last_time_ ;
-    private boolean use_new_gamepad_ ;
     private DriveBaseSubsystem db_ ;
     
     private final static String DriverGamepadHIDIndexName = "hw:driverstation:hid:driver";
@@ -44,15 +40,6 @@ public class OISubsystem extends Subsystem {
         devices_ = new ArrayList<HIDDevice>();
         gp_index_ = -1 ;
         last_time_ = 0.0 ;
-
-        use_new_gamepad_ = false ;
-        SettingsValue v = db.getRobot().getSettingsParser().getOrNull("oi:newdrive") ;
-        try {
-            if (v != null && v.isBoolean() && v.getBoolean())
-                use_new_gamepad_ = true;
-        } catch (BadParameterTypeException e) {
-        }
-
         addDriveBaseGamePad();
     }
 

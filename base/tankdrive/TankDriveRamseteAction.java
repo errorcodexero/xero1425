@@ -40,6 +40,10 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
                 sub.getRobot().getSettingsParser().get(sub.getName() + ":ramsete:zeta").getDouble()) ;
     }
 
+    public boolean reverse() {
+        return reverse_ ;
+    }
+
     @Override
     public void start() throws Exception {
         super.start() ;

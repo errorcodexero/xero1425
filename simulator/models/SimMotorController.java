@@ -7,6 +7,7 @@ import org.xero1425.simulator.engine.SimulationModel;
 import org.xero1425.base.motors.CTREMotorController;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.SparkMaxMotorController;
+import org.xero1425.base.motors.TalonFXMotorController;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.SettingsValue;
 
@@ -93,7 +94,12 @@ public class SimMotorController {
         } catch (BadParameterTypeException e) {
         }
 
-        if (t.equals("talonfx") || t.equals("talonsrx")) {
+        if (t.equals("talonfx"))
+        {
+            if (handle_ == -1)
+                handle_ = SimDeviceDataJNI.getSimDeviceHandle(TalonFXMotorController.SimDeviceName + "[" + index + "]") ;
+        } 
+        else if (t.equals("talonsrx")) {
             if (handle_ == -1)
                 handle_ = SimDeviceDataJNI.getSimDeviceHandle(CTREMotorController.SimDeviceName + "[" + index + "]") ;
         }
