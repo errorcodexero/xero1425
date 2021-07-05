@@ -20,6 +20,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     static public final int FR = 1 ;
     static public final int BL = 2 ;
     static public final int BR = 3 ;
+    static public final int LAST_MODULE = 3 ;
 
     static private String [] cname = { "fl", "fr", "bl", "br"} ;
     static private String [] hname = { "FrontLeft", "FrontRight", "BackLeft", "BackRight"} ;
@@ -125,5 +126,19 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
             throw new Exception("invalid swerve pair address") ;
        
         pairs_[which].setDrivePower(drive) ;
+    }
+
+    public void setTargets(double[] angles, double[] speeds) {
+        for(int i = 0 ; i < LAST_MODULE ; i++) {
+            pairs_[i].setTargetAngle(angles[i]);
+            pairs_[i].setTargetSpeed(speeds[i]) ;
+        }
+    }
+
+    public void setNoTargets() {
+        for(int i = 0 ; i < LAST_MODULE ; i++) {
+            pairs_[i].setNoAngle();
+            pairs_[i].setNoSpeed();
+        }
     }
 }
