@@ -8,19 +8,25 @@ import org.xero1425.misc.MessageType;
 import edu.wpi.first.hal.simulation.AnalogInDataJNI;
 
 public class SwerveDriveModuleModel {
+    SwerveDriveModel model_ ;
     private SimMotorController steer_ ;
     private SimMotorController drive_ ;
     private int encoder_input_ ;
     private double degrees_per_second_per_volt_ ;
+    private double kv_ ;
+    private double ticks_per_inch_ ;
     private double angle_ ;
     private double voltage_ ;
     private EncoderMapper mapper_ ;
+    private double position_ ;
 
     public SwerveDriveModuleModel(SwerveDriveModel model, String name) throws Exception {
         double rmax, rmin, emax, emin, rc, ec ;
         String motorname = name + "steer" ;
 
-        angle_ = 0 ;
+        model_ = model ;
+        angle_ = 0.0 ;
+        position_ = 0.0 ;
 
         steer_ = new SimMotorController(model, motorname) ;
         if (!steer_.createMotor())
@@ -62,6 +68,7 @@ public class SwerveDriveModuleModel {
             logger.add(" - missing parameter ").addQuoted("ticks_per_second_per_volt").endMessage();
             throw new Exception("missing degrees_per_second_per_volt property - check log file") ;
         }
+
 
 
         try {
@@ -124,15 +131,49 @@ public class SwerveDriveModuleModel {
             throw new Exception("missing rc property - check log file") ;
         }        
 
+        try {
+            kv_ = model.getProperty(name + "drive:" + "kv").getDouble();
+        } catch (BadParameterTypeException e) {
+            MessageLogger logger = model.getEngine().getMessageLogger() ;
+            logger.startMessage(MessageType.Error) ;
+            logger.add("cannot create model ").addQuoted(model.getModelName()).add(" instance ").addQuoted(model.getInstanceName()) ;
+            logger.add(" - missing parameter ").addQuoted("kv").endMessage();
+            throw new Exception("missing kv property - check log file") ;
+        }
+
+        try {
+            ticks_per_inch_ = model.getProperty(name + "drive:" + "ticks_per_inch").getDouble();
+        } catch (BadParameterTypeException e) {
+            MessageLogger logger = model.getEngine().getMessageLogger() ;
+            logger.startMessage(MessageType.Error) ;
+            logger.add("cannot create model ").addQuoted(model.getModelName()).add(" instance ").addQuoted(model.getInstanceName()) ;
+            logger.add(" - missing parameter ").addQuoted("ticks_per_inch").endMessage();
+            throw new Exception("missing kv property - check log file") ;
+        }
+
         mapper_ = new EncoderMapper(rmax, rmin, emax, emin) ;
         mapper_.calibrate(rc, ec);        
     }
 
     public void run(double dt) {
+
         double power = steer_.getPower() ;
         angle_ += degrees_per_second_per_volt_ * dt * power ;
         voltage_ = mapper_.toEncoder(angle_) ;
         AnalogInDataJNI.setVoltage(encoder_input_, voltage_) ;
+
+        MessageLogger logger = model_.getEngine().getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, model_.getLoggerID()) ;
+        logger.add("power", power) ;
+        logger.add("angle", angle_) ;
+        logger.add("voltage", voltage_) ;
+        logger.add("encoder", encoder_input_) ;
+        logger.endMessage();
+
+        power = drive_.getPower() ;
+        double speed = power * kv_ ;
+        position_ += speed * dt ;
+        drive_.setEncoder(position_ * ticks_per_inch_);
     }
 
     public double getSteerPower() {
@@ -141,5 +182,13 @@ public class SwerveDriveModuleModel {
 
     public double getDrivePower() {
         return drive_.getPower() ;
+    }
+
+    public double getAngle() {
+        return angle_ ;
+    }
+
+    public double getPosition() {
+        return position_ ;
     }
 }
