@@ -14,7 +14,7 @@ import org.xero1425.misc.SettingsParser;
 public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     private double width_ ;
     private double length_ ;
-    private SwervePair [] pairs_ ;
+    private SwerveModule [] pairs_ ;
 
     static public final int FL = 0 ;
     static public final int FR = 1 ;
@@ -37,10 +37,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         width_ = settings.get("swervedrive:width").getDouble() ;
         length_ = settings.get("swervedrive:length").getDouble() ;
 
-        pairs_  = new SwervePair[cname.length] ;
+        pairs_  = new SwerveModule[cname.length] ;
         for(int i = 0 ; i < cname.length ; i++) 
         {
-            pairs_[i] = new SwervePair(getRobot(), hname[i], config + ":"+ cname[i]) ;
+            pairs_[i] = new SwerveModule(getRobot(), this, hname[i], config + ":"+ cname[i]) ;
         }
     }
 
@@ -94,15 +94,28 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     public void computeMyState() {
         MessageLogger logger = getRobot().getMessageLogger() ;
-        logger.startMessage(MessageType.Debug, getLoggerID()) ;
 
+        for(int i = 0 ; i < pairs_.length ; i++)
+            pairs_[i].computeMyState() ;
+
+        logger.startMessage(MessageType.Debug, getLoggerID()) ;
         logger.add("SwerveDrivePower:") ;
-        for(int i = 0 ; i < cname.length ; i++) 
+        for(int i = 0 ; i < cname.length ; i++)
         {
             logger.add(cname[i] + "steer", pairs_[FL].steerPower()) ;
             logger.add(cname[i] + "drive", pairs_[FL].drivePower()) ;
         }
         logger.endMessage();
+    }
+
+    @Override
+    public void run() throws Exception {
+        super.run() ;
+
+        double dt = getRobot().getDeltaTime() ;
+        for(int i = 0 ; i < pairs_.length ; i++)
+            pairs_[i].run(dt) ;
+
     }
 
     public void setPower(int which, double steer, double drive) throws Exception {
@@ -129,14 +142,14 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     }
 
     public void setTargets(double[] angles, double[] speeds) {
-        for(int i = 0 ; i < LAST_MODULE ; i++) {
+        for(int i = 0 ; i <= LAST_MODULE ; i++) {
             pairs_[i].setTargetAngle(angles[i]);
             pairs_[i].setTargetSpeed(speeds[i]) ;
         }
     }
 
     public void setNoTargets() {
-        for(int i = 0 ; i < LAST_MODULE ; i++) {
+        for(int i = 0 ; i <= LAST_MODULE ; i++) {
             pairs_[i].setNoAngle();
             pairs_[i].setNoSpeed();
         }

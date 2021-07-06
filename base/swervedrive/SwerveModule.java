@@ -7,10 +7,15 @@ import org.xero1425.base.motors.MotorRequestFailedException;
 import org.xero1425.base.motorsubsystem.EncoderConfigException;
 import org.xero1425.base.motorsubsystem.XeroEncoder;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.PIDCtrl;
 
-public class SwervePair {
+public class SwerveModule {
+    private XeroRobot robot_ ;
+    private SwerveDriveSubsystem subsystem_ ;
+    private String name_ ;
     private MotorController steer_;
     private MotorController drive_;
     private XeroEncoder encoder_;
@@ -23,8 +28,13 @@ public class SwervePair {
     private PIDCtrl angle_pid_ ;
     private PIDCtrl speed_pid_ ;
 
-    public SwervePair(XeroRobot robot, String name, String config) throws BadParameterTypeException,
+    public SwerveModule(XeroRobot robot, SwerveDriveSubsystem subsystem, String name, String config) throws BadParameterTypeException,
             MissingParameterException, EncoderConfigException, BadMotorRequestException {
+
+        robot_ = robot ;
+        subsystem_ = subsystem ;
+        name_ = name ;
+
         steer_ = robot.getMotorFactory().createMotor(name + "-steer", config + ":steer");
         drive_ = robot.getMotorFactory().createMotor(name + "-drive", config + ":drive");
         encoder_ = new XeroEncoder(robot, config + ":encoder", true, null) ;
@@ -42,17 +52,35 @@ public class SwervePair {
     }
 
     public void run(double dt) throws BadMotorRequestException, MotorRequestFailedException {
+
+        MessageLogger logger = robot_.getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, subsystem_.getLoggerID()) ;
+        logger.add(name_) ;
+                
         if (has_angle_target_)
         {
             double out = angle_pid_.getOutput(target_angle_, angle(), dt) ;
+
+            logger.add(" AnglePID") ;
+            logger.add("target", target_angle_) ;
+            logger.add("angle", angle()) ;
+            logger.add("out", out) ;
             steer_.set(out) ;
         }
 
         if (has_speed_target_)
         {
             double out = speed_pid_.getOutput(target_speed_, speed(), dt) ;
+            logger.add(" SpeedPID") ;
+            logger.add("target", target_speed_) ;
+            logger.add("speed", speed()) ;
+            logger.add("out", out) ;
             drive_.set(out) ;
         }
+        logger.endMessage();
+    }
+
+    public void computeMyState() {
     }
 
     public double speed() {
