@@ -3,14 +3,22 @@ package org.xero1425.base.swervedrive;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
-    Translation2d dir_ ;
-    double rot_ ;
+    private Translation2d dir_ ;
+    private double rot_ ;
+    private double circum_ ;
 
     public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double dirx, double diry, double rot) {
         super(subsys) ;
 
         dir_ = new Translation2d(dirx, diry) ;
         rot_ = rot ;
+
+        //
+        // We approximate the circumference of the robot by averaging the length and width and applying
+        // the CIRCUM = 2 * PI * R.  Calculating the circumference of an ellipse is more computational intensive
+        // and really does not get us that much.
+        //
+        circum_ = (subsys.getLength() + subsys.getWidth()) * Math.PI ;
     }
 
     public void updateTargets(double dirx, double diry, double rot) {
