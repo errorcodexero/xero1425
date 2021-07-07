@@ -155,10 +155,10 @@ public class TankDriveGamepad extends Gamepad {
                 }
                 else {
                     double boost = ds.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) ;
-                    boolean slow = isLBackButtonPrssed() ;
+                    boolean slow = isLBackButtonPressed() ;
 
-                    double power = scalePower(-ly, boost, slow) ;
-                    double spin = (Math.abs(rx) > 0.01) ? scaleTurn(rx, boost, slow) : 0.0 ;
+                    double power = scale(-ly, boost, slow, default_power_, max_power_, slow_factor_) ;
+                    double spin = (Math.abs(rx) > 0.01) ? scale(rx, boost, slow, turn_power_, turn_max_power_, slow_factor_) : 0.0 ;
 
                     left = power + spin ;
                     right = power - spin ;
@@ -178,17 +178,5 @@ public class TankDriveGamepad extends Gamepad {
             // This should never happen
             //
         }
-    }
-
-    private double scalePower(double axis, double boost, boolean slow) {
-        double base = default_power_ + (max_power_ - default_power_) * boost ;
-        double slowdown = slow ? default_power_ * slow_factor_ : 0.0 ;
-        return axis * (base - slowdown) ;
-    }
-
-    private double scaleTurn(double axis, double boost, boolean slow) {
-        double base = turn_power_ + (turn_max_power_ - turn_power_) * boost ;
-        double slowdown = slow ? turn_power_ * slow_factor_ : 0.0 ;
-        return axis * (base - slowdown) ;
     }
 }

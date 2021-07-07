@@ -88,7 +88,7 @@ public abstract class Gamepad extends HIDDevice
         return ds.getStickButton(getIndex(), ButtonNumber.RB.value) ;        
     }
 
-    public boolean isLBackButtonPrssed() {
+    public boolean isLBackButtonPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.LB.value) ;        
     }
@@ -97,6 +97,12 @@ public abstract class Gamepad extends HIDDevice
         DriverStation ds = DriverStation.getInstance() ;
         int povval = ds.getStickPOV(getIndex(), 0) ;
         return POVAngle.fromInt(povval) ;
+    }
+
+    protected double scale(double axis, double boost, boolean slow, double nominal, double maxpower, double slowfactor) {
+        double base = nominal + (maxpower - nominal) * boost ;
+        double slowdown = slow ? (nominal * slowfactor) : 0.0 ;
+        return axis * (base - slowdown) ;
     }
 
     protected enum AxisNumber {
