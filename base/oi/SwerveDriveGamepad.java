@@ -7,6 +7,7 @@ import org.xero1425.base.swervedrive.SwerveDriveDirectionRotateAction;
 import org.xero1425.base.swervedrive.SwerveDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
+import org.xero1425.misc.SettingsParser;
 
 import edu.wpi.first.wpilibj.DriverStation;
 
@@ -22,7 +23,7 @@ public class SwerveDriveGamepad extends Gamepad {
     public SwerveDriveGamepad(OISubsystem oi, int index, DriveBaseSubsystem drive_) throws Exception {
         super(oi, "Xero1425GamePad", index);
 
-        slowby_ = 0.5 ;
+
 
         DriverStation ds = DriverStation.getInstance();
         if (ds.getStickPOVCount(getIndex()) == 0) {
@@ -42,6 +43,14 @@ public class SwerveDriveGamepad extends Gamepad {
 
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
+        SettingsParser settings = getSubsystem().getRobot().getSettingsParser();
+        
+        slowby_ = 0.5 ;
+        angle_nominal_ = settings.get("driver:angle:nominal").getDouble();
+        angle_maximum_ = settings.get("driver:angle:maximum").getDouble();
+        pos_nominal_ = settings.get("driver:position:nominal").getDouble();
+        pos_maximum_ = settings.get("driver:position:maximum").getDouble();        
+
         action_ = new SwerveDriveDirectionRotateAction(db_, 0.0, 0.0, 0.0) ;
     }
 

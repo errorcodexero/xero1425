@@ -22,8 +22,11 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     }
 
     public void updateTargets(double dirx, double diry, double rot) {
-        dir_ = new Translation2d(dirx, diry) ;        
-        rot_ = rot ;
+        if (dirx != dir_.getX() || diry != dir_.getY() || rot != rot_)
+        {
+            dir_ = new Translation2d(dirx, diry) ;        
+            rot_ = rot ;
+        }
     }
 
     @Override
