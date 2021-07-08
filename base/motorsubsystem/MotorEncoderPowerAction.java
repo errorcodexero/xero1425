@@ -62,9 +62,6 @@ public class MotorEncoderPowerAction extends MotorPowerAction
             getSubsystem().endPlot(plot_id_) ;
 
         super.run() ;
-
-        // int cnt = getSubsystem().getRobot().getLoopCount() ;
-        // System.out.println("Data: " + cnt + " " + data[0] + " " + data[1] + " " + data[5]) ;
     }
 
     @Override

@@ -31,6 +31,7 @@ public class SwerveModule {
     private PIDCtrl speed_pid_ ;
     private Speedometer linear_ ;
     private double inches_per_tick_ ;
+    private int logger_id_ ;
 
     private final String LinearSamplesName = "swervedrive:linear:samples" ;
     private final String InchesPerTickName = "swervedrive:inches_per_tick" ;
@@ -39,6 +40,7 @@ public class SwerveModule {
             MissingParameterException, EncoderConfigException, BadMotorRequestException {
 
         SettingsParser settings = subsystem.getRobot().getSettingsParser() ;
+        MessageLogger logger = subsystem.getRobot().getMessageLogger() ;
 
         inches_per_tick_ = settings.get(InchesPerTickName).getDouble() ;
 
@@ -66,12 +68,14 @@ public class SwerveModule {
             samples = settings.get(LinearSamplesName).getInteger() ;
             
         linear_ = new Speedometer("linear", samples, false) ;
+
+        logger_id_ = logger.registerSubsystem("swerve_module") ;
     }
 
     public void run(double dt) throws BadMotorRequestException, MotorRequestFailedException {
 
         MessageLogger logger = robot_.getMessageLogger() ;
-        logger.startMessage(MessageType.Debug, subsystem_.getLoggerID()) ;
+        logger.startMessage(MessageType.Debug, logger_id_) ;
         logger.add(name_) ;
 
                 

@@ -10,10 +10,7 @@ public class SwerveStopAction extends SwerveDriveAction {
     public void start() throws Exception {
         super.start() ;
 
-        for(int i = 0 ; i <= SwerveDriveSubsystem.LAST_MODULE ; i++) {
-            getSubsystem().setPower(i, 0.0, 0.0);
-        }
-
+        getSubsystem().stop() ;
         setDone() ;
     }
 

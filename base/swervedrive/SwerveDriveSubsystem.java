@@ -10,7 +10,6 @@ import org.xero1425.base.oi.Gamepad;
 import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.base.oi.SwerveDriveGamepad;
 import org.xero1425.misc.MessageLogger;
-import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsParser;
 
 public class SwerveDriveSubsystem extends DriveBaseSubsystem {
@@ -22,7 +21,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     static public final int FR = 1;
     static public final int BL = 2;
     static public final int BR = 3;
-    static public final int LAST_MODULE = 3;
+    static private final int LAST_MODULE = 3;
 
     static private String[] cname = { "fl", "fr", "bl", "br" };
     static private String[] hname = { "FrontLeft", "FrontRight", "BackLeft", "BackRight" };
@@ -43,6 +42,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         for (int i = 0; i < cname.length; i++) {
             pairs_[i] = new SwerveModule(getRobot(), this, hname[i], config + ":" + cname[i]);
         }
+    }
+
+    public int getModuleCount() {
+        return pairs_.length ;
     }
 
     public double getWidth() {
@@ -126,14 +129,6 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
         for (int i = 0; i < pairs_.length; i++)
             pairs_[i].computeMyState(getRobot().getDeltaTime());
-
-        logger.startMessage(MessageType.Debug, getLoggerID());
-        logger.add("SwerveDrivePower:");
-        for (int i = 0; i < cname.length; i++) {
-            logger.add(cname[i] + "steer", pairs_[FL].steerPower());
-            logger.add(cname[i] + "drive", pairs_[FL].drivePower());
-        }
-        logger.endMessage();
 
         putDashboard("flangle", DisplayType.Always, pairs_[FL].angle());
         putDashboard("frangle", DisplayType.Always, pairs_[FR].angle());

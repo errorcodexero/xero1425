@@ -48,7 +48,7 @@ public class SwerveAngleVelocityAction extends SwerveDriveAction {
 
     public String toString(int indent) {
         String ret = prefix(indent) + "SwerveAngleVelocityAction: " ;
-        for(int which = 0 ; which <= SwerveDriveSubsystem.LAST_MODULE  ; which++) 
+        for(int which = 0 ; which < getSubsystem().getModuleCount()  ; which++) 
         {
             if (which != 0)
                 ret += " " ;

@@ -65,7 +65,7 @@ public class SwerveDriveGamepad extends Gamepad {
             return ;
 
         DriverStation ds = DriverStation.getInstance() ;
-        double ly = ds.getStickAxis(getIndex(), AxisNumber.LEFTY.value) ;
+        double ly = -ds.getStickAxis(getIndex(), AxisNumber.LEFTY.value) ;
         double lx = ds.getStickAxis(getIndex(), AxisNumber.LEFTX.value) ;
         double rx = ds.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
 

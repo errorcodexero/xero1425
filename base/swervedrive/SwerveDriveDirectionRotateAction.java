@@ -1,5 +1,8 @@
 package org.xero1425.base.swervedrive;
 
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
+
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
@@ -7,10 +10,10 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private double rot_ ;
     private double circum_ ;
 
-    public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double dirx, double diry, double rot) {
+    public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot) {
         super(subsys) ;
 
-        dir_ = new Translation2d(dirx, diry) ;
+        dir_ = new Translation2d(x, y) ;
         rot_ = rot ;
 
         //
@@ -36,6 +39,9 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
 
     @Override
     public void run() {
+        for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
+
+        }
     }
 
     @Override
