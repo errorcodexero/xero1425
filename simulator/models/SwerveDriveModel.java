@@ -6,21 +6,13 @@ import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsValue;
 import org.xero1425.simulator.engine.SimulationEngine;
 import org.xero1425.simulator.engine.SimulationModel;
-import org.xero1425.simulator.models.SwerveDriveModuleModel;
-
-import edu.wpi.first.wpilibj.estimator.SwerveDrivePoseEstimator;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
-import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 
 public class SwerveDriveModel extends SimulationModel {
     private SwerveDriveModuleModel fl_;
     private SwerveDriveModuleModel fr_;
     private SwerveDriveModuleModel bl_;
     private SwerveDriveModuleModel br_;
-    private NavXModel navx_ ;
-    private SwerveDrivePoseEstimator estimator_;
+    // private NavXModel navx_ ;
 
     public SwerveDriveModel(SimulationEngine engine, String model, String inst) {
         super(engine, model, inst);
@@ -146,13 +138,13 @@ public class SwerveDriveModel extends SimulationModel {
                 return false ;
             }
 
-            navx_ = (NavXModel)model ;
+            // navx_ = (NavXModel)model ;
         }
 
         return true ;
     }
 
-    private double inchesToMeters(double in) {
-        return in * 0.0254 ;
-    }
+    // private double inchesToMeters(double in) {
+    //     return in * 0.0254 ;
+    // }
 }

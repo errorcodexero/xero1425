@@ -11,6 +11,8 @@ import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.PIDCtrl;
+import org.xero1425.misc.SettingsParser;
+import org.xero1425.misc.Speedometer;
 
 public class SwerveModule {
     private XeroRobot robot_ ;
@@ -27,9 +29,18 @@ public class SwerveModule {
     private double target_speed_ ;
     private PIDCtrl angle_pid_ ;
     private PIDCtrl speed_pid_ ;
+    private Speedometer linear_ ;
+    private double inches_per_tick_ ;
+
+    private final String LinearSamplesName = "swervedrive:linear:samples" ;
+    private final String InchesPerTickName = "swervedrive:inches_per_tick" ;
 
     public SwerveModule(XeroRobot robot, SwerveDriveSubsystem subsystem, String name, String config) throws BadParameterTypeException,
             MissingParameterException, EncoderConfigException, BadMotorRequestException {
+
+        SettingsParser settings = subsystem.getRobot().getSettingsParser() ;
+
+        inches_per_tick_ = settings.get(InchesPerTickName).getDouble() ;
 
         robot_ = robot ;
         subsystem_ = subsystem ;
@@ -49,6 +60,12 @@ public class SwerveModule {
 
         angle_pid_ = new PIDCtrl(robot.getSettingsParser(), config + ":steer:pid", true) ;
         speed_pid_ = new PIDCtrl(robot.getSettingsParser(), config + ":speed:pid", false) ;
+
+        int samples =  2 ;
+        if (settings.isDefined(LinearSamplesName) && settings.get(LinearSamplesName).isInteger())
+            samples = settings.get(LinearSamplesName).getInteger() ;
+            
+        linear_ = new Speedometer("linear", samples, false) ;
     }
 
     public void run(double dt) throws BadMotorRequestException, MotorRequestFailedException {
@@ -56,6 +73,7 @@ public class SwerveModule {
         MessageLogger logger = robot_.getMessageLogger() ;
         logger.startMessage(MessageType.Debug, subsystem_.getLoggerID()) ;
         logger.add(name_) ;
+
                 
         if (has_angle_target_)
         {
@@ -70,21 +88,31 @@ public class SwerveModule {
 
         if (has_speed_target_)
         {
-            double out = speed_pid_.getOutput(target_speed_, speed(), dt) ;
+            double out = speed_pid_.getOutput(target_speed_, getVelocity(), dt) ;
             logger.add(" SpeedPID") ;
             logger.add("target", target_speed_) ;
-            logger.add("speed", speed()) ;
+            logger.add("speed", getVelocity()) ;
             logger.add("out", out) ;
             drive_.set(out) ;
         }
         logger.endMessage();
     }
 
-    public void computeMyState() {
+    public void computeMyState(double dt) throws BadMotorRequestException {
+        double dist = drive_.getPosition() * inches_per_tick_ ;
+        linear_.update(dt, dist);
     }
 
-    public double speed() {
-        return 0.0 ;
+    public double getAcceleration() {
+        return linear_.getAcceleration() ;
+    }
+
+    public double getVelocity() {
+        return linear_.getVelocity() ;
+    }
+
+    public double getDistance() {
+        return linear_.getDistance() ;
     }
 
     public double angle() {
@@ -128,7 +156,7 @@ public class SwerveModule {
         has_angle_target_ = false ;
     }
 
-    public void setTargetSpeed(double speed) {
+    public void setTargetVelocity(double speed) {
         has_speed_target_ = true ;
         target_speed_ = speed ;
     }

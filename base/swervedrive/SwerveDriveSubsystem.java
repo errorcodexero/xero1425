@@ -53,6 +53,36 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         return length_;
     }
 
+    public double getAcceleration() {
+        double total = 0.0 ;
+
+        for(int i = 0 ; i <= LAST_MODULE ; i++) {
+            total += pairs_[i].getAcceleration() ;
+        }
+
+        return total / pairs_.length ;
+    }
+
+    public double getVelocity() {
+        double total = 0.0 ;
+
+        for(int i = 0 ; i <= LAST_MODULE ; i++) {
+            total += pairs_[i].getVelocity() ;
+        }
+
+        return total / pairs_.length ;
+    }
+
+    public double getDistance() {
+        double total = 0.0 ;
+
+        for(int i = 0 ; i <= LAST_MODULE ; i++) {
+            total += pairs_[i].getDistance() ;
+        }
+
+        return total / pairs_.length ;
+    }
+
     public Gamepad createGamePad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception {
         return new SwerveDriveGamepad(oi, index, drive);
     }
@@ -91,11 +121,11 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         return ret;
     }
 
-    public void computeMyState() {
+    public void computeMyState() throws BadMotorRequestException {
         MessageLogger logger = getRobot().getMessageLogger();
 
         for (int i = 0; i < pairs_.length; i++)
-            pairs_[i].computeMyState();
+            pairs_[i].computeMyState(getRobot().getDeltaTime());
 
         logger.startMessage(MessageType.Debug, getLoggerID());
         logger.add("SwerveDrivePower:");
@@ -104,6 +134,11 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
             logger.add(cname[i] + "drive", pairs_[FL].drivePower());
         }
         logger.endMessage();
+
+        putDashboard("flangle", DisplayType.Always, pairs_[FL].angle());
+        putDashboard("frangle", DisplayType.Always, pairs_[FR].angle());
+        putDashboard("blangle", DisplayType.Always, pairs_[BL].angle());
+        putDashboard("brangle", DisplayType.Always, pairs_[BR].angle());
     }
 
     @Override
@@ -113,12 +148,11 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         double dt = getRobot().getDeltaTime();
         for (int i = 0; i < pairs_.length; i++)
             pairs_[i].run(dt);
+
     }
 
     public void stop() throws BadMotorRequestException, MotorRequestFailedException {
         for(int i = 0 ; i <= LAST_MODULE ; i++) {
-            pairs_[i].setNoAngle();
-            pairs_[i].setNoSpeed();
             pairs_[i].set(0.0, 0.0) ;
         }
     }
@@ -149,8 +183,14 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     public void setTargets(double[] angles, double[] speeds) {
         for(int i = 0 ; i <= LAST_MODULE ; i++) {
             pairs_[i].setTargetAngle(angles[i]);
-            pairs_[i].setTargetSpeed(speeds[i]) ;
+            pairs_[i].setTargetVelocity(speeds[i]) ;
         }
+    }
+
+    public void setAngle(double angle) {
+        for(int i = 0 ; i <= LAST_MODULE ; i++) {
+            pairs_[i].setTargetAngle(angle);
+        }        
     }
 
     public void setNoTargets() {
