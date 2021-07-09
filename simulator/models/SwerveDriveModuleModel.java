@@ -69,8 +69,6 @@ public class SwerveDriveModuleModel {
             throw new Exception("missing degrees_per_second_per_volt property - check log file") ;
         }
 
-
-
         try {
             rmax = model.getProperty(name + "steer:" + "rmax").getDouble();
         } catch (BadParameterTypeException e) {
@@ -162,6 +160,11 @@ public class SwerveDriveModuleModel {
         voltage_ = mapper_.toEncoder(angle_) ;
         AnalogInDataJNI.setVoltage(encoder_input_, voltage_) ;
 
+        power = drive_.getPower() ;
+        double speed = power / kv_ ;
+        position_ += speed * dt ;
+        drive_.setEncoder(position_ * ticks_per_inch_);
+
         MessageLogger logger = model_.getEngine().getMessageLogger() ;
         logger.startMessage(MessageType.Debug, model_.getLoggerID()) ;
         logger.add("power", power) ;
@@ -169,11 +172,6 @@ public class SwerveDriveModuleModel {
         logger.add("voltage", voltage_) ;
         logger.add("encoder", encoder_input_) ;
         logger.endMessage();
-
-        power = drive_.getPower() ;
-        double speed = power * kv_ ;
-        position_ += speed * dt ;
-        drive_.setEncoder(position_ * ticks_per_inch_);
     }
 
     public double getSteerPower() {

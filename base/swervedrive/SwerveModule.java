@@ -30,7 +30,7 @@ public class SwerveModule {
     private PIDCtrl speed_pid_ ;
     private Speedometer linear_ ;
     private double inches_per_tick_ ;
-    private int logger_id_ ;
+    static private int logger_id_ = -1 ;
 
     private final String LinearSamplesName = "swervedrive:linear:samples" ;
     private final String InchesPerTickName = "swervedrive:inches_per_tick" ;
@@ -67,7 +67,8 @@ public class SwerveModule {
             
         linear_ = new Speedometer("linear", samples, false) ;
 
-        logger_id_ = logger.registerSubsystem("swerve_module") ;
+        if (logger_id_ == -1)
+            logger_id_ = logger.registerSubsystem("swerve_module") ;
     }
 
     public void run(double dt) throws BadMotorRequestException, MotorRequestFailedException {

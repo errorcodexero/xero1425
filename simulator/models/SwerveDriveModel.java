@@ -4,27 +4,51 @@ import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsValue;
+import org.xero1425.misc.XeroMath;
 import org.xero1425.simulator.engine.SimulationEngine;
 import org.xero1425.simulator.engine.SimulationModel;
 
 public class SwerveDriveModel extends SimulationModel {
-    private SwerveDriveModuleModel fl_;
-    private SwerveDriveModuleModel fr_;
-    private SwerveDriveModuleModel bl_;
-    private SwerveDriveModuleModel br_;
-    // private NavXModel navx_ ;
+    // private SwerveDriveModuleModel fl_;
+    // private SwerveDriveModuleModel fr_;
+    // private SwerveDriveModuleModel bl_;
+    // private SwerveDriveModuleModel br_;
+    private SwerveDriveModuleModel [] models_ ;
+    private NavXModel navx_ ;
+    private double [] previous_ ;
+
+    private double xpos_ ;
+    private double ypos_ ;
+    private double angle_ ;
+
+    //
+    // The name of the event that contains the x position of the robot.  This is also the name
+    // of the value that is published in the network table for the X position of the robot.
+    //
+    private final static String XPosName = "xpos" ;
+
+    //
+    // The name of the event that contains the y position of the robot.   This is also the name
+    // of the value that is published in the network table for the Y position of the robot.
+    //
+    private final static String YPosName = "ypos" ;
+
+    //
+    // The name of the event that contains the angle of the robot.  This is also the name
+    // of the value that is published in the network table for the angle of the robot.
+    //
+    private final static String AngleName = "angle" ;
 
     public SwerveDriveModel(SimulationEngine engine, String model, String inst) {
         super(engine, model, inst);
 
-        // Rotation2d gyroAngle = Rotation2d.fromDegrees(0.0) ;
-        // Pose2d initialPoseMeters = new Pose2d(new Translation2d(0.0, 0.0), Rotation2d.fromDegrees(0.0)) ;
+        xpos_ = 0.0 ;
+        ypos_ = 0.0 ;
+        angle_ = 0.0 ;
 
-
-        // Translation2d fl = new Translation2d() ;
-        // SwerveDriveKinematics km = new SwerveDriveKinematics() ;
-
-        // estimator_ = new SwerveDrivePoseEstimator(gyroAngle, initialPoseMeters, kinematics, stateStdDevs, localMeasurementStdDevs, visionMeasurementStdDevs) ;
+        previous_ = new double[4] ;
+        for(int i = 0 ; i < previous_.length ; i++)
+            previous_[i] = 0.0 ;
     }
 
     /// \brief called once at the end of the simulator loop
@@ -51,22 +75,31 @@ public class SwerveDriveModel extends SimulationModel {
     /// \param dt the amount of time that has passed since the last simulator loop
     @Override
     public void run(double dt) {
-        fl_.run(dt) ;
-        fr_.run(dt) ;
-        bl_.run(dt) ;
-        br_.run(dt) ;
+        for(int i = 0 ; i < models_.length ; i++)
+            models_[i].run(dt) ;
+
+        double [] angles = new double[4] ;
+        double [] deltapos = new double[4] ;        
+
+        for(int i = 0 ; i < 4 ; i++) {
+            angles[i] = models_[i].getAngle() ;
+            deltapos[i] = models_[i].getPosition() - previous_[i]  ;
+            previous_[i] = models_[i].getPosition() ;
+        }
+
+        calculatePosition(angles, deltapos) ;
 
         MessageLogger logger = getEngine().getMessageLogger() ;
         logger.startMessage(MessageType.Debug, getLoggerID()) ;
         logger.add("SwerveDriveMotorPower: ") ;
-        logger.add("flsteer", fl_.getSteerPower()) ;
-        logger.add("fldrive", fl_.getDrivePower()) ;
-        logger.add("frsteer", fr_.getSteerPower()) ;
-        logger.add("frdrive", fr_.getDrivePower()) ;
-        logger.add("blsteer", bl_.getSteerPower()) ;
-        logger.add("bldrive", bl_.getDrivePower()) ;
-        logger.add("brsteer", br_.getSteerPower()) ;
-        logger.add("brdrive", br_.getDrivePower()) ;
+        logger.add("flsteer", models_[0].getSteerPower()) ;
+        logger.add("fldrive", models_[0].getDrivePower()) ;
+        logger.add("frsteer", models_[1].getSteerPower()) ;
+        logger.add("frdrive", models_[1].getDrivePower()) ;
+        logger.add("blsteer", models_[2].getSteerPower()) ;
+        logger.add("bldrive", models_[2].getDrivePower()) ;
+        logger.add("brsteer", models_[3].getSteerPower()) ;
+        logger.add("brdrive", models_[3].getDrivePower()) ;
         logger.endMessage();
     }
 
@@ -79,16 +112,64 @@ public class SwerveDriveModel extends SimulationModel {
     /// \param name the name of the event
     /// \param value the value of the event
     public boolean processEvent(String name, SettingsValue value) {
+        if (name.equals(XPosName)) {
+            if (!value.isDouble()) {
+                MessageLogger logger = getEngine().getMessageLogger() ;
+                logger.startMessage(MessageType.Error) ;
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" event name ").addQuoted(name);
+                logger.add(" value is not a double").endMessage();
+                return true ;
+            }
+
+            try {
+                xpos_ = value.getDouble();
+            } catch (BadParameterTypeException e) {
+            }
+        }
+        else if (name.equals(YPosName)) {
+            if (!value.isDouble()) {
+                MessageLogger logger = getEngine().getMessageLogger() ;
+                logger.startMessage(MessageType.Error) ;
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" event name ").addQuoted(name);
+                logger.add(" value is not a double").endMessage();
+                return true ;
+            }
+
+            try {
+                ypos_ = value.getDouble();
+            } catch (BadParameterTypeException e) {
+            }
+        }  
+        else if (name.equals(AngleName)) {
+            if (!value.isDouble()) {
+                MessageLogger logger = getEngine().getMessageLogger() ;
+                logger.startMessage(MessageType.Error) ;
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" event name ").addQuoted(name);
+                logger.add(" value is not a double").endMessage();
+                return true ;
+            }
+
+            try {
+                angle_ = XeroMath.deg2rad(value.getDouble()) ;
+            } catch (BadParameterTypeException e) {
+            }
+        }                    
         return true ;
     }    
 
     private boolean attachHardware() {
 
         try {
-            fl_ = new SwerveDriveModuleModel(this, "fl") ;
-            fr_ = new SwerveDriveModuleModel(this, "fr") ;
-            bl_ = new SwerveDriveModuleModel(this, "bl") ;
-            br_ = new SwerveDriveModuleModel(this, "br") ;
+            models_[0] = new SwerveDriveModuleModel(this, "fl") ;
+            models_[1] = new SwerveDriveModuleModel(this, "fr") ;
+            models_[2] = new SwerveDriveModuleModel(this, "bl") ;
+            models_[3] = new SwerveDriveModuleModel(this, "br") ;
         }
         catch(Exception ex) {
             return false ;
@@ -138,13 +219,13 @@ public class SwerveDriveModel extends SimulationModel {
                 return false ;
             }
 
-            // navx_ = (NavXModel)model ;
+            navx_ = (NavXModel)model ;
         }
 
         return true ;
     }
 
-    // private double inchesToMeters(double in) {
-    //     return in * 0.0254 ;
-    // }
+    private void calculatePosition(double [] angles, double [] deltapos) {
+        
+    }
 }
