@@ -1,8 +1,5 @@
 package org.xero1425.base.swervedrive;
 
-import org.xero1425.misc.MessageLogger;
-import org.xero1425.misc.MessageType;
-
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
@@ -49,9 +46,10 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
 
     @Override
     public void run() {
+        Translation2d dirrot = rotateVector(dir_, -getSubsystem().getAngle()) ;
         for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
             Translation2d rotvec = createRotVector(i, rot_);
-            Translation2d resvec = addVectors(dir_, rotvec) ;
+            Translation2d resvec = addVectors(dirrot, rotvec) ;
             angles_[i] = Math.atan2(resvec.getY(), resvec.getX()) ;
             speeds_[i] = resvec.getNorm() ;
         }
@@ -72,10 +70,15 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
 
     public String toString(int indent) {
         String ret = prefix(indent) + "SwerveDriveDirectionRotateAction:" ;
-        ret += " dx" + Double.toString(dir_.getX()) ;
-        ret += " dy" + Double.toString(dir_.getY()) ;
-        ret += " rot" + Double.toString(rot_) ;
+        ret += " dx " + Double.toString(dir_.getX()) ;
+        ret += " dy " + Double.toString(dir_.getY()) ;
+        ret += " rot " + Double.toString(rot_) ;
         return ret ;
+    }
+
+    private Translation2d rotateVector(Translation2d vec, double angle) {
+        double rads = angle / 180.0 * Math.PI ;
+        return new Translation2d(vec.getX() * Math.cos(rads) - vec.getY() * Math.sin(rads), vec.getY() * Math.cos(rads) + vec.getX() * Math.sin(rads)) ;
     }
 
     private Translation2d createRotVector(int which, double rot) {

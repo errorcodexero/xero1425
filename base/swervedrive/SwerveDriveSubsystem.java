@@ -9,13 +9,14 @@ import org.xero1425.base.motors.MotorRequestFailedException;
 import org.xero1425.base.oi.Gamepad;
 import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.base.oi.SwerveDriveGamepad;
-import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.SettingsParser;
+import org.xero1425.misc.Speedometer;
 
 public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     private double width_;
     private double length_;
     private SwerveModule[] pairs_;
+    private Speedometer angular_;
 
     static public final int FL = 0;
     static public final int FR = 1;
@@ -23,8 +24,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     static public final int BR = 3;
     static private final int LAST_MODULE = 3;
 
-    static private String[] cname = { "fl", "fr", "bl", "br" };
-    static private String[] hname = { "FrontLeft", "FrontRight", "BackLeft", "BackRight" };
+    static private final String AngularSamplesName = "swervedrive:angularsamples";
+
+    static private final String[] cname = { "fl", "fr", "bl", "br" };
+    static private final String[] hname = { "FrontLeft", "FrontRight", "BackLeft", "BackRight" };
 
     public SwerveDriveSubsystem(Subsystem parent, String name, String config) throws Exception {
         super(parent, name);
@@ -42,6 +45,14 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         for (int i = 0; i < cname.length; i++) {
             pairs_[i] = new SwerveModule(getRobot(), this, hname[i], config + ":" + cname[i]);
         }
+
+        int angularsamples = 2 ;
+
+        if (settings.isDefined(AngularSamplesName) && settings.get(AngularSamplesName).isInteger()) {
+            angularsamples = settings.get(AngularSamplesName).getInteger();
+        }
+
+        angular_ = new Speedometer("angles", angularsamples, true);
     }
 
     public int getModuleCount() {
@@ -54,6 +65,12 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     public double getLength() {
         return length_;
+    }
+
+    /// \brief returns the current angle in degrees of the robot
+    /// \returns the current angle of the robot
+    public double getAngle() {
+        return angular_.getDistance() ;
     }
 
     public double getAcceleration() {
@@ -125,10 +142,13 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     }
 
     public void computeMyState() throws BadMotorRequestException {
-        MessageLogger logger = getRobot().getMessageLogger();
-
         for (int i = 0; i < pairs_.length; i++)
             pairs_[i].computeMyState(getRobot().getDeltaTime());
+
+        if (gyro() != null) {
+            double angle = gyro().getYaw();
+            angular_.update(getRobot().getDeltaTime(), angle);
+        }
 
         putDashboard("flangle", DisplayType.Always, pairs_[FL].angle());
         putDashboard("frangle", DisplayType.Always, pairs_[FR].angle());

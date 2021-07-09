@@ -16,7 +16,6 @@ import org.xero1425.misc.Speedometer;
 
 public class SwerveModule {
     private XeroRobot robot_ ;
-    private SwerveDriveSubsystem subsystem_ ;
     private String name_ ;
     private MotorController steer_;
     private MotorController drive_;
@@ -45,7 +44,6 @@ public class SwerveModule {
         inches_per_tick_ = settings.get(InchesPerTickName).getDouble() ;
 
         robot_ = robot ;
-        subsystem_ = subsystem ;
         name_ = name ;
 
         steer_ = robot.getMotorFactory().createMotor(name + "-steer", config + ":steer");
