@@ -29,6 +29,7 @@ public class SwerveModule {
     private PIDCtrl angle_pid_ ;
     private PIDCtrl speed_pid_ ;
     private Speedometer linear_ ;
+    private double ticks_ ;
     private double inches_per_tick_ ;
     static private int logger_id_ = -1 ;
 
@@ -80,30 +81,33 @@ public class SwerveModule {
                 
         if (has_angle_target_)
         {
-            double out = angle_pid_.getOutput(target_angle_, angle(), dt) ;
+            double out = angle_pid_.getOutput(target_angle_, getAngle(), dt) ;
 
-            logger.add(" AnglePID") ;
+            logger.add(" [AnglePID") ;
             logger.add("target", target_angle_) ;
-            logger.add("angle", angle()) ;
-            logger.add("out", out) ;
+            logger.add("actual", getAngle()) ;
+            logger.add("pidout", out) ;
+            logger.add("]") ;
             steer_.set(out) ;
         }
 
         if (has_speed_target_)
         {
             double out = speed_pid_.getOutput(target_speed_, getVelocity(), dt) ;
-            logger.add(" SpeedPID") ;
+            logger.add(" [SpeedPID") ;
+            logger.add("ticks", ticks_) ;
             logger.add("target", target_speed_) ;
-            logger.add("speed", getVelocity()) ;
-            logger.add("out", out) ;
+            logger.add("actual", getVelocity()) ;
+            logger.add("pidout", out) ;
+            logger.add("]") ;
             drive_.set(out) ;
         }
         logger.endMessage();
     }
 
     public void computeMyState(double dt) throws BadMotorRequestException {
-        double dist = drive_.getPosition() * inches_per_tick_ ;
-        linear_.update(dt, dist);
+        ticks_ = drive_.getPosition() ;
+        linear_.update(dt, ticks_ * inches_per_tick_) ;
     }
 
     public double getAcceleration() {
@@ -118,7 +122,7 @@ public class SwerveModule {
         return linear_.getDistance() ;
     }
 
-    public double angle() {
+    public double getAngle() {
         return encoder_.getPosition() ;
     }
 
@@ -166,5 +170,9 @@ public class SwerveModule {
 
     public void setNoSpeed() {
         has_speed_target_ = false ;
+    }
+
+    public String status() {
+        return String.format("%.2f @ %.2f", getVelocity(), getAngle()) ;
     }
 }

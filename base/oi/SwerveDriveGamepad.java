@@ -65,7 +65,7 @@ public class SwerveDriveGamepad extends Gamepad {
             return ;
 
         DriverStation ds = DriverStation.getInstance() ;
-        double ly = -ds.getStickAxis(getIndex(), AxisNumber.LEFTY.value) ;
+        double ly = ds.getStickAxis(getIndex(), AxisNumber.LEFTY.value) ;
         double lx = ds.getStickAxis(getIndex(), AxisNumber.LEFTX.value) ;
         double rx = ds.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
 
@@ -75,9 +75,14 @@ public class SwerveDriveGamepad extends Gamepad {
 
         //
         // The rotational velocity is given by rxscaled
-        // The position velocity is given by the vector (lxscaled, lyscaled)
+        // The position velocity is given by the vector (lyscaled, lxscaled)
         //
-        action_.updateTargets(lxscaled, lyscaled, rxscaled) ;
+        // Note, the x and y are swapped because of the orientation of the gamepad versus the orientation of the
+        // field.  The drive team is at the end of the field looking down the X axis.  So, when the Y axis on the
+        // gamepad is pushed forward (negative value from the gamepad), the driver expects the robot to move along
+        // the positive X axis of the field.  
+        //
+        action_.updateTargets(-lyscaled, lxscaled, rxscaled) ;
         if (db_.getAction() != action_)
             db_.setAction(action_) ;
     }    

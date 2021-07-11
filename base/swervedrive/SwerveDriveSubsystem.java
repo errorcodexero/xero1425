@@ -9,6 +9,8 @@ import org.xero1425.base.motors.MotorRequestFailedException;
 import org.xero1425.base.oi.Gamepad;
 import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.base.oi.SwerveDriveGamepad;
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
 
@@ -71,6 +73,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     /// \returns the current angle of the robot
     public double getAngle() {
         return angular_.getDistance() ;
+    }
+
+    public double getModuleAngle(int module) {
+        return pairs_[module].getAngle() ;
     }
 
     public double getAcceleration() {
@@ -150,10 +156,18 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
             angular_.update(getRobot().getDeltaTime(), angle);
         }
 
-        putDashboard("flangle", DisplayType.Always, pairs_[FL].angle());
-        putDashboard("frangle", DisplayType.Always, pairs_[FR].angle());
-        putDashboard("blangle", DisplayType.Always, pairs_[BL].angle());
-        putDashboard("brangle", DisplayType.Always, pairs_[BR].angle());
+        putDashboard("flangle", DisplayType.Always, pairs_[FL].status()) ;
+        putDashboard("frangle", DisplayType.Always, pairs_[FR].status());
+        putDashboard("blangle", DisplayType.Always, pairs_[BL].status());
+        putDashboard("brangle", DisplayType.Always, pairs_[BR].status());
+
+        MessageLogger logger = getRobot().getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, getLoggerID()) ;
+        logger.add("fl", pairs_[FL].status()) ;
+        logger.add("fr", pairs_[FR].status()) ;
+        logger.add("bl", pairs_[BL].status()) ;        
+        logger.add("br", pairs_[BR].status()) ;
+        logger.endMessage();        
     }
 
     @Override

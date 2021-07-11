@@ -39,6 +39,11 @@ public class SwerveDriveModel extends SimulationModel {
     //
     private final static String AngleName = "angle" ;
 
+    private final static String FLAngleName = "fl:angle" ;
+    private final static String FRAngleName = "fr:angle" ;
+    private final static String BLAngleName = "bl:angle" ;
+    private final static String BRAngleName = "br:angle" ;            
+
     public SwerveDriveModel(SimulationEngine engine, String model, String inst) {
         super(engine, model, inst);
 
@@ -159,12 +164,77 @@ public class SwerveDriveModel extends SimulationModel {
                 angle_ = XeroMath.deg2rad(value.getDouble()) ;
             } catch (BadParameterTypeException e) {
             }
+        }     
+        else if (name.equals(FLAngleName)) {
+            if (!value.isDouble()) {
+                MessageLogger logger = getEngine().getMessageLogger() ;
+                logger.startMessage(MessageType.Error) ;
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" event name ").addQuoted(name);
+                logger.add(" value is not a double").endMessage();
+                return true ;
+            }
+
+            try {
+                models_[0].setAngle(value.getDouble()) ;
+            } catch (BadParameterTypeException e) {
+            }
+        }    
+        else if (name.equals(FRAngleName)) {
+            if (!value.isDouble()) {
+                MessageLogger logger = getEngine().getMessageLogger() ;
+                logger.startMessage(MessageType.Error) ;
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" event name ").addQuoted(name);
+                logger.add(" value is not a double").endMessage();
+                return true ;
+            }
+
+            try {
+                models_[1].setAngle(value.getDouble()) ;
+            } catch (BadParameterTypeException e) {
+            }
+        }
+        else if (name.equals(BLAngleName)) {
+            if (!value.isDouble()) {
+                MessageLogger logger = getEngine().getMessageLogger() ;
+                logger.startMessage(MessageType.Error) ;
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" event name ").addQuoted(name);
+                logger.add(" value is not a double").endMessage();
+                return true ;
+            }
+
+            try {
+                models_[2].setAngle(value.getDouble()) ;
+            } catch (BadParameterTypeException e) {
+            }
+        }     
+        else if (name.equals(BRAngleName)) {
+            if (!value.isDouble()) {
+                MessageLogger logger = getEngine().getMessageLogger() ;
+                logger.startMessage(MessageType.Error) ;
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" event name ").addQuoted(name);
+                logger.add(" value is not a double").endMessage();
+                return true ;
+            }
+
+            try {
+                models_[3].setAngle(value.getDouble()) ;
+            } catch (BadParameterTypeException e) {
+            }
         }                    
         return true ;
     }    
 
     private boolean attachHardware() {
-
+        models_ = new SwerveDriveModuleModel[4] ;
+        
         try {
             models_[0] = new SwerveDriveModuleModel(this, "fl") ;
             models_[1] = new SwerveDriveModuleModel(this, "fr") ;

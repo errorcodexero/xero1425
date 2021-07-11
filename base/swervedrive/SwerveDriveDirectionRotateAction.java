@@ -1,5 +1,9 @@
 package org.xero1425.base.swervedrive;
 
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
+import org.xero1425.misc.XeroMath;
+
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
@@ -8,12 +12,14 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private double circum_ ;
     private double [] angles_ ;
     private double [] speeds_ ;
+    private boolean dirty_ ;
 
     public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot) {
         super(subsys) ;
 
         dir_ = new Translation2d(x, y) ;
         rot_ = rot ;
+        dirty_ = true ;
 
         angles_ = new double[subsys.getModuleCount()] ;
         speeds_ = new double[subsys.getModuleCount()] ;
@@ -36,6 +42,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         {
             dir_ = new Translation2d(dirx, diry) ;        
             rot_ = rot ;
+            dirty_ = true ;
         }
     }
 
@@ -46,15 +53,11 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
 
     @Override
     public void run() {
-        Translation2d dirrot = rotateVector(dir_, -getSubsystem().getAngle()) ;
-        for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
-            Translation2d rotvec = createRotVector(i, rot_);
-            Translation2d resvec = addVectors(dirrot, rotvec) ;
-            angles_[i] = Math.atan2(resvec.getY(), resvec.getX()) ;
-            speeds_[i] = resvec.getNorm() ;
+        if (dirty_) {
+            calcModuleTrajectories() ;
+            getSubsystem().setTargets(angles_, speeds_);
+            dirty_ = false ;
         }
-
-        getSubsystem().setTargets(angles_, speeds_);
     }
 
     @Override
@@ -79,6 +82,28 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private Translation2d rotateVector(Translation2d vec, double angle) {
         double rads = angle / 180.0 * Math.PI ;
         return new Translation2d(vec.getX() * Math.cos(rads) - vec.getY() * Math.sin(rads), vec.getY() * Math.cos(rads) + vec.getX() * Math.sin(rads)) ;
+    }
+
+    private void calcModuleTrajectories() {
+        Translation2d dirrot = rotateVector(dir_, -getSubsystem().getAngle()) ;
+        for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
+            Translation2d rotvec = createRotVector(i, rot_);
+            Translation2d resvec = addVectors(dirrot, rotvec) ;
+            angles_[i] = Math.toDegrees(Math.atan2(resvec.getY(), resvec.getX())) ;
+            speeds_[i] = resvec.getNorm() ;
+        }
+
+        //
+        // Now, process the desired angles versus the current angles to see if mirroring the wheel works better
+        //
+        for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
+            double delta = Math.abs(XeroMath.normalizeAngleDegrees(getSubsystem().getModuleAngle(i) - angles_[i])) ;
+            if (delta > 90.0)
+            {
+                angles_[i] = XeroMath.normalizeAngleDegrees(180 + angles_[i]) ;
+                speeds_[i] = -speeds_[i] ;
+            }
+        }
     }
 
     private Translation2d createRotVector(int which, double rot) {

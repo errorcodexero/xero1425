@@ -19,6 +19,8 @@ public class SwerveDriveModuleModel {
     private double voltage_ ;
     private EncoderMapper mapper_ ;
     private double position_ ;
+    private double current_speed_ ;
+    private double max_change_ ;
 
     public SwerveDriveModuleModel(SwerveDriveModel model, String name) throws Exception {
         double rmax, rmin, emax, emin, rc, ec ;
@@ -27,6 +29,7 @@ public class SwerveDriveModuleModel {
         model_ = model ;
         angle_ = 0.0 ;
         position_ = 0.0 ;
+        current_speed_ = 0.0 ;
 
         steer_ = new SimMotorController(model, motorname) ;
         if (!steer_.createMotor())
@@ -149,28 +152,60 @@ public class SwerveDriveModuleModel {
             throw new Exception("missing kv property - check log file") ;
         }
 
+        try {
+            max_change_ = model.getProperty(name + "drive:" + "maxchange").getDouble();
+        } catch (BadParameterTypeException e) {
+            MessageLogger logger = model.getEngine().getMessageLogger() ;
+            logger.startMessage(MessageType.Error) ;
+            logger.add("cannot create model ").addQuoted(model.getModelName()).add(" instance ").addQuoted(model.getInstanceName()) ;
+            logger.add(" - missing parameter ").addQuoted("maxchange").endMessage();
+            throw new Exception("missing kv property - check log file") ;
+        }        
+
         mapper_ = new EncoderMapper(rmax, rmin, emax, emin) ;
-        mapper_.calibrate(rc, ec);        
+        mapper_.calibrate(rc, ec);   
+
+        double stangle = 0.0 ;
+        try {
+            stangle = model.getProperty(name + "drive:" + "angle").getDouble();
+
+        } catch (BadParameterTypeException e) {
+            stangle = 0.0 ;
+        }
+
+        voltage_ = mapper_.toEncoder(stangle) ;
+        AnalogInDataJNI.setVoltage(encoder_input_, voltage_) ;
     }
 
     public void run(double dt) {
+        MessageLogger logger = model_.getEngine().getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, model_.getLoggerID()) ;
 
         double power = steer_.getPower() ;
         angle_ += degrees_per_second_per_volt_ * dt * power ;
         voltage_ = mapper_.toEncoder(angle_) ;
         AnalogInDataJNI.setVoltage(encoder_input_, voltage_) ;
 
-        power = drive_.getPower() ;
-        double speed = power / kv_ ;
-        position_ += speed * dt ;
-        drive_.setEncoder(position_ * ticks_per_inch_);
+        logger.add("dt", dt) ;
 
-        MessageLogger logger = model_.getEngine().getMessageLogger() ;
-        logger.startMessage(MessageType.Debug, model_.getLoggerID()) ;
+        logger.add(" [Angle") ;
         logger.add("power", power) ;
         logger.add("angle", angle_) ;
         logger.add("voltage", voltage_) ;
         logger.add("encoder", encoder_input_) ;
+        logger.add("]") ;
+
+        power = drive_.getPower() ;
+        current_speed_ = capVelocity(current_speed_, power / kv_) ;
+        position_ += current_speed_ * dt ;
+        drive_.setEncoder(position_ / ticks_per_inch_);
+
+        logger.add(" [Speed") ;
+        logger.add("power", power) ;
+        logger.add("position", position_) ;
+        logger.add("encoder", position_ / ticks_per_inch_) ;
+        logger.add("]") ;
+
         logger.endMessage();
     }
 
@@ -186,7 +221,34 @@ public class SwerveDriveModuleModel {
         return angle_ ;
     }
 
+    public void setAngle(double a) {
+        angle_ = a ;
+    }
+
     public double getPosition() {
         return position_ ;
     }
+
+
+    //
+    // Cap the velocity so that it does not exceed the maximum allowed change in a 
+    // single simlator loop
+    //
+    private double capVelocity(double prev, double target) {
+        double ret = 0.0 ;
+
+        if (target > prev) {
+            if (target > prev + max_change_)
+                ret = prev +  max_change_ ;
+            else
+                ret = target ;
+        } else {
+            if (target < prev - max_change_)
+                ret = prev - max_change_ ;
+            else
+                ret = target ;
+        }
+
+        return ret ;
+    }    
 }
