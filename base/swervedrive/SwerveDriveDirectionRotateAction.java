@@ -43,6 +43,14 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
             dir_ = new Translation2d(dirx, diry) ;        
             rot_ = rot ;
             dirty_ = true ;
+
+            MessageLogger logger = getSubsystem().getRobot().getMessageLogger() ;
+            logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
+            logger.add("DirectionRotateAction update") ;
+            logger.add("dirx", dirx) ;
+            logger.add("diry", diry) ;
+            logger.add("rot", rot) ;
+            logger.endMessage();
         }
     }
 
@@ -85,6 +93,8 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     }
 
     private void calcModuleTrajectories() {
+        MessageLogger logger  = getSubsystem().getRobot().getMessageLogger() ;
+
         Translation2d dirrot = rotateVector(dir_, -getSubsystem().getAngle()) ;
         for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
             Translation2d rotvec = createRotVector(i, rot_);
@@ -100,8 +110,20 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
             double delta = Math.abs(XeroMath.normalizeAngleDegrees(getSubsystem().getModuleAngle(i) - angles_[i])) ;
             if (delta > 90.0)
             {
+                logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
+                logger.add("Mirrored wheel:") ;
+                logger.add("index", i) ;
+                logger.add(" requested [") ;
+                logger.add("angle", angles_[i]) ;
+                logger.add("velocity", speeds_[i]) ;
+                logger.add("]") ;
                 angles_[i] = XeroMath.normalizeAngleDegrees(180 + angles_[i]) ;
                 speeds_[i] = -speeds_[i] ;
+                logger.add(" applied [") ;
+                logger.add("angle", angles_[i]) ;
+                logger.add("velocity", speeds_[i]) ;
+                logger.add("]") ;
+                logger.endMessage();
             }
         }
     }
