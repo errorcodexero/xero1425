@@ -135,19 +135,20 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         //
         double linear = rot / 360.0 * circum_ ;
         double angle = 0.0 ;
+        double phi = getSubsystem().getPHI() ;
 
         switch(which) {
             case SwerveDriveSubsystem.FL:
-                angle = -45.0 ;
+                angle = 180 - phi ;
                 break ;
             case SwerveDriveSubsystem.FR:
-                angle = 45.0 ;
+                angle = phi ;
                 break ;
             case SwerveDriveSubsystem.BL:
-                angle = 45.0 ;
+                angle = -180 - phi ;
                 break ;
             case SwerveDriveSubsystem.BR:
-                angle = -45.0 ;
+                angle = -phi ;
                 break ;                                                
         }
 

@@ -19,6 +19,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     private double length_;
     private SwerveModule[] pairs_;
     private Speedometer angular_;
+    private double rotate_angle_ ;
 
     static public final int FL = 0;
     static public final int FR = 1;
@@ -55,6 +56,12 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         }
 
         angular_ = new Speedometer("angles", angularsamples, true);
+
+        rotate_angle_ = Math.atan2(length_, width_);
+    }
+
+    public double getPHI() {
+        return rotate_angle_ ;
     }
 
     public int getModuleCount() {
