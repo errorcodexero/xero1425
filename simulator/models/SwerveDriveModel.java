@@ -9,10 +9,6 @@ import org.xero1425.simulator.engine.SimulationEngine;
 import org.xero1425.simulator.engine.SimulationModel;
 
 public class SwerveDriveModel extends SimulationModel {
-    // private SwerveDriveModuleModel fl_;
-    // private SwerveDriveModuleModel fr_;
-    // private SwerveDriveModuleModel bl_;
-    // private SwerveDriveModuleModel br_;
     private SwerveDriveModuleModel [] models_ ;
     private NavXModel navx_ ;
     private double [] previous_ ;

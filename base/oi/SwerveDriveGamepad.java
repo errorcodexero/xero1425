@@ -13,17 +13,16 @@ import edu.wpi.first.wpilibj.DriverStation;
 
 public class SwerveDriveGamepad extends Gamepad {
     private SwerveDriveSubsystem db_;
-    private double angle_nominal_;
     private double angle_maximum_;
-    private double pos_nominal_;
     private double pos_maximum_;
-    private double slowby_;
+    private double deadband_pos_x_ ;
+    private double deadband_pos_y_ ;
+    private double deadband_rotate_ ;
+    private double power_ ;
     private SwerveDriveDirectionRotateAction action_;
 
     public SwerveDriveGamepad(OISubsystem oi, int index, DriveBaseSubsystem drive_) throws Exception {
         super(oi, "Xero1425GamePad", index);
-
-
 
         DriverStation ds = DriverStation.getInstance();
         if (ds.getStickPOVCount(getIndex()) == 0) {
@@ -44,11 +43,13 @@ public class SwerveDriveGamepad extends Gamepad {
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
         SettingsParser settings = getSubsystem().getRobot().getSettingsParser();
+
+        deadband_pos_x_ = getSubsystem().getRobot().getSettingsParser().get("driver:position:x:deadband").getDouble() ;
+        deadband_pos_y_ = getSubsystem().getRobot().getSettingsParser().get("driver:position:y:deadband").getDouble() ;
+        deadband_rotate_ = getSubsystem().getRobot().getSettingsParser().get("driver:rotate:deadband").getDouble() ;
+        power_ = getSubsystem().getRobot().getSettingsParser().get("driver:axis:power").getDouble() ;
         
-        slowby_ = 0.5 ;
-        angle_nominal_ = settings.get("driver:angle:nominal").getDouble();
         angle_maximum_ = settings.get("driver:angle:maximum").getDouble();
-        pos_nominal_ = settings.get("driver:position:nominal").getDouble();
         pos_maximum_ = settings.get("driver:position:maximum").getDouble();        
 
         action_ = new SwerveDriveDirectionRotateAction(db_, 0.0, 0.0, 0.0) ;
@@ -69,9 +70,9 @@ public class SwerveDriveGamepad extends Gamepad {
         double lx = ds.getStickAxis(getIndex(), AxisNumber.LEFTX.value) ;
         double rx = ds.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
 
-        double lyscaled = scale(ly, 0.0, false, pos_nominal_, pos_maximum_, slowby_) ;
-        double lxscaled = scale(lx, 0.0, false, pos_nominal_, pos_maximum_, slowby_) ;
-        double rxscaled = scale(rx, 0.0, false, angle_nominal_, angle_maximum_, slowby_) ;
+        double lyscaled = mapJoyStick(ly, pos_maximum_, deadband_pos_y_, power_) ;
+        double lxscaled = mapJoyStick(lx, pos_maximum_, deadband_pos_x_, power_) ;
+        double rxscaled = mapJoyStick(rx, angle_maximum_, deadband_rotate_, power_) ;
 
         //
         // The rotational velocity is given by rxscaled
@@ -82,8 +83,15 @@ public class SwerveDriveGamepad extends Gamepad {
         // gamepad is pushed forward (negative value from the gamepad), the driver expects the robot to move along
         // the positive X axis of the field.  
         //
-        action_.updateTargets(-lyscaled, -lxscaled, -rxscaled) ;
+        action_.updateTargets(-lyscaled, lxscaled, rxscaled) ;
         if (db_.getAction() != action_)
             db_.setAction(action_) ;
     }    
+
+    private double mapJoyStick(double v, double maxv, double db, double power) {
+        if (Math.abs(v) < db)
+            return 0.0 ;
+
+        return Math.signum(v) * Math.pow(v, power) * maxv ;
+    }
 }
