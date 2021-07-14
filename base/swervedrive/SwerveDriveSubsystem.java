@@ -163,10 +163,15 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
             angular_.update(getRobot().getDeltaTime(), angle);
         }
 
-        putDashboard("flangle", DisplayType.Always, pairs_[FL].status()) ;
-        putDashboard("frangle", DisplayType.Always, pairs_[FR].status());
-        putDashboard("blangle", DisplayType.Always, pairs_[BL].status());
-        putDashboard("brangle", DisplayType.Always, pairs_[BR].status());
+        putDashboard("fl", DisplayType.Always, pairs_[FL].status());
+        putDashboard("fr", DisplayType.Always, pairs_[FR].status());
+        putDashboard("bl", DisplayType.Always, pairs_[BL].status());
+        putDashboard("br", DisplayType.Always, pairs_[BR].status());
+
+        putDashboard("flticks", DisplayType.Verbose, pairs_[FL].getTicks()) ;
+        putDashboard("frticks", DisplayType.Verbose, pairs_[FR].getTicks()) ;
+        putDashboard("blticks", DisplayType.Verbose, pairs_[BL].getTicks()) ;
+        putDashboard("brticks", DisplayType.Verbose, pairs_[BR].getTicks()) ;
 
         MessageLogger logger = getRobot().getMessageLogger() ;
         logger.startMessage(MessageType.Debug, getLoggerID()) ;

@@ -82,7 +82,7 @@ public class SwerveDriveGamepad extends Gamepad {
         // gamepad is pushed forward (negative value from the gamepad), the driver expects the robot to move along
         // the positive X axis of the field.  
         //
-        action_.updateTargets(-lyscaled, lxscaled, rxscaled) ;
+        action_.updateTargets(-lyscaled, -lxscaled, -rxscaled) ;
         if (db_.getAction() != action_)
             db_.setAction(action_) ;
     }    

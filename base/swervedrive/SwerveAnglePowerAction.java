@@ -1,5 +1,8 @@
 package org.xero1425.base.swervedrive;
 
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
+
 public class SwerveAnglePowerAction extends SwerveDriveAction {
     private double angle_ ;
     private double power_ ;
@@ -17,6 +20,12 @@ public class SwerveAnglePowerAction extends SwerveDriveAction {
         power_ = power ;
         duration_ = duration ;
         plot_id_ = subsys.initPlot("swerve" + Integer.toString(plot_number_++)) ;
+
+        MessageLogger logger = subsys.getRobot().getMessageLogger() ;
+        logger.startMessage(MessageType.Error) ;
+        logger.add("called init plot") ;
+        logger.add("plotid", plot_id_) ;
+        logger.endMessage();
     }
 
     @Override
@@ -67,6 +76,7 @@ public class SwerveAnglePowerAction extends SwerveDriveAction {
         String ret = prefix(indent) + "SwerveAnglePowerAction:" ;
         ret += " " + Double.toString(angle_) ;
         ret += " " + Double.toString(power_) ;
+        ret += " " + Double.toString(duration_) ;
         return ret ;
     }
 }

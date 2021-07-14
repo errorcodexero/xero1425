@@ -28,6 +28,7 @@ class PlotManager
 
     int initPlot(String name)
     {
+        
         if (!enabled_ || DriverStation.getInstance().isFMSAttached())
             return -1 ;
 
@@ -40,6 +41,7 @@ class PlotManager
         PlotInfo info = new PlotInfo(name, next_plot_id_++) ;
         plots_.put(info.index_, info) ;
 
+        System.out.println("Created a plot, index = " + Integer.toString(info.index_)) ;
         return info.index_ ;
     }
 

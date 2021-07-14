@@ -154,6 +154,10 @@ public class SwerveModule {
         setDrivePower(drive) ;
     }
 
+    public double getTicks() {
+        return ticks_ ;
+    }
+
     public void setTargetAngle(double angle) {
         has_angle_target_ = true ;
         target_angle_ = angle ;
