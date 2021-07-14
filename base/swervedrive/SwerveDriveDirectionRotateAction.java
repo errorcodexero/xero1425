@@ -14,6 +14,8 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private double [] speeds_ ;
     private boolean dirty_ ;
 
+    private final double NearZero = 0.005 ;
+
     public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot) {
         super(subsys) ;
 
@@ -40,7 +42,9 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     public void updateTargets(double dirx, double diry, double rot) {
         if (dirx != dir_.getX() || diry != dir_.getY() || rot != rot_)
         {
-            dir_ = new Translation2d(dirx, diry) ;        
+
+            dir_ = new Translation2d(dirx, diry) ;
+
             rot_ = rot ;
             dirty_ = true ;
 
@@ -92,15 +96,25 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         return new Translation2d(vec.getX() * Math.cos(rads) - vec.getY() * Math.sin(rads), vec.getY() * Math.cos(rads) + vec.getX() * Math.sin(rads)) ;
     }
 
-    private void calcModuleTrajectories() {
+    private void calcModuleTrajectories() {       
         MessageLogger logger  = getSubsystem().getRobot().getMessageLogger() ;
 
-        Translation2d dirrot = rotateVector(dir_, -getSubsystem().getAngle()) ;
-        for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
-            Translation2d rotvec = createRotVector(i, rot_);
-            Translation2d resvec = addVectors(dirrot, rotvec) ;
-            angles_[i] = Math.toDegrees(Math.atan2(resvec.getY(), resvec.getX())) ;
-            speeds_[i] = resvec.getNorm() ;
+        if (Math.abs(dir_.getX()) < NearZero && Math.abs(dir_.getY()) < NearZero)
+        {
+            for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
+                angles_[i] = getSubsystem().getModuleAngle(i) ;
+                speeds_[i] = 0.0 ;
+            }
+        }
+        else
+        {
+            Translation2d dirrot = rotateVector(dir_, -getSubsystem().getAngle()) ;
+            for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
+                Translation2d rotvec = createRotVector(i, rot_);
+                Translation2d resvec = addVectors(dirrot, rotvec) ;
+                angles_[i] = Math.toDegrees(Math.atan2(resvec.getY(), resvec.getX())) ;
+                speeds_[i] = resvec.getNorm() ;
+            }
         }
 
         //
