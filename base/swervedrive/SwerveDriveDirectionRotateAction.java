@@ -99,7 +99,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private void calcModuleTrajectories() {       
         MessageLogger logger  = getSubsystem().getRobot().getMessageLogger() ;
 
-        if (Math.abs(dir_.getX()) < NearZero && Math.abs(dir_.getY()) < NearZero)
+        if (Math.abs(dir_.getX()) < NearZero && Math.abs(dir_.getY()) < NearZero && Math.abs(rot_) < NearZero)
         {
             for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
                 angles_[i] = getSubsystem().getModuleAngle(i) ;
@@ -121,7 +121,8 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         // Now, process the desired angles versus the current angles to see if mirroring the wheel works better
         //
         for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
-            double delta = Math.abs(XeroMath.normalizeAngleDegrees(getSubsystem().getModuleAngle(i) - angles_[i])) ;
+            double modangle = getSubsystem().getModuleAngle(i) ;
+            double delta = Math.abs(XeroMath.normalizeAngleDegrees(modangle - angles_[i])) ;
             if (delta > 90.0)
             {
                 logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
@@ -147,7 +148,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         // The rot value is in degress per second, we need to transform this to a
         // linear speed for the wheel
         //
-        double linear = rot / 360.0 * circum_ ;
+        double linear = rot / 360.0 * circum_ / 2 ;
         double angle = 0.0 ;
         double phi = getSubsystem().getPHI() ;
 
@@ -159,7 +160,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
                 angle = phi ;
                 break ;
             case SwerveDriveSubsystem.BL:
-                angle = -180 - phi ;
+                angle = -180 + phi ;
                 break ;
             case SwerveDriveSubsystem.BR:
                 angle = -phi ;

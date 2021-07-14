@@ -57,7 +57,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
         angular_ = new Speedometer("angles", angularsamples, true);
 
-        rotate_angle_ = Math.atan2(length_, width_);
+        rotate_angle_ = Math.toDegrees(Math.atan2(length_, width_)) ;
     }
 
     public double getPHI() {
