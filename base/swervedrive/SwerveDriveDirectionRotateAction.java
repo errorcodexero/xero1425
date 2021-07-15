@@ -108,7 +108,8 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         }
         else
         {
-            Translation2d dirrot = rotateVector(dir_, -getSubsystem().getAngle()) ;
+            double angle = getSubsystem().getAngle() ;
+            Translation2d dirrot = rotateVector(dir_, -angle) ;
             for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
                 Translation2d rotvec = createRotVector(i, rot_);
                 Translation2d resvec = addVectors(dirrot, rotvec) ;

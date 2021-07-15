@@ -4,4 +4,5 @@ public interface XeroGyro {
     public boolean isConnected() ;
     public double getYaw() ;
     public double getAngle() ;
+    public void reset() ;
 }

@@ -58,6 +58,8 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         angular_ = new Speedometer("angles", angularsamples, true);
 
         rotate_angle_ = Math.toDegrees(Math.atan2(length_, width_)) ;
+
+        gyro().reset() ;
     }
 
     public double getPHI() {
@@ -173,8 +175,11 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         putDashboard("blticks", DisplayType.Verbose, pairs_[BL].getTicks()) ;
         putDashboard("brticks", DisplayType.Verbose, pairs_[BR].getTicks()) ;
 
+        putDashboard("dbangle", DisplayType.Always, getAngle()) ;
+
         MessageLogger logger = getRobot().getMessageLogger() ;
         logger.startMessage(MessageType.Debug, getLoggerID()) ;
+        logger.add("angle", getAngle()) ;
         logger.add("fl", pairs_[FL].status()) ;
         logger.add("fr", pairs_[FR].status()) ;
         logger.add("bl", pairs_[BL].status()) ;        
