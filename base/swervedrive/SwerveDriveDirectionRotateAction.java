@@ -13,6 +13,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private double [] angles_ ;
     private double [] speeds_ ;
     private boolean dirty_ ;
+    private boolean mirror_ ;
 
     private final double NearZero = 0.005 ;
 
@@ -22,6 +23,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         dir_ = new Translation2d(x, y) ;
         rot_ = rot ;
         dirty_ = true ;
+        mirror_ = false ;
 
         angles_ = new double[subsys.getModuleCount()] ;
         speeds_ = new double[subsys.getModuleCount()] ;
@@ -36,7 +38,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         // the CIRCUM = 2 * PI * R.  Calculating the circumference of an ellipse is more computational intensive
         // and really does not get us that much.
         //
-        circum_ = (subsys.getLength() + subsys.getWidth()) * Math.PI ;
+        circum_ = (subsys.getLength() + subsys.getWidth()) * Math.PI / 2.0 ;
     }
 
     public void updateTargets(double dirx, double diry, double rot) {
@@ -113,33 +115,37 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
             for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
                 Translation2d rotvec = createRotVector(i, rot_);
                 Translation2d resvec = addVectors(dirrot, rotvec) ;
-                angles_[i] = Math.toDegrees(Math.atan2(resvec.getY(), resvec.getX())) ;
+                double rads = Math.atan2(resvec.getY(), resvec.getX()) ;
+                angles_[i] = Math.toDegrees(rads) ;
                 speeds_[i] = resvec.getNorm() ;
             }
         }
 
-        //
-        // Now, process the desired angles versus the current angles to see if mirroring the wheel works better
-        //
-        for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
-            double modangle = getSubsystem().getModuleAngle(i) ;
-            double delta = Math.abs(XeroMath.normalizeAngleDegrees(modangle - angles_[i])) ;
-            if (delta > 90.0)
-            {
-                logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
-                logger.add("Mirrored wheel:") ;
-                logger.add("index", i) ;
-                logger.add(" requested [") ;
-                logger.add("angle", angles_[i]) ;
-                logger.add("velocity", speeds_[i]) ;
-                logger.add("]") ;
-                angles_[i] = XeroMath.normalizeAngleDegrees(180 + angles_[i]) ;
-                speeds_[i] = -speeds_[i] ;
-                logger.add(" applied [") ;
-                logger.add("angle", angles_[i]) ;
-                logger.add("velocity", speeds_[i]) ;
-                logger.add("]") ;
-                logger.endMessage();
+        if (mirror_)
+        {
+            //
+            // Now, process the desired angles versus the current angles to see if mirroring the wheel works better
+            //
+            for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
+                double modangle = getSubsystem().getModuleAngle(i) ;
+                double delta = Math.abs(XeroMath.normalizeAngleDegrees(modangle - angles_[i])) ;
+                if (delta > 90.0)
+                {
+                    logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
+                    logger.add("Mirrored wheel:") ;
+                    logger.add("index", i) ;
+                    logger.add(" requested [") ;
+                    logger.add("angle", angles_[i]) ;
+                    logger.add("velocity", speeds_[i]) ;
+                    logger.add("]") ;
+                    angles_[i] = XeroMath.normalizeAngleDegrees(180 + angles_[i]) ;
+                    speeds_[i] = -speeds_[i] ;
+                    logger.add(" applied [") ;
+                    logger.add("angle", angles_[i]) ;
+                    logger.add("velocity", speeds_[i]) ;
+                    logger.add("]") ;
+                    logger.endMessage();
+                }
             }
         }
     }
