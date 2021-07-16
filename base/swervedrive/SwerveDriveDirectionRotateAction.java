@@ -14,16 +14,23 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private double [] speeds_ ;
     private boolean dirty_ ;
     private boolean mirror_ ;
+    private double duration_ ;
+    private double start_ ;
 
     private final double NearZero = 0.005 ;
 
     public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot) {
+        this(subsys, x, y, rot, Double.MAX_VALUE) ;
+    }
+
+    public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot, double duration) {
         super(subsys) ;
 
         dir_ = new Translation2d(x, y) ;
         rot_ = rot ;
         dirty_ = true ;
         mirror_ = false ;
+        duration_ = duration ;
 
         angles_ = new double[subsys.getModuleCount()] ;
         speeds_ = new double[subsys.getModuleCount()] ;
@@ -63,10 +70,23 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     @Override
     public void start() throws Exception {
         super.start() ;
+
+        start_ = getSubsystem().getRobot().getTime() ;
     }
 
     @Override
     public void run() {
+
+        if (getSubsystem().getRobot().getTime() > start_ + duration_)
+        {
+            try {
+                getSubsystem().stop() ;
+            }
+            catch(Exception ex) {
+            }
+            setDone() ;
+        }
+
         if (dirty_) {
             calcModuleTrajectories() ;
             getSubsystem().setTargets(angles_, speeds_);
