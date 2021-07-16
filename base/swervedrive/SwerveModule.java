@@ -150,6 +150,8 @@ public class SwerveModule {
     }
 
     public void set(double steer, double drive) throws BadMotorRequestException, MotorRequestFailedException {
+        setNoAngle();
+        setNoSpeed();
         setSteerPower(steer);
         setDrivePower(drive) ;
     }
@@ -177,6 +179,13 @@ public class SwerveModule {
     }
 
     public String status() {
-        return String.format("%.2f @ %.2f", getVelocity(), getAngle()) ;
+        String str = String.format("%.2f @ %.2f", getVelocity(), getAngle()) ;
+
+        if (has_angle_target_ && has_speed_target_)
+        {
+            str += " t: " + String.format("%2f @ %2f", target_speed_, target_angle_) ;
+        }
+
+        return str ;
     }
 }
