@@ -13,9 +13,11 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private double [] angles_ ;
     private double [] speeds_ ;
     private boolean dirty_ ;
+    private double last_robot_angle_ ;
     private boolean mirror_ ;
     private double duration_ ;
     private double start_ ;
+    private double threshold_ ;
 
     private final double NearZero = 0.005 ;
 
@@ -26,9 +28,10 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot, double duration) {
         super(subsys) ;
 
+        threshold_ = 0.5 ;
         dir_ = new Translation2d(x, y) ;
         rot_ = rot ;
-        dirty_ = true ;
+        dirty_ = false ;
         mirror_ = false ;
         duration_ = duration ;
 
@@ -71,7 +74,9 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     public void start() throws Exception {
         super.start() ;
 
+        dirty_ = true ;
         start_ = getSubsystem().getRobot().getTime() ;
+        last_robot_angle_ = getSubsystem().getAngle() ;
     }
 
     @Override
@@ -87,9 +92,11 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
             setDone() ;
         }
 
-        if (dirty_) {
+        double rangle = getSubsystem().getAngle() ;
+        if (dirty_ || Math.abs(last_robot_angle_ - rangle) > threshold_) {
             calcModuleTrajectories() ;
             getSubsystem().setTargets(angles_, speeds_);
+            last_robot_angle_ = rangle ;
             dirty_ = false ;
         }
     }
