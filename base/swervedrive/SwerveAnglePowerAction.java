@@ -24,10 +24,10 @@ public class SwerveAnglePowerAction extends SwerveDriveAction {
         super.start() ;
 
         getSubsystem().setAngle(angle_) ;
-        getSubsystem().setDrive(SwerveDriveSubsystem.FL, power_) ;
-        getSubsystem().setDrive(SwerveDriveSubsystem.FR, power_) ;
-        getSubsystem().setDrive(SwerveDriveSubsystem.BL, power_) ;
-        getSubsystem().setDrive(SwerveDriveSubsystem.BR, power_) ;                        
+        getSubsystem().setDriveMotorPower(SwerveDriveSubsystem.FL, power_) ;
+        getSubsystem().setDriveMotorPower(SwerveDriveSubsystem.FR, power_) ;
+        getSubsystem().setDriveMotorPower(SwerveDriveSubsystem.BL, power_) ;
+        getSubsystem().setDriveMotorPower(SwerveDriveSubsystem.BR, power_) ;                        
 
         start_ = getSubsystem().getRobot().getTime() ;
 

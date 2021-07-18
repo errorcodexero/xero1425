@@ -22,9 +22,9 @@ public class SwerveModule {
     private XeroEncoder encoder_;
     private double steer_power_;
     private double drive_power_;
-    private boolean has_angle_target_ ;
+    private boolean has_steer_target_ ;
     private double target_angle_ ;
-    private boolean has_speed_target_ ;
+    private boolean has_drive_target_ ;
     private double target_speed_ ;
     private PIDCtrl angle_pid_ ;
     private PIDCtrl speed_pid_ ;
@@ -54,8 +54,8 @@ public class SwerveModule {
         drive_power_ = 0.0;
         steer_power_ = 0.0;
 
-        has_angle_target_ = false ;
-        has_speed_target_ = false ;
+        has_steer_target_ = false ;
+        has_drive_target_ = false ;
         target_angle_ = 0.0 ;
         target_speed_ = 0.0 ;
 
@@ -77,9 +77,8 @@ public class SwerveModule {
         MessageLogger logger = robot_.getMessageLogger() ;
         logger.startMessage(MessageType.Debug, logger_id_) ;
         logger.add(name_) ;
-
                 
-        if (has_angle_target_)
+        if (has_steer_target_)
         {
             double out = angle_pid_.getOutput(target_angle_, getAngle(), dt) ;
 
@@ -91,7 +90,7 @@ public class SwerveModule {
             steer_.set(out) ;
         }
 
-        if (has_speed_target_)
+        if (has_drive_target_)
         {
             double out = speed_pid_.getOutput(target_speed_, getVelocity(), dt) ;
             logger.add(" [SpeedPID") ;
@@ -139,21 +138,21 @@ public class SwerveModule {
         return drive_power_;
     }
 
-    public void setSteerPower(double p) throws BadMotorRequestException, MotorRequestFailedException {
+    public void setSteerMotorPower(double p) throws BadMotorRequestException, MotorRequestFailedException {
+        has_steer_target_ = false ;
         steer_power_ = p ;
         steer_.set(p) ;
     }
 
-    public void setDrivePower(double p) throws BadMotorRequestException, MotorRequestFailedException {
+    public void setDriveMotorPower(double p) throws BadMotorRequestException, MotorRequestFailedException {
+        has_drive_target_ = false ;
         drive_power_ = p ;
         drive_.set(p);
     }
 
     public void set(double steer, double drive) throws BadMotorRequestException, MotorRequestFailedException {
-        setNoAngle();
-        setNoSpeed();
-        setSteerPower(steer);
-        setDrivePower(drive) ;
+        setSteerMotorPower(steer);
+        setDriveMotorPower(drive) ;
     }
 
     public double getTicks() {
@@ -161,27 +160,27 @@ public class SwerveModule {
     }
 
     public void setTargetAngle(double angle) {
-        has_angle_target_ = true ;
+        has_steer_target_ = true ;
         target_angle_ = angle ;
     }
 
     public void setNoAngle() {
-        has_angle_target_ = false ;
+        has_steer_target_ = false ;
     }
 
     public void setTargetVelocity(double speed) {
-        has_speed_target_ = true ;
+        has_drive_target_ = true ;
         target_speed_ = speed ;
     }
 
     public void setNoSpeed() {
-        has_speed_target_ = false ;
+        has_drive_target_ = false ;
     }
 
     public String status() {
         String str = String.format("%.2f @ %.2f", getVelocity(), getAngle()) ;
 
-        if (has_angle_target_ && has_speed_target_)
+        if (has_steer_target_ && has_drive_target_)
         {
             str += " t: " + String.format("%2f @ %2f", target_speed_, target_angle_) ;
         }

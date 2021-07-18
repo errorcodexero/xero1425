@@ -15,6 +15,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     private boolean dirty_ ;
     private double last_robot_angle_ ;
     private boolean mirror_ ;
+    private boolean scale_ ;
     private double duration_ ;
     private double start_ ;
     private double threshold_ ;
@@ -32,11 +33,25 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         dir_ = new Translation2d(x, y) ;
         rot_ = rot ;
         dirty_ = false ;
-        mirror_ = false ;
         duration_ = duration ;
 
         angles_ = new double[subsys.getModuleCount()] ;
         speeds_ = new double[subsys.getModuleCount()] ;
+
+        //
+        // These should both be true, but can be set to false to remove this processing from the
+        // per robot loop calculations when trying to track down bugs.
+        //
+        // The mirror_ flag controls the processing that causes a given module to rotate to the opposite
+        // angle than the one requested and reverse the velocity of the drive.  For instance, if a module needs
+        // to be set to 30 degrees and 100 inches per second, but its a shorter path to go to -150 degrees, then
+        // the target will be set to -150 degrees and the velocity changed to -100 inches per second.
+        //
+        // The scale_ flag controls scalling of the final set of velocities, if any module would exceed the maximum
+        // velocityh a single module can reach.
+        //
+        mirror_ = false ;
+        scale_ = false ;
 
         for(int i = 0 ; i < subsys.getModuleCount() ; i++) {
             angles_[i] = 0.0 ;
@@ -150,7 +165,7 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
                     maxspeed = speeds_[i] ;
             }
 
-            if (maxspeed > getSubsystem().getMaxSpeed()) {
+            if (scale_ && maxspeed > getSubsystem().getMaxSpeed()) {
                 double scale = maxspeed / getSubsystem().getMaxSpeed() ;
                 logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
                 logger.add("Scale Velocity:") ;
