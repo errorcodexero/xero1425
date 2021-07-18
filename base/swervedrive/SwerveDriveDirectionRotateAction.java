@@ -54,7 +54,6 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
     public void updateTargets(double dirx, double diry, double rot) {
         if (dirx != dir_.getX() || diry != dir_.getY() || rot != rot_)
         {
-
             dir_ = new Translation2d(dirx, diry) ;
 
             rot_ = rot ;
@@ -139,12 +138,27 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
         {
             double angle = getSubsystem().getAngle() ;
             Translation2d dirrot = rotateVector(dir_, -angle) ;
+            double maxspeed = 0.0 ;
             for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
                 Translation2d rotvec = createRotVector(i, rot_);
                 Translation2d resvec = addVectors(dirrot, rotvec) ;
                 double rads = Math.atan2(resvec.getY(), resvec.getX()) ;
                 angles_[i] = Math.toDegrees(rads) ;
                 speeds_[i] = resvec.getNorm() ;
+
+                if (speeds_[i] > maxspeed)
+                    maxspeed = speeds_[i] ;
+            }
+
+            if (maxspeed > getSubsystem().getMaxSpeed()) {
+                double scale = maxspeed / getSubsystem().getMaxSpeed() ;
+                logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
+                logger.add("Scale Velocity:") ;
+                logger.add("scale", scale) ;
+                logger.endMessage();
+                for(int i = 0 ; i < speeds_.length ; i++) {
+                    speeds_[i] /= scale ;
+                }
             }
         }
 

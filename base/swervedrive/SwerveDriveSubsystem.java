@@ -20,6 +20,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     private SwerveModule[] pairs_;
     private Speedometer angular_;
     private double rotate_angle_ ;
+    private double maxspeed_ ;
 
     static public final int FL = 0;
     static public final int FR = 1;
@@ -43,6 +44,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
         width_ = settings.get("swervedrive:width").getDouble();
         length_ = settings.get("swervedrive:length").getDouble();
+        maxspeed_ = settings.get("swervedrive:maxspeed").getDouble();
 
         pairs_ = new SwerveModule[cname.length];
         for (int i = 0; i < cname.length; i++) {
@@ -60,6 +62,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         rotate_angle_ = Math.toDegrees(Math.atan2(length_, width_)) ;
 
         gyro().reset() ;
+    }
+
+    public double getMaxSpeed() {
+        return maxspeed_ ;
     }
 
     public double getPHI() {
