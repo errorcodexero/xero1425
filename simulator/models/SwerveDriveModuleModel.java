@@ -179,7 +179,7 @@ public class SwerveDriveModuleModel {
 
     public void run(double dt) {
         MessageLogger logger = model_.getEngine().getMessageLogger() ;
-        logger.startMessage(MessageType.Debug, model_.getLoggerID()) ;
+        logger.startMessage(MessageType.Debug, model_.getModuleLoggerID()) ;
 
         double power = steer_.getPower() ;
         angle_ += degrees_per_second_per_volt_ * dt * power ;

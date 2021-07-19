@@ -7,6 +7,9 @@ import org.xero1425.misc.SettingsValue;
 import org.xero1425.simulator.engine.SimulationEngine;
 import org.xero1425.simulator.engine.SimulationModel;
 
+import edu.wpi.first.networktables.NetworkTable;
+import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
@@ -19,11 +22,39 @@ public class SwerveDriveModel extends SimulationModel {
     private double [] previous_ ;
     private double elapsed_ ;
 
+    private double xpos_ ;
+    private double ypos_ ;
+    private double angle_ ;
+
     private double width_ ;
     private double length_ ;
     private SwerveDriveKinematics kinematics_ ;
     private SwerveDriveOdometry odometry_ ;
 
+    private int module_logger_id_ ;
+
+    //
+    // The network table name for publising information about tank drive in the network tables
+    //
+    private final static String SubTableName = "tankdrive" ;
+
+    //
+    // The name of the event that contains the x position of the robot.  This is also the name
+    // of the value that is published in the network table for the X position of the robot.
+    //
+    private final static String TankDriveXPos = "xpos" ;
+
+    //
+    // The name of the event that contains the y position of the robot.   This is also the name
+    // of the value that is published in the network table for the Y position of the robot.
+    //
+    private final static String TankDriveYPos = "ypos" ;
+
+    //
+    // The name of the event that contains the angle of the robot.  This is also the name
+    // of the value that is published in the network table for the angle of the robot.
+    //
+    private final static String TankDriveAngle = "angle" ;
 
     private final static String FLAngleName = "fl:angle" ;
     private final static String FRAngleName = "fr:angle" ;
@@ -33,17 +64,44 @@ public class SwerveDriveModel extends SimulationModel {
     public SwerveDriveModel(SimulationEngine engine, String model, String inst) {
         super(engine, model, inst);
 
+        module_logger_id_ = engine.getMessageLogger().registerSubsystem("sweverdrive_module_model") ;
 
         previous_ = new double[4] ;
         for(int i = 0 ; i < previous_.length ; i++)
             previous_[i] = 0.0 ;
 
         elapsed_ = 0.0 ;
+
+        angle_ = 0.0 ;
+        xpos_ = 0.0 ;
+        ypos_ = 0.0 ;
+    }
+
+    public int getModuleLoggerID() {
+        return module_logger_id_ ;
     }
 
     /// \brief called once at the end of the simulator loop
     @Override
     public void endCycle() {
+        //
+        // Write information to the log file about the position of the robot as seen by the model
+        //
+        MessageLogger logger = getEngine().getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, getLoggerID()) ;
+        logger.add("swervedrive") ;
+        logger.add(" ").add(xpos_) ;
+        logger.add(" ").add(ypos_) ;
+        logger.add(" ").add(angle_) ;
+        logger.endMessage() ;
+
+        //
+        // Write information to the network tables about the position on the robot
+        //
+        NetworkTable table_ = NetworkTableInstance.getDefault().getTable(SimulationEngine.NetworkTableName).getSubTable(SubTableName) ;
+        table_.getEntry(TankDriveXPos).setNumber(xpos_) ;
+        table_.getEntry(TankDriveYPos).setNumber(ypos_) ;
+        table_.getEntry(TankDriveAngle).setNumber(angle_) ;
     }
 
     /// \brief create a new simulation model for a tank drive.
@@ -71,13 +129,12 @@ public class SwerveDriveModel extends SimulationModel {
             return false ;
         }
 
-        //
-        // TODO: This needs to be in meters per second
-        //
-        Translation2d fl = new Translation2d(-width_ / 2.0, length_ / 2.0) ;
-        Translation2d fr = new Translation2d(width_ / 2.0, length_ / 2.0) ;
-        Translation2d bl = new Translation2d(-width_ / 2.0, -length_ / 2.0) ;
-        Translation2d br = new Translation2d(width_ / 2.0, -length_ / 2.0) ;
+        double w = inches2Meters(width_) ;
+        double l = inches2Meters(length_) ;
+        Translation2d fl = new Translation2d(-w / 2.0, l / 2.0) ;
+        Translation2d fr = new Translation2d(w / 2.0, l / 2.0) ;
+        Translation2d bl = new Translation2d(-w / 2.0, -l / 2.0) ;
+        Translation2d br = new Translation2d(w / 2.0, -l / 2.0) ;
 
         kinematics_ = new SwerveDriveKinematics(fl, fr, bl, br) ;
         odometry_ = new SwerveDriveOdometry(kinematics_, Rotation2d.fromDegrees(angle));
@@ -106,7 +163,7 @@ public class SwerveDriveModel extends SimulationModel {
         calculatePosition(dt, angles, deltapos) ;
 
         MessageLogger logger = getEngine().getMessageLogger() ;
-        logger.startMessage(MessageType.Debug, getLoggerID()) ;
+        logger.startMessage(MessageType.Debug, getModuleLoggerID()) ;
         logger.add("SwerveDriveMotorPower: ") ;
         logger.add("flsteer", models_[0].getSteerPower()) ;
         logger.add("fldrive", models_[0].getDrivePower()) ;
@@ -268,10 +325,26 @@ public class SwerveDriveModel extends SimulationModel {
 
         elapsed_ += dt ;
 
-        SwerveModuleState fl  = new SwerveModuleState(0.0, Rotation2d.fromDegrees(angles[0])) ;
-        SwerveModuleState fr  = new SwerveModuleState(0.0, Rotation2d.fromDegrees(angles[1])) ;
-        SwerveModuleState bl  = new SwerveModuleState(0.0, Rotation2d.fromDegrees(angles[2])) ;
-        SwerveModuleState br  = new SwerveModuleState(0.0, Rotation2d.fromDegrees(angles[3])) ;
-        odometry_.updateWithTime(elapsed_, Rotation2d.fromDegrees(0.0), fl, fr, bl, br) ;
+        SwerveModuleState fl  = new SwerveModuleState(deltapos[0] / dt, Rotation2d.fromDegrees(angles[0])) ;
+        SwerveModuleState fr  = new SwerveModuleState(deltapos[1] / dt, Rotation2d.fromDegrees(angles[1])) ;
+        SwerveModuleState bl  = new SwerveModuleState(deltapos[2] / dt, Rotation2d.fromDegrees(angles[2])) ;
+        SwerveModuleState br  = new SwerveModuleState(deltapos[3] / dt, Rotation2d.fromDegrees(angles[3])) ;
+        odometry_.updateWithTime(elapsed_, Rotation2d.fromDegrees(angle_), fl, fr, bl, br) ;
+
+        Pose2d pose = odometry_.getPoseMeters() ;
+        navx_.setYaw(pose.getRotation().getDegrees()) ;
+
+        xpos_ = meters2Inches(pose.getTranslation().getX()) ;
+        ypos_ = meters2Inches(pose.getTranslation().getY()) ;
+    }
+
+    static final double InchesPerMeter = 0.0254 ;
+
+    private double inches2Meters(double in) {
+        return in * InchesPerMeter ;
+    }
+
+    private double meters2Inches(double mtr) {
+        return mtr / InchesPerMeter ;
     }
 }
