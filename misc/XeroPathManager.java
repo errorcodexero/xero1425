@@ -56,6 +56,14 @@ public class XeroPathManager
     //
     static final private String LoggerName = "pathmanager" ;
 
+    //
+    // The indexes of the wheels
+    //
+    static public final int FL = 0;                                                             // Index of the front left module
+    static public final int FR = 1;                                                             // Index of the front right module
+    static public final int BL = 2;                                                             // Index of the back left module
+    static public final int BR = 3;                                                             // Index of the back right module
+
     /// \brief create the path manager
     /// \param logger the message logger
     /// \param basedir the base directory where all paths are found
@@ -78,8 +86,8 @@ public class XeroPathManager
             exts_ = new String[4] ;
             exts_[0] = "_fl.csv" ;
             exts_[1] = "_fr.csv" ;
-            exts_[2] = "_fr.csv" ;
-            exts_[3] = "_fr.csv" ;
+            exts_[2] = "_bl.csv" ;
+            exts_[3] = "_br.csv" ;
         }
         else if (path_type_ == XeroPathType.TankPurePursuit)
         {
