@@ -325,10 +325,10 @@ public class SwerveDriveModel extends SimulationModel {
 
         elapsed_ += dt ;
 
-        SwerveModuleState fl  = new SwerveModuleState(deltapos[0] / dt, Rotation2d.fromDegrees(angles[0])) ;
-        SwerveModuleState fr  = new SwerveModuleState(deltapos[1] / dt, Rotation2d.fromDegrees(angles[1])) ;
-        SwerveModuleState bl  = new SwerveModuleState(deltapos[2] / dt, Rotation2d.fromDegrees(angles[2])) ;
-        SwerveModuleState br  = new SwerveModuleState(deltapos[3] / dt, Rotation2d.fromDegrees(angles[3])) ;
+        SwerveModuleState fl  = new SwerveModuleState(inches2Meters(deltapos[0]) / dt, Rotation2d.fromDegrees(angles[0])) ;
+        SwerveModuleState fr  = new SwerveModuleState(inches2Meters(deltapos[1]) / dt, Rotation2d.fromDegrees(angles[1])) ;
+        SwerveModuleState bl  = new SwerveModuleState(inches2Meters(deltapos[2]) / dt, Rotation2d.fromDegrees(angles[2])) ;
+        SwerveModuleState br  = new SwerveModuleState(inches2Meters(deltapos[3]) / dt, Rotation2d.fromDegrees(angles[3])) ;
         odometry_.updateWithTime(elapsed_, Rotation2d.fromDegrees(angle_), fl, fr, bl, br) ;
 
         Pose2d pose = odometry_.getPoseMeters() ;

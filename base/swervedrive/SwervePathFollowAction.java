@@ -6,14 +6,14 @@ import org.xero1425.misc.XeroPath;
 import org.xero1425.misc.XeroPathManager;
 import org.xero1425.misc.XeroPathSegment;
 
-public class SwerveDrivePathFollowAction extends SwerveDriveAction {
+public class SwervePathFollowAction extends SwerveDriveAction {
     private int index_;
     private String pathname_;
     private XeroPath path_;
     private double[] angles_;
     private double[] speeds_;
 
-    public SwerveDrivePathFollowAction(SwerveDriveSubsystem drive, String path) {
+    public SwervePathFollowAction(SwerveDriveSubsystem drive, String path) {
 
         super(drive);
 

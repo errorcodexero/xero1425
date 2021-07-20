@@ -6,7 +6,7 @@ import org.xero1425.misc.XeroMath;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
-public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
+public class SwerveDirectionRotateAction extends SwerveDriveAction {
     private Translation2d dir_ ;
     private double rot_ ;
     private double circum_ ;
@@ -22,11 +22,11 @@ public class SwerveDriveDirectionRotateAction extends SwerveDriveAction {
 
     private final double NearZero = 0.005 ;
 
-    public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot) {
+    public SwerveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot) {
         this(subsys, x, y, rot, Double.MAX_VALUE) ;
     }
 
-    public SwerveDriveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot, double duration) {
+    public SwerveDirectionRotateAction(SwerveDriveSubsystem subsys, double x, double y, double rot, double duration) {
         super(subsys) ;
 
         threshold_ = 0.5 ;

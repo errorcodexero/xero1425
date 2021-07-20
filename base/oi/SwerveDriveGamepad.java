@@ -3,7 +3,7 @@ package org.xero1425.base.oi;
 import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.LoopType;
 import org.xero1425.base.actions.SequenceAction;
-import org.xero1425.base.swervedrive.SwerveDriveDirectionRotateAction;
+import org.xero1425.base.swervedrive.SwerveDirectionRotateAction;
 import org.xero1425.base.swervedrive.SwerveDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
@@ -19,7 +19,7 @@ public class SwerveDriveGamepad extends Gamepad {
     private double deadband_pos_y_ ;
     private double deadband_rotate_ ;
     private double power_ ;
-    private SwerveDriveDirectionRotateAction action_;
+    private SwerveDirectionRotateAction action_;
 
     public SwerveDriveGamepad(OISubsystem oi, int index, DriveBaseSubsystem drive_) throws Exception {
         super(oi, "Xero1425GamePad", index);
@@ -52,7 +52,7 @@ public class SwerveDriveGamepad extends Gamepad {
         angle_maximum_ = settings.get("driver:angle:maximum").getDouble();
         pos_maximum_ = settings.get("driver:position:maximum").getDouble();        
 
-        action_ = new SwerveDriveDirectionRotateAction(db_, 0.0, 0.0, 0.0) ;
+        action_ = new SwerveDirectionRotateAction(db_, 0.0, 0.0, 0.0) ;
     }
 
     @Override
