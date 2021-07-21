@@ -50,8 +50,8 @@ public class SwerveDirectionRotateAction extends SwerveDriveAction {
         // The scale_ flag controls scalling of the final set of velocities, if any module would exceed the maximum
         // velocityh a single module can reach.
         //
-        mirror_ = false ;
-        scale_ = false ;
+        mirror_ = true ;
+        scale_ = true ;
 
         for(int i = 0 ; i < subsys.getModuleCount() ; i++) {
             angles_[i] = 0.0 ;
