@@ -14,7 +14,6 @@ public class SwerveDirectionRotateAction extends SwerveDriveAction {
     private double [] speeds_ ;
     private boolean dirty_ ;
     private double last_robot_angle_ ;
-    private boolean mirror_ ;
     private boolean scale_ ;
     private double duration_ ;
     private double start_ ;
@@ -42,15 +41,9 @@ public class SwerveDirectionRotateAction extends SwerveDriveAction {
         // These should both be true, but can be set to false to remove this processing from the
         // per robot loop calculations when trying to track down bugs.
         //
-        // The mirror_ flag controls the processing that causes a given module to rotate to the opposite
-        // angle than the one requested and reverse the velocity of the drive.  For instance, if a module needs
-        // to be set to 30 degrees and 100 inches per second, but its a shorter path to go to -150 degrees, then
-        // the target will be set to -150 degrees and the velocity changed to -100 inches per second.
-        //
         // The scale_ flag controls scalling of the final set of velocities, if any module would exceed the maximum
         // velocityh a single module can reach.
         //
-        mirror_ = true ;
         scale_ = true ;
 
         for(int i = 0 ; i < subsys.getModuleCount() ; i++) {
@@ -173,34 +166,6 @@ public class SwerveDirectionRotateAction extends SwerveDriveAction {
                 logger.endMessage();
                 for(int i = 0 ; i < speeds_.length ; i++) {
                     speeds_[i] /= scale ;
-                }
-            }
-        }
-
-        if (mirror_)
-        {
-            //
-            // Now, process the desired angles versus the current angles to see if mirroring the wheel works better
-            //
-            for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++) {
-                double modangle = getSubsystem().getModuleAngle(i) ;
-                double delta = Math.abs(XeroMath.normalizeAngleDegrees(modangle - angles_[i])) ;
-                if (delta > 90.0)
-                {
-                    logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
-                    logger.add("Mirrored wheel:") ;
-                    logger.add("index", i) ;
-                    logger.add(" requested [") ;
-                    logger.add("angle", angles_[i]) ;
-                    logger.add("velocity", speeds_[i]) ;
-                    logger.add("]") ;
-                    angles_[i] = XeroMath.normalizeAngleDegrees(180 + angles_[i]) ;
-                    speeds_[i] = -speeds_[i] ;
-                    logger.add(" applied [") ;
-                    logger.add("angle", angles_[i]) ;
-                    logger.add("velocity", speeds_[i]) ;
-                    logger.add("]") ;
-                    logger.endMessage();
                 }
             }
         }

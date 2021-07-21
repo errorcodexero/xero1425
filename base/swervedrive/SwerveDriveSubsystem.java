@@ -236,7 +236,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     public void stop() throws BadMotorRequestException, MotorRequestFailedException {
         for(int i = 0 ; i < getModuleCount() ; i++) {
-            getModule(i).set(0.0, 0.0) ;
+            getModule(i).setPower(0.0, 0.0) ;
         }
     }
 
@@ -244,7 +244,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         if (which < 0 || which > BR)
             throw new Exception("invalid swerve pair address") ;
        
-        getModule(which).set(steer, drive) ;
+        getModule(which).setPower(steer, drive) ;
     }
 
     
@@ -265,21 +265,13 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     public void setTargets(double[] angles, double[] speeds) {
         for(int i = 0 ; i < getModuleCount() ; i++) {
-            getModule(i).setTargetAngle(angles[i]);
-            getModule(i).setTargetVelocity(speeds[i]) ;
+            getModule(i).setTargets(angles[i], speeds[i]) ;
         }
     }
 
-    public void setAngle(double angle) {
+    public void setAngleTarget(double angle) {
         for(int i = 0 ; i < getModuleCount() ; i++) {
-            getModule(i).setTargetAngle(angle);
-        }        
-    }
-
-    public void setNoTargets() {
-        for(int i = 0 ; i <= getModuleCount() ; i++) {
-            getModule(i).setNoAngle();
-            getModule(i).setNoSpeed();
+            getModule(i).setAngle(angle);
         }
     }
 }

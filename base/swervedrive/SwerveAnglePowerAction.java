@@ -23,7 +23,7 @@ public class SwerveAnglePowerAction extends SwerveDriveAction {
     public void start() throws Exception {
         super.start() ;
 
-        getSubsystem().setAngle(angle_) ;
+        getSubsystem().setAngleTarget(angle_) ;
         getSubsystem().setDriveMotorPower(SwerveDriveSubsystem.FL, power_) ;
         getSubsystem().setDriveMotorPower(SwerveDriveSubsystem.FR, power_) ;
         getSubsystem().setDriveMotorPower(SwerveDriveSubsystem.BL, power_) ;

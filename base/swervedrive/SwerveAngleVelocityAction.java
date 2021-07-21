@@ -43,7 +43,14 @@ public class SwerveAngleVelocityAction extends SwerveDriveAction {
         super.cancel() ;
 
         if (hold_ == false)
-            getSubsystem().setNoTargets();
+        {
+            try {
+                getSubsystem().stop() ;
+            }
+            catch(Exception ex) {                
+            }
+        }
+
     }
 
     public String toString(int indent) {

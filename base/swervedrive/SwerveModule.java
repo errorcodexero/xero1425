@@ -13,6 +13,7 @@ import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.PIDCtrl;
 import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
+import org.xero1425.misc.XeroMath;
 
 public class SwerveModule {
     private XeroRobot robot_ ;
@@ -150,7 +151,7 @@ public class SwerveModule {
         drive_.set(p);
     }
 
-    public void set(double steer, double drive) throws BadMotorRequestException, MotorRequestFailedException {
+    public void setPower(double steer, double drive) throws BadMotorRequestException, MotorRequestFailedException {
         setSteerMotorPower(steer);
         setDriveMotorPower(drive) ;
     }
@@ -159,22 +160,23 @@ public class SwerveModule {
         return ticks_ ;
     }
 
-    public void setTargetAngle(double angle) {
+    public void setTargets(double angle, double speed) {
         has_steer_target_ = true ;
-        target_angle_ = angle ;
-    }
-
-    public void setNoAngle() {
-        has_steer_target_ = false ;
-    }
-
-    public void setTargetVelocity(double speed) {
         has_drive_target_ = true ;
+
+        double dist = Math.abs(XeroMath.normalizeAngleDegrees(angle - getAngle())) ;
+        if (dist > 90.0) {
+            angle = XeroMath.normalizeAngleDegrees(angle + 180.0) ;
+            speed = -speed ;
+        }
+
+        target_angle_ = angle ;
         target_speed_ = speed ;
     }
 
-    public void setNoSpeed() {
-        has_drive_target_ = false ;
+    public void setAngle(double angle) {
+        has_steer_target_ = true ;
+        target_angle_ = angle ;
     }
 
     public String status() {
