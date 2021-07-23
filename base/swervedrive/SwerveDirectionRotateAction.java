@@ -2,8 +2,6 @@ package org.xero1425.base.swervedrive;
 
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
-import org.xero1425.misc.XeroMath;
-
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 public class SwerveDirectionRotateAction extends SwerveDriveAction {

@@ -14,6 +14,13 @@ import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
 
+import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
+import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+
 /// \brief The swerve drive subsystem for driving a robot using a drive base where each wheel can be independently steered.
 public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     //
@@ -44,6 +51,9 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     static private Names[] names_ = new Names[4] ;                                              // The names of each module (short name and long name)
 
     static private final String AngularSamplesName = "swervedrive:angularsamples";              // The settings file entry for the angular speedometer
+
+    private SwerveDriveKinematics kinematics_ ;
+    private SwerveDriveOdometry odometry_ ;
 
     private double plot_start_time_ ;
     private boolean plotting_ ;
@@ -109,6 +119,14 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         // Reset the GYRO to zero degrees
         //
         gyro().reset() ;
+
+        Translation2d fl = new Translation2d(-width_ / 2.0, length_ / 2.0) ;
+        Translation2d fr = new Translation2d(width_ / 2.0, length_ / 2.0) ;
+        Translation2d bl = new Translation2d(-width_ / 2.0, -length_ / 2.0) ;
+        Translation2d br = new Translation2d(width_ / 2.0, -length_ / 2.0) ;
+
+        kinematics_ = new SwerveDriveKinematics(fl, fr, bl, br) ;
+
     }
 
     public void startSwervePlot() {
@@ -120,6 +138,17 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     public void endSwervePlot() {
         plotting_ = false ;
         endPlot(plot_id_) ;;
+    }
+
+    public void startOdometry(Pose2d pose) {
+        if (odometry_ == null) {
+            Rotation2d gyroangle = Rotation2d.fromDegrees(getAngle()) ;
+            odometry_ = new SwerveDriveOdometry(kinematics_, gyroangle, pose);
+        }
+    }
+
+    public Pose2d getPose() {
+        return odometry_.getPoseMeters() ;
     }
 
     public double getMaxSpeed() {
@@ -227,6 +256,14 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         if (gyro() != null) {
             double angle = gyro().getYaw();
             angular_.update(getRobot().getDeltaTime(), angle);
+        }
+       
+        if (odometry_ != null) {
+            SwerveModuleState fl = getModule(FL).getModuleStateMeters() ;
+            SwerveModuleState fr = getModule(FR).getModuleStateMeters() ;
+            SwerveModuleState bl = getModule(BL).getModuleStateMeters() ;
+            SwerveModuleState br = getModule(BR).getModuleStateMeters() ;
+            odometry_.updateWithTime(getRobot().getTime(), Rotation2d.fromDegrees(getAngle()), fl, fr, bl, br) ;
         }
 
         putDashboard("fl", DisplayType.Always, getModule(FL).status());

@@ -15,6 +15,9 @@ import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
 import org.xero1425.misc.XeroMath;
 
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
+
 public class SwerveModule {
     private XeroRobot robot_ ;
     private String name_ ;
@@ -108,6 +111,10 @@ public class SwerveModule {
     public void computeMyState(double dt) throws BadMotorRequestException {
         ticks_ = drive_.getPosition() ;
         linear_.update(dt, ticks_ * inches_per_tick_) ;
+    }
+
+    public SwerveModuleState getModuleStateMeters() {
+        return new SwerveModuleState(XeroMath.inchesToMeters(getSpeed()), Rotation2d.fromDegrees(getAngle())) ;
     }
 
     public double getAcceleration() {
