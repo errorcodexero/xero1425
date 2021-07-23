@@ -45,6 +45,18 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     static private final String AngularSamplesName = "swervedrive:angularsamples";              // The settings file entry for the angular speedometer
 
+    private double plot_start_time_ ;
+    private boolean plotting_ ;
+    private int plot_id_ ;
+    private Double [] plot_data_ ;
+    static final String[] plot_columns_ = {             
+        "time", 
+        "fl-spd-target", "fl-spd-actual", "fl-ang-target", "fl-ang-actual",
+        "fr-spd-target", "fr-spd-actual", "fr-ang-target", "fr-ang-actual",
+        "bl-spd-target", "bl-spd-actual", "bl-ang-target", "bl-ang-actual",
+        "br-spd-target", "br-spd-actual", "br-ang-target", "br-ang-actual",                        
+    } ;
+
 
     /// \brief create the serve drive subsystem
     /// \param parent the parent subsystem
@@ -52,6 +64,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     /// \param config the prefix for configuration entries in the settings file
     public SwerveDriveSubsystem(Subsystem parent, String name, String config) throws Exception {
         super(parent, name);
+
+        plotting_ = false ;
+        plot_id_ = initPlot("swervepids") ;
+        plot_data_ = new Double[plot_columns_.length] ;
 
         // Set the module names (short and long)
         names_[FL] = new Names("fl",  "FrontLeft") ;
@@ -93,6 +109,17 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         // Reset the GYRO to zero degrees
         //
         gyro().reset() ;
+    }
+
+    public void startSwervePlot() {
+        plotting_ = true ;
+        startPlot(plot_id_, plot_columns_) ;
+        plot_start_time_ = getRobot().getTime() ;
+    }
+
+    public void endSwervePlot() {
+        plotting_ = false ;
+        endPlot(plot_id_) ;;
     }
 
     public double getMaxSpeed() {
@@ -145,7 +172,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         double total = 0.0 ;
 
         for(int i = 0 ; i < getModuleCount() ; i++) {
-            total += getModule(i).getVelocity() ;
+            total += getModule(i).getSpeed() ;
         }
 
         return total / getModuleCount() ;
@@ -222,6 +249,21 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         logger.add("bl", getModule(BL).status()) ;        
         logger.add("br", getModule(BR).status()) ;
         logger.endMessage();        
+
+        if (plotting_) {
+            int index = 0 ;
+            plot_data_[index++] = getRobot().getTime() - plot_start_time_ ;
+
+            for(int i = 0 ; i < getModuleCount() ; i++) {
+                SwerveModule module = getModule(i) ;
+                plot_data_[index++] = module.getSpeedTarget() ;
+                plot_data_[index++] = module.getSpeed() ;
+                plot_data_[index++] = module.getAngleTarget() ;
+                plot_data_[index++] = module.getAngle() ;
+            }
+
+            addPlotData(plot_id_, plot_data_) ;
+        }
     }
 
     @Override

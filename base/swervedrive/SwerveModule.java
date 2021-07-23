@@ -93,11 +93,11 @@ public class SwerveModule {
 
         if (has_drive_target_)
         {
-            double out = speed_pid_.getOutput(target_speed_, getVelocity(), dt) ;
+            double out = speed_pid_.getOutput(target_speed_, getSpeed(), dt) ;
             logger.add(" [SpeedPID") ;
             logger.add("ticks", ticks_) ;
             logger.add("target", target_speed_) ;
-            logger.add("actual", getVelocity()) ;
+            logger.add("actual", getSpeed()) ;
             logger.add("pidout", out) ;
             logger.add("]") ;
             drive_.set(out) ;
@@ -114,8 +114,12 @@ public class SwerveModule {
         return linear_.getAcceleration() ;
     }
 
-    public double getVelocity() {
+    public double getSpeed() {
         return linear_.getVelocity() ;
+    }
+
+    public double getSpeedTarget() {
+        return target_speed_;
     }
 
     public double getDistance() {
@@ -124,6 +128,10 @@ public class SwerveModule {
 
     public double getAngle() {
         return encoder_.getPosition() ;
+    }
+
+    public double getAngleTarget() {
+        return target_angle_ ;
     }
 
     public void setNeutralMode(MotorController.NeutralMode mode) throws BadMotorRequestException, MotorRequestFailedException {
@@ -180,7 +188,7 @@ public class SwerveModule {
     }
 
     public String status() {
-        String str = String.format("%.2f @ %.2f", getVelocity(), getAngle()) ;
+        String str = String.format("%.2f @ %.2f", getSpeed(), getAngle()) ;
 
         if (has_steer_target_ && has_drive_target_)
         {

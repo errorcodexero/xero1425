@@ -28,6 +28,8 @@ public class SwervePathFollowAction extends SwerveDriveAction {
     public void start() throws Exception {
         super.start();
 
+        getSubsystem().startSwervePlot();
+
         index_ = 0;
         path_ = getSubsystem().getRobot().getPathManager().getPath(pathname_);
     }
@@ -58,6 +60,7 @@ public class SwervePathFollowAction extends SwerveDriveAction {
 
         if (index_ == path_.getSize())
         {
+            getSubsystem().endSwervePlot();
             getSubsystem().stop();
             setDone() ;
         }
