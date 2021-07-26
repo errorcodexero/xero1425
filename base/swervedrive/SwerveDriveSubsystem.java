@@ -50,7 +50,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     static private Names[] names_ = new Names[4] ;                                              // The names of each module (short name and long name)
 
-    static private final String AngularSamplesName = "swervedrive:angularsamples";              // The settings file entry for the angular speedometer
+    static private final String AngularSamplesName = "swervedrive:angular:samples";              // The settings file entry for the angular speedometer
 
     private SwerveDriveKinematics kinematics_ ;
     private SwerveDriveOdometry odometry_ ;

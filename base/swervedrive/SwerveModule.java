@@ -73,7 +73,7 @@ public class SwerveModule {
         linear_ = new Speedometer("linear", samples, false) ;
 
         if (logger_id_ == -1)
-            logger_id_ = logger.registerSubsystem("swerve_module") ;
+            logger_id_ = logger.registerSubsystem("swervemodule") ;
     }
 
     public void run(double dt) throws BadMotorRequestException, MotorRequestFailedException {

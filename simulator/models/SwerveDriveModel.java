@@ -64,7 +64,7 @@ public class SwerveDriveModel extends SimulationModel {
     public SwerveDriveModel(SimulationEngine engine, String model, String inst) {
         super(engine, model, inst);
 
-        module_logger_id_ = engine.getMessageLogger().registerSubsystem("sweverdrive_module_model") ;
+        module_logger_id_ = engine.getMessageLogger().registerSubsystem("swevermodule_model") ;
 
         previous_ = new double[4] ;
         for(int i = 0 ; i < previous_.length ; i++)
