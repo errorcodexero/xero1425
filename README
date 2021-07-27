@@ -7,7 +7,7 @@ cd src/main/java
 mkdir org
 cd org
 git submodule add https://github.com/errorcodexero/xero1425.git xero1425
-git commit -a -m "added xero framwork code"
+git commit -a -m "added xero framework code"
 
 
 
