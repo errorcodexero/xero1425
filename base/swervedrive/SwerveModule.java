@@ -180,7 +180,7 @@ public class SwerveModule {
         has_drive_target_ = true ;
 
         double dist = Math.abs(XeroMath.normalizeAngleDegrees(angle - getAngle())) ;
-        if (dist > 90.0) {
+        if (Math.abs(dist) > 90.0) {
             angle = XeroMath.normalizeAngleDegrees(angle + 180.0) ;
             speed = -speed ;
         }

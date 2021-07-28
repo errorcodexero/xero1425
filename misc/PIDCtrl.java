@@ -84,6 +84,8 @@ public class PIDCtrl
     /// \param isangle if true it is managing an angle between =180 and +180
     public PIDCtrl(SettingsParser settings, String name, boolean isangle) throws MissingParameterException, BadParameterTypeException {
         init(settings, name) ;
+
+        is_angle_ = isangle ;
     }
 
     /// \brief create a new object by reading parameters from the settings parser.
@@ -116,6 +118,14 @@ public class PIDCtrl
 
     public double getFComponent() {
         return fout_ ;
+    }
+
+    public double getLastError() {
+        return last_error_ ;
+    }
+
+    public boolean isAngle() {
+        return is_angle_ ;
     }
 
     /// \brief get the output by using variables & performing the PID calculations
@@ -189,7 +199,7 @@ public class PIDCtrl
             error = XeroMath.normalizeAngleDegrees(target - current) ;
         else
             error = target - current ;
-    
+
         return error ;        
     }
 }

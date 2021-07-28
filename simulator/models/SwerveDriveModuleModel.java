@@ -4,6 +4,7 @@ import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.EncoderMapper;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
+import org.xero1425.misc.XeroMath;
 
 import edu.wpi.first.hal.simulation.AnalogInDataJNI;
 
@@ -183,6 +184,7 @@ public class SwerveDriveModuleModel {
 
         double power = steer_.getPower() ;
         angle_ += degrees_per_second_per_volt_ * dt * power ;
+        angle_ = XeroMath.normalizeAngleDegrees(angle_) ;
         voltage_ = mapper_.toEncoder(angle_) ;
         AnalogInDataJNI.setVoltage(encoder_input_, voltage_) ;
 
