@@ -2,6 +2,8 @@ package org.xero1425.base.swervedrive;
 
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorRequestFailedException;
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
 import org.xero1425.misc.XeroPath;
 import org.xero1425.misc.XeroPathManager;
 import org.xero1425.misc.XeroPathSegment;
@@ -12,6 +14,7 @@ public class SwervePathFollowAction extends SwerveDriveAction {
     private XeroPath path_;
     private double[] angles_;
     private double[] speeds_;
+    private double start_dist_ ;
 
     public SwervePathFollowAction(SwerveDriveSubsystem drive, String path) {
 
@@ -27,6 +30,8 @@ public class SwervePathFollowAction extends SwerveDriveAction {
     @Override
     public void start() throws Exception {
         super.start();
+
+        start_dist_ = getSubsystem().getDistance() ;
 
         getSubsystem().startSwervePlot();
 
@@ -63,6 +68,12 @@ public class SwervePathFollowAction extends SwerveDriveAction {
             getSubsystem().endSwervePlot();
             getSubsystem().stop();
             setDone() ;
+
+            MessageLogger logger = getSubsystem().getRobot().getMessageLogger() ;
+            logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
+            logger.add("Path Following") ;
+            logger.add("distance", getSubsystem().getDistance() - start_dist_) ;
+            logger.endMessage();
         }
     }
 
