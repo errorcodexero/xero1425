@@ -58,7 +58,24 @@ public class SwervePathFollowAction extends SwerveDriveAction {
             speeds_[SwerveDriveSubsystem.BL] = bl.getVelocity() ;
             speeds_[SwerveDriveSubsystem.BR] = br.getVelocity() ;
 
+            MessageLogger logger = getSubsystem().getRobot().getMessageLogger() ;
+            logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
+            logger.add("Assigned Data") ;
+            logger.add("fl").add(fl.getHeading()) ;
+            logger.add("fr").add(fr.getHeading()) ;
+            logger.add("bl").add(bl.getHeading()) ;
+            logger.add("br").add(br.getHeading()) ;
+            logger.endMessage();
+
             getSubsystem().setTargets(angles_, speeds_);
+
+            logger.startMessage(MessageType.Debug, getSubsystem().getLoggerID()) ;
+            logger.add("Assigned Data") ;
+            logger.add("fl").add(getSubsystem().getModule(SwerveDriveSubsystem.FL).getAngle()) ;
+            logger.add("fr").add(getSubsystem().getModule(SwerveDriveSubsystem.FR).getAngle()) ;
+            logger.add("bl").add(getSubsystem().getModule(SwerveDriveSubsystem.BL).getAngle()) ;
+            logger.add("br").add(getSubsystem().getModule(SwerveDriveSubsystem.BR).getAngle()) ;
+            logger.endMessage();
 
             index_++ ;
         }
