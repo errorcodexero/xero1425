@@ -48,7 +48,11 @@ public abstract class DriveBaseSubsystem extends Subsystem {
         }
     }
 
-    public abstract Gamepad createGamePad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception ;
+    /// \brief returns true to indicate this is a drivebase
+    /// \returns true to indicate this is a drivebase
+    public boolean isDB() {
+        return true;
+    }
 
     protected boolean hasGyro() {
         return gyro_ != null ;

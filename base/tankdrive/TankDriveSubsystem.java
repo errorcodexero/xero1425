@@ -148,10 +148,6 @@ public class TankDriveSubsystem extends DriveBaseSubsystem {
         recording_start_ = getRobot().getTime();
     }
 
-    public Gamepad createGamePad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception {
-        return new TankDriveGamepad(oi, index, drive);
-    }
-
     /// \brief returns true to indicate this is a drivebase
     /// \returns true to indicate this is a drivebase
     public boolean isDB() {
