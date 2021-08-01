@@ -219,6 +219,10 @@ public class SwerveDriveModuleModel {
         return drive_.getPower() ;
     }
 
+    public double getSpeed() {
+        return current_speed_ ;
+    }
+
     public double getAngle() {
         return angle_ ;
     }
