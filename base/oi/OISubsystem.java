@@ -111,6 +111,12 @@ public abstract class OISubsystem extends Subsystem {
                     HIDDevice hid = createDevice(dev.getName()) ;
                     hid.createStaticActions();
                     dev.setDevice(hid);
+
+                    MessageLogger logger = getRobot().getMessageLogger() ;
+                    logger.startMessage(MessageType.Debug, getLoggerID()) ;
+                    logger.add("Created HID device:") ;
+                    logger.add("name", dev.getName()) ;
+                    logger.endMessage() ;
                 }
                 catch(Exception ex)
                 {
@@ -136,7 +142,7 @@ public abstract class OISubsystem extends Subsystem {
     public void generateActions(SequenceAction seq) throws InvalidActionRequest {
         for(OIDeviceNeeded dev : devices_.values())
         {
-            if (dev.hasError() && dev.getDevice().isEnabled())
+            if (!dev.hasError() && dev.getDevice().isEnabled())
                 dev.getDevice().generateActions(seq) ;
         }
     }
