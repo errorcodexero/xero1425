@@ -6,17 +6,16 @@ import org.xero1425.base.Subsystem;
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.MotorRequestFailedException;
-import org.xero1425.base.oi.Gamepad;
-import org.xero1425.base.oi.OISubsystem;
-import org.xero1425.base.oi.SwerveDriveGamepad;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
+import org.xero1425.misc.XeroMath;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.wpilibj.kinematics.SwerveDriveOdometry;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
@@ -120,13 +119,12 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         //
         gyro().reset() ;
 
-        Translation2d fl = new Translation2d(-width_ / 2.0, length_ / 2.0) ;
-        Translation2d fr = new Translation2d(width_ / 2.0, length_ / 2.0) ;
-        Translation2d bl = new Translation2d(-width_ / 2.0, -length_ / 2.0) ;
-        Translation2d br = new Translation2d(width_ / 2.0, -length_ / 2.0) ;
+        Translation2d fl = new Translation2d(XeroMath.inchesToMeters(-width_ / 2.0), XeroMath.inchesToMeters(length_ / 2.0)) ;
+        Translation2d fr = new Translation2d(XeroMath.inchesToMeters(width_ / 2.0), XeroMath.inchesToMeters(length_ / 2.0)) ;
+        Translation2d bl = new Translation2d(XeroMath.inchesToMeters(-width_ / 2.0), XeroMath.inchesToMeters(-length_ / 2.0)) ;
+        Translation2d br = new Translation2d(XeroMath.inchesToMeters(width_ / 2.0), XeroMath.inchesToMeters(-length_ / 2.0)) ;
 
         kinematics_ = new SwerveDriveKinematics(fl, fr, bl, br) ;
-
     }
 
     public void startSwervePlot() {
@@ -143,12 +141,14 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     public void startOdometry(Pose2d pose) {
         if (odometry_ == null) {
             Rotation2d gyroangle = Rotation2d.fromDegrees(getAngle()) ;
-            odometry_ = new SwerveDriveOdometry(kinematics_, gyroangle, pose);
+            Pose2d p = new Pose2d(XeroMath.inchesToMeters(pose.getX()), XeroMath.inchesToMeters(pose.getY()), pose.getRotation()) ;
+            odometry_ = new SwerveDriveOdometry(kinematics_, gyroangle, p);
         }
     }
 
     public Pose2d getPose() {
-        return odometry_.getPoseMeters() ;
+        Pose2d mtrs = odometry_.getPoseMeters() ;
+        return new Pose2d(XeroMath.metersToInches(mtrs.getX()), XeroMath.metersToInches(mtrs.getY()), mtrs.getRotation()) ;
     }
 
     public double getMaxSpeed() {
@@ -306,6 +306,15 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     public void stop() throws BadMotorRequestException, MotorRequestFailedException {
         for(int i = 0 ; i < getModuleCount() ; i++) {
             getModule(i).setPower(0.0, 0.0) ;
+        }
+    }
+
+    public void setChassisSpeeds(ChassisSpeeds speeds) {
+        SwerveModuleState[] states = kinematics_.toSwerveModuleStates(speeds);
+
+        for (int i = 0; i < getModuleCount(); i++) {
+            double speed = XeroMath.metersToInches(states[i].speedMetersPerSecond) ;
+            getModule(i).setTargets(states[i].angle.getDegrees(), speed) ;
         }
     }
 

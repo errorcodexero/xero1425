@@ -42,7 +42,6 @@ public class SwerveRamseteAction extends SwerveDriveAction {
         index_ = 0 ;
 
         XeroPathSegment seg = path_.getSegment(MainRobot, 0) ;
-
         Pose2d start = new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading())) ;
         getSubsystem().startOdometry(start) ;
     }
@@ -52,7 +51,7 @@ public class SwerveRamseteAction extends SwerveDriveAction {
         if (index_ < path_.getSize()) {
             SwerveDriveSubsystem sub = getSubsystem() ;
 
-           // Current pose in meters
+           // Current pose in inches
            Pose2d currentPose = sub.getPose() ;
 
            // Current segment in inches
@@ -79,9 +78,7 @@ public class SwerveRamseteAction extends SwerveDriveAction {
            // Robot speed in meters per second
            ChassisSpeeds speeds = ctrl_.calculate(currentPose, desiredPose, linearVelocityRefMeters, angularVelocityRefRadiansPerSecond) ;
 
-           double xvel = XeroMath.metersToInches(speeds.vxMetersPerSecond) ;
-           double yvel = XeroMath.metersToInches(speeds.vyMetersPerSecond) ;
-           double rot = 0.0 ;
+           getSubsystem().setChassisSpeeds(speeds) ;
 
            index_++ ;
        }
