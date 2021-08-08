@@ -27,7 +27,7 @@ public abstract class DriveBaseSubsystem extends Subsystem {
 
 
     public DriveBaseSubsystem(Subsystem parent, String name) 
-                        throws BadParameterException, MissingParameterException {
+            throws BadParameterTypeException, MissingParameterException {
         super(parent, name) ;
 
         MessageLogger logger = getRobot().getMessageLogger() ;  
@@ -74,7 +74,7 @@ public abstract class DriveBaseSubsystem extends Subsystem {
     protected boolean HasGyro() {
         return gyro_ != null ;
     }
-    protected XeroGyro Gyro() {
+    protected XeroGyro gyro() {
         return gyro_ ;
     }
 
@@ -99,26 +99,21 @@ public abstract class DriveBaseSubsystem extends Subsystem {
             case Teleop:
                 nm = teleop_neutral_ ;
                 break ;
-            case Disabled:
+            case Test:
                 nm = disabled_neutral_ ;
                 break ;
-            case Test:
+            case Disabled:
                 nm = disabled_neutral_ ;
                 break ;   
         }
         return nm ;
     }
 
-/// common sw:
-// brake mode
-// gyro
-
-
-/// common interface:
-// pos
-// vel
-// accel
-// heading
+    /// TBD add common interface:
+    // pos
+    // vel
+    // accel
+    // heading
 
 
 }
