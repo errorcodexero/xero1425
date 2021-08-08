@@ -22,6 +22,8 @@ import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
 
+import DriveBaseSubsystem ;
+
 /// \brief The tankdrive subsystem for driving a robot using a tank drive type drivebase.
 /// 
 /// This class expects entries in the settings file.
