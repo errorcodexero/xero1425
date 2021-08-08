@@ -65,7 +65,10 @@ public abstract class DriveBaseSubsystem extends Subsystem {
 
     }
 
-    ///DB
+    //Gamepad
+    abstract void createGamePad() ;
+
+    //DB
     public boolean isDriveBase() {
         return true ;
     }
