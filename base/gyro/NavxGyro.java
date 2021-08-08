@@ -21,4 +21,9 @@ public class NavxGyro implements XeroGyro {
     public double getAngle() {
         return navx_.getAngle() ;
     }
+
+    public void reset() {
+        navx_.reset() ;
+    }
+
 }
