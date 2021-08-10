@@ -1,5 +1,6 @@
 package org.xero1425.base.swervedrive;
 
+import org.xero1425.base.Subsystem.DisplayType;
 import org.xero1425.misc.XeroMath;
 import org.xero1425.misc.XeroPath;
 import org.xero1425.misc.XeroPathSegment;
@@ -54,8 +55,18 @@ public class SwerveRamseteAction extends SwerveDriveAction {
            // Current pose in inches
            Pose2d currentPose = sub.getPose() ;
 
+           sub.putDashboard("db-trk-t", DisplayType.Always, sub.getRobot().getTime()) ;
+           sub.putDashboard("db-trk-x", DisplayType.Always, currentPose.getX()) ;
+           sub.putDashboard("db-trk-y", DisplayType.Always, currentPose.getY()) ;
+           sub.putDashboard("db-trk-a", DisplayType.Always, currentPose.getRotation().getDegrees()) ;
+
            // Current segment in inches
            XeroPathSegment seg = path_.getSegment(MainRobot, index_) ;
+
+           sub.putDashboard("db-path-t", DisplayType.Always, sub.getRobot().getTime()) ;
+           sub.putDashboard("db-path-x", DisplayType.Always, seg.getX()) ;
+           sub.putDashboard("db-path-y", DisplayType.Always, seg.getY()) ;
+           sub.putDashboard("db-path-a", DisplayType.Always, seg.getHeading()) ;
 
            // Desired pose in meters
            Pose2d desiredPose = new Pose2d(XeroMath.inchesToMeters(seg.getX()), 

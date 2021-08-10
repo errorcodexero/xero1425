@@ -238,8 +238,6 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     }
 
     public void computeMyState() throws BadMotorRequestException {
-        //
-        //
         for (int i = 0; i < getModuleCount(); i++)
             getModule(i).computeMyState(getRobot().getDeltaTime());
 
