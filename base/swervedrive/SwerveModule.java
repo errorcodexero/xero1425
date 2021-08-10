@@ -64,17 +64,17 @@ public class SwerveModule {
         drive_ = robot.getMotorFactory().createMotor(name + "-drive", config + ":drive") ;
         encoder_ = new XeroEncoder(robot, config + ":encoder", true, null) ;
 
-        steer_power_ = 0 ;   //is a double
-        drive_power_ = 0 ;   //is a double
+        steer_power_ = 0.0 ;  
+        drive_power_ = 0.0 ;   
         
         has_steer_target_ = false ;
         has_drive_target_ = false ;
 
-        target_angle_ = 0 ;  //is a double
-        target_speed_ = 0 ;  //is a double
+        target_angle_ = 0.0 ;  //is a double
+        target_speed_ = 0.0 ;  //is a double
 
-        angle_pid_ = new PIDCtrl(robot.getSettingsParser(), config + ":steer:pid", true) ; //replace "robot.getSettingsParser" with "settings" ??
-        speed_pid_ = new PIDCtrl(robot.getSettingsParser(), config + ":drive:pid", false) ;
+        angle_pid_ = new PIDCtrl(settings, config + ":steer:pid", true) ;
+        speed_pid_ = new PIDCtrl(settings, config + ":drive:pid", false) ;
 
         int samples = 2 ;
         if (settings.isDefined(LinearSamplesName) && settings.get(LinearSamplesName).isInteger()) {
@@ -191,7 +191,7 @@ public class SwerveModule {
 
     public void setTargets(double angle, double speed) {
         
-        double dist = Math.abs(XeroMath.normalizeAngleDegrees(angle - getAngle()))
+        double dist = Math.abs(XeroMath.normalizeAngleDegrees(angle - getAngle())) ;
         if(Math.abs(dist) > 90.0) {
             angle = XeroMath.normalizeAngleDegrees(angle + 180) ;
             speed = -speed ; 
@@ -200,14 +200,12 @@ public class SwerveModule {
         target_angle_ = angle ;
         target_speed_ = speed ;
 
-        //moved to end of function as opposed to at the beginning
         has_steer_target_ = true ;
         has_drive_target_ = true ;
     }
 
     public void setAngle(double angle) {
         target_angle_ = angle ;
-        //again, moved to end of function as opposed to at the beginning
         has_steer_target_ = true ;
     }
 
