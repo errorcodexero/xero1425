@@ -16,7 +16,6 @@ import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
 import org.xero1425.misc.XeroMath;
 
-//import edu.wpi.first.wpilibj.PIDController;   //don't use this...
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.kinematics.SwerveModuleState;
 
@@ -70,8 +69,8 @@ public class SwerveModule {
         has_steer_target_ = false ;
         has_drive_target_ = false ;
 
-        target_angle_ = 0.0 ;  //is a double
-        target_speed_ = 0.0 ;  //is a double
+        target_angle_ = 0.0 ; 
+        target_speed_ = 0.0 ; 
 
         angle_pid_ = new PIDCtrl(settings, config + ":steer:pid", true) ;
         speed_pid_ = new PIDCtrl(settings, config + ":drive:pid", false) ;
@@ -124,7 +123,7 @@ public class SwerveModule {
         linear_.update(dt, ticks_ * inches_per_tick_) ;
     }
 
-    public SwerveModuleState getModuleStateMeters() {  //Why use meter conversion -- we usually do inches...
+    public SwerveModuleState getModuleStateMeters() {  
         return new SwerveModuleState(XeroMath.inchesToMeters(getSpeed()), Rotation2d.fromDegrees(getAngle()))
     }
 
