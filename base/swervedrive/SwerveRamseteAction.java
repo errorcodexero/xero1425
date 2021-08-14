@@ -1,6 +1,8 @@
 package org.xero1425.base.swervedrive;
 
 import org.xero1425.base.Subsystem.DisplayType;
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
 import org.xero1425.misc.XeroMath;
 import org.xero1425.misc.XeroPath;
 import org.xero1425.misc.XeroPathSegment;
@@ -52,47 +54,56 @@ public class SwerveRamseteAction extends SwerveDriveAction {
         if (index_ < path_.getSize()) {
             SwerveDriveSubsystem sub = getSubsystem() ;
 
-           // Current pose in inches
-           Pose2d currentPose = sub.getPose() ;
+            // Current pose in inches
+            Pose2d currentPoseInches = sub.getPose() ;
+            Pose2d currentPose = new Pose2d(XeroMath.inchesToMeters(currentPoseInches.getX()), XeroMath.inchesToMeters(currentPoseInches.getY()), currentPoseInches.getRotation()) ;
 
-           sub.putDashboard("db-trk-t", DisplayType.Always, sub.getRobot().getTime()) ;
-           sub.putDashboard("db-trk-x", DisplayType.Always, currentPose.getX()) ;
-           sub.putDashboard("db-trk-y", DisplayType.Always, currentPose.getY()) ;
-           sub.putDashboard("db-trk-a", DisplayType.Always, currentPose.getRotation().getDegrees()) ;
+            sub.putDashboard("db-trk-t", DisplayType.Always, sub.getRobot().getTime()) ;
+            sub.putDashboard("db-trk-x", DisplayType.Always, currentPoseInches.getX()) ;
+            sub.putDashboard("db-trk-y", DisplayType.Always, currentPoseInches.getY()) ;
+            sub.putDashboard("db-trk-a", DisplayType.Always, currentPoseInches.getRotation().getDegrees()) ;
 
-           // Current segment in inches
-           XeroPathSegment seg = path_.getSegment(MainRobot, index_) ;
+            // Current segment in inches
+            XeroPathSegment seg = path_.getSegment(MainRobot, index_) ;
 
-           sub.putDashboard("db-path-t", DisplayType.Always, sub.getRobot().getTime()) ;
-           sub.putDashboard("db-path-x", DisplayType.Always, seg.getX()) ;
-           sub.putDashboard("db-path-y", DisplayType.Always, seg.getY()) ;
-           sub.putDashboard("db-path-a", DisplayType.Always, seg.getHeading()) ;
+            sub.putDashboard("db-path-t", DisplayType.Always, sub.getRobot().getTime()) ;
+            sub.putDashboard("db-path-x", DisplayType.Always, seg.getX()) ;
+            sub.putDashboard("db-path-y", DisplayType.Always, seg.getY()) ;
+            sub.putDashboard("db-path-a", DisplayType.Always, seg.getHeading()) ;
 
-           // Desired pose in meters
-           Pose2d desiredPose = new Pose2d(XeroMath.inchesToMeters(seg.getX()), 
-                                            XeroMath.inchesToMeters(seg.getY()), 
-                                            Rotation2d.fromDegrees(seg.getHeading())) ;
+            // Desired pose in meters
+            Pose2d desiredPose = new Pose2d(XeroMath.inchesToMeters(seg.getX()), 
+                                                XeroMath.inchesToMeters(seg.getY()), 
+                                                Rotation2d.fromDegrees(seg.getHeading())) ;
 
-           // The desired linear velocity in meters
-           double linearVelocityRefMeters = XeroMath.inchesToMeters(seg.getVelocity()) ;
+            // The desired linear velocity in meters
+            double linearVelocityRefMeters = XeroMath.inchesToMeters(seg.getVelocity()) ;
 
-           // The desired angular velocity in radians per second
-           double angularVelocityRefRadiansPerSecond = 0.0 ;
+            // The desired angular velocity in radians per second
+            double angularVelocityRefRadiansPerSecond = 0.0 ;
 
-           if (index_ != 0) {
-               XeroPathSegment prev = path_.getSegment(MainRobot, index_ - 1) ;
+            if (index_ != 0) {
+                XeroPathSegment prev = path_.getSegment(MainRobot, index_ - 1) ;
 
-               // Compute the angular velocity in radians per second
-               angularVelocityRefRadiansPerSecond = XeroMath.normalizeAngleDegrees(seg.getHeading() - prev.getHeading()) / getSubsystem().getRobot().getPeriod() / 180.0 * Math.PI ;
-           }
+                // Compute the angular velocity in radians per second
+                angularVelocityRefRadiansPerSecond = XeroMath.normalizeAngleDegrees(seg.getHeading() - prev.getHeading()) / getSubsystem().getRobot().getPeriod() / 180.0 * Math.PI ;
+            }
 
-           // Robot speed in meters per second
-           ChassisSpeeds speeds = ctrl_.calculate(currentPose, desiredPose, linearVelocityRefMeters, angularVelocityRefRadiansPerSecond) ;
+            // Robot speed in meters per second
+            ChassisSpeeds speeds = ctrl_.calculate(currentPose, desiredPose, linearVelocityRefMeters, angularVelocityRefRadiansPerSecond) ;
+            MessageLogger logger = sub.getRobot().getMessageLogger() ;
+            logger.startMessage(MessageType.Debug, sub.getLoggerID()) ;
+            logger.add("vx", speeds.vxMetersPerSecond) ;
+            logger.add("vy", speeds.vyMetersPerSecond) ;
+            logger.add("ang", XeroMath.rad2deg(speeds.omegaRadiansPerSecond)) ;
+            logger.add("pose-angle", currentPose.getRotation().getDegrees()) ;
+            logger.add("target-angle", desiredPose.getRotation().getDegrees()) ;
+            logger.endMessage(); 
 
-           getSubsystem().setChassisSpeeds(speeds) ;
+            getSubsystem().setChassisSpeeds(speeds) ;
 
-           index_++ ;
-       }
+            index_++ ;
+        }
 
        if (index_ == path_.getSize())
        {

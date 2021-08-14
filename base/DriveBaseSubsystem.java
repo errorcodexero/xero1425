@@ -4,12 +4,13 @@ import org.xero1425.base.gyro.NavxGyro;
 import org.xero1425.base.gyro.RomiGyro;
 import org.xero1425.base.gyro.XeroGyro;
 import org.xero1425.base.motors.MotorController;
-import org.xero1425.base.oi.Gamepad;
-import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
+import org.xero1425.misc.XeroMath;
+
+import edu.wpi.first.wpilibj.geometry.Pose2d;
 
 public abstract class DriveBaseSubsystem extends Subsystem {
     private XeroGyro gyro_;
@@ -46,6 +47,14 @@ public abstract class DriveBaseSubsystem extends Subsystem {
             logger.endMessage();
             gyro_ = null;
         }
+    }
+
+    public static Pose2d inchesToMeters(Pose2d p) {
+        return new Pose2d(XeroMath.inchesToMeters(p.getX()), XeroMath.inchesToMeters(p.getY()), p.getRotation()) ;
+    }
+
+    public static Pose2d metersToInches(Pose2d p) {
+        return new Pose2d(XeroMath.metersToInches(p.getX()), XeroMath.metersToInches(p.getY()), p.getRotation()) ;
     }
 
     /// \brief returns true to indicate this is a drivebase

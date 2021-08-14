@@ -119,10 +119,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         //
         gyro().reset() ;
 
-        Translation2d fl = new Translation2d(XeroMath.inchesToMeters(-width_ / 2.0), XeroMath.inchesToMeters(length_ / 2.0)) ;
-        Translation2d fr = new Translation2d(XeroMath.inchesToMeters(width_ / 2.0), XeroMath.inchesToMeters(length_ / 2.0)) ;
-        Translation2d bl = new Translation2d(XeroMath.inchesToMeters(-width_ / 2.0), XeroMath.inchesToMeters(-length_ / 2.0)) ;
-        Translation2d br = new Translation2d(XeroMath.inchesToMeters(width_ / 2.0), XeroMath.inchesToMeters(-length_ / 2.0)) ;
+        Translation2d fl = new Translation2d(XeroMath.inchesToMeters(width_ / 2.0), XeroMath.inchesToMeters(length_ / 2.0)) ;
+        Translation2d fr = new Translation2d(XeroMath.inchesToMeters(width_ / 2.0), XeroMath.inchesToMeters(-length_ / 2.0)) ;
+        Translation2d bl = new Translation2d(XeroMath.inchesToMeters(-width_ / 2.0), XeroMath.inchesToMeters(length_ / 2.0)) ;
+        Translation2d br = new Translation2d(XeroMath.inchesToMeters(-width_ / 2.0), XeroMath.inchesToMeters(-length_ / 2.0)) ;
 
         kinematics_ = new SwerveDriveKinematics(fl, fr, bl, br) ;
     }
@@ -147,8 +147,11 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
     }
 
     public Pose2d getPose() {
-        Pose2d mtrs = odometry_.getPoseMeters() ;
-        return new Pose2d(XeroMath.metersToInches(mtrs.getX()), XeroMath.metersToInches(mtrs.getY()), mtrs.getRotation()) ;
+        return DriveBaseSubsystem.metersToInches(getPoseMeters()) ;
+    }
+
+    public Pose2d getPoseMeters() {
+        return odometry_.getPoseMeters() ;
     }
 
     public double getMaxSpeed() {
