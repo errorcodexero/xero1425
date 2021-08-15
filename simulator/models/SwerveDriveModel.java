@@ -10,7 +10,6 @@ import org.xero1425.simulator.engine.SimulationModel;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.geometry.Translation2d;
 
 public class SwerveDriveModel extends SimulationModel {
     private SwerveDriveModuleModel [] models_ ;
@@ -351,15 +350,5 @@ public class SwerveDriveModel extends SimulationModel {
             xpos_ += dx ;
             ypos_ += dy ;
         }
-    }
-
-    static final double InchesPerMeter = 0.0254 ;
-
-    private double inches2Meters(double in) {
-        return in * InchesPerMeter ;
-    }
-
-    private double meters2Inches(double mtr) {
-        return mtr / InchesPerMeter ;
     }
 }

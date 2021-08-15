@@ -46,7 +46,7 @@ public class SwerveRamseteAction extends SwerveDriveAction {
 
         XeroPathSegment seg = path_.getSegment(MainRobot, 0) ;
         Pose2d start = new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading())) ;
-        getSubsystem().startOdometry(start) ;
+        getSubsystem().resetOdometry(start) ;
     }
 
     @Override

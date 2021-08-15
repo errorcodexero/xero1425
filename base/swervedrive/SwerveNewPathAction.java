@@ -1,70 +1,87 @@
 package org.xero1425.base.swervedrive;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.Subsystem.DisplayType;
 import org.xero1425.misc.XeroMath;
+import org.xero1425.misc.XeroPath;
+import org.xero1425.misc.XeroPathSegment;
 
-import edu.wpi.first.wpilibj.controller.RamseteController;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
-import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
-import edu.wpi.first.wpilibj.trajectory.Trajectory;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryConfig;
-import edu.wpi.first.wpilibj.trajectory.TrajectoryGenerator;
 
 public class SwerveNewPathAction extends SwerveDriveAction {
-    private Trajectory traj_ ;
-    private RamseteController ctrl_ ;
-    private double start_ ;
+    private String pathname_ ;
+    private XeroPath path_ ;
+    private int index_ ;
+    private double [] angles_ ;
+    private double [] speeds_ ;
 
-    public SwerveNewPathAction(SwerveDriveSubsystem sub) {
+    static private final int MainRobot = 0 ;
+
+    public SwerveNewPathAction(SwerveDriveSubsystem sub, String pathname) {
         super(sub) ;
+
+        pathname_ = pathname ;
+        angles_ = new double[getSubsystem().getModuleCount()] ;
+        speeds_ = new double[getSubsystem().getModuleCount()] ;
     }
 
     @Override
     public void start() throws Exception {
         super.start();
 
-        List<Pose2d> pts  = new ArrayList<Pose2d>() ;
+        getSubsystem().startSwervePlot();
 
-        pts.add(new Pose2d(XeroMath.inchesToMeters(0.0), XeroMath.inchesToMeters(180.0), Rotation2d.fromDegrees(0.0))) ;
-        pts.add(new Pose2d(XeroMath.inchesToMeters(120.0), XeroMath.inchesToMeters(60.0), Rotation2d.fromDegrees(-90.0))) ;
+        path_ = getSubsystem().getRobot().getPathManager().getPath(pathname_);
+        index_ = 0 ;
 
-        TrajectoryConfig cfg = new TrajectoryConfig(XeroMath.inchesToMeters(140), XeroMath.inchesToMeters(140)) ;
-        traj_ = TrajectoryGenerator.generateTrajectory(pts, cfg) ;
-        start_ = getSubsystem().getRobot().getTime() ;
-        ctrl_ = new RamseteController() ;
-
-        getSubsystem().startOdometry(DriveBaseSubsystem.metersToInches(traj_.getInitialPose())) ;
+        Pose2d initial = DriveBaseSubsystem.segmentToPose(path_.getSegment(MainRobot, 0)) ;
+        getSubsystem().resetOdometry(initial) ;
     }
 
     @Override
     public void run() {
-        double elapsed = getSubsystem().getRobot().getTime() - start_ ;
-        if (elapsed < traj_.getTotalTimeSeconds())
+        if (index_ < path_.getSize())
         {
-            Pose2d currentPoseInches = getSubsystem().getPose() ;
-            getSubsystem().putDashboard("db-trk-t", DisplayType.Always, getSubsystem().getRobot().getTime()) ;
-            getSubsystem().putDashboard("db-trk-x", DisplayType.Always, currentPoseInches.getX()) ;
-            getSubsystem().putDashboard("db-trk-y", DisplayType.Always, currentPoseInches.getY()) ;
-            getSubsystem().putDashboard("db-trk-a", DisplayType.Always, currentPoseInches.getRotation().getDegrees()) ;
-            
-            Trajectory.State st = traj_.sample(elapsed) ;
-            ChassisSpeeds speed = ctrl_.calculate(getSubsystem().getPoseMeters(), st) ;
-            getSubsystem().setChassisSpeeds(speed) ;
+            var sub = getSubsystem() ;
+            XeroPathSegment seg = path_.getSegment(MainRobot, index_) ;
 
-            Pose2d pathpose = DriveBaseSubsystem.metersToInches(st.poseMeters) ;
-            getSubsystem().putDashboard("db-path-t", DisplayType.Always, getSubsystem().getRobot().getTime()) ;
-            getSubsystem().putDashboard("db-path-x", DisplayType.Always, pathpose.getX()) ;
-            getSubsystem().putDashboard("db-path-y", DisplayType.Always, pathpose.getY()) ;
-            getSubsystem().putDashboard("db-path-a", DisplayType.Always, pathpose.getRotation().getDegrees()) ;
+            Pose2d pos = getSubsystem().getPose() ;
+            Pose2d desired = DriveBaseSubsystem.segmentToPose(seg) ;
+            Pose2d err = desired.relativeTo(pos) ;
+
+
+            //
+            // The desired angle is to get us back to the desired position
+            // The desired velocity is the velocity of the path
+            //
+            double angle = Math.toDegrees(Math.atan2(err.getY(), err.getX())) ;
+
+            for(int i = 0 ; i < getSubsystem().getModuleCount() ; i++)
+            {
+                angles_[i] = angle ;
+                speeds_[i] = seg.getVelocity() ;
+            }
+
+            getSubsystem().setTargets(angles_, speeds_);
+
+            sub.putDashboard("db-trk-t", DisplayType.Always, sub.getRobot().getTime()) ;
+            sub.putDashboard("db-trk-x", DisplayType.Always, pos.getX()) ;
+            sub.putDashboard("db-trk-y", DisplayType.Always, pos.getY()) ;
+            sub.putDashboard("db-trk-a", DisplayType.Always, pos.getRotation().getDegrees()) ;
+
+            sub.putDashboard("db-path-t", DisplayType.Always, sub.getRobot().getTime()) ;
+            sub.putDashboard("db-path-x", DisplayType.Always, seg.getX()) ;
+            sub.putDashboard("db-path-y", DisplayType.Always, seg.getY()) ;
+            sub.putDashboard("db-path-a", DisplayType.Always, seg.getHeading()) ;
         }
-        else
+
+        index_++ ;
+        
+        if (index_ == path_.getSize())
         {
             setDone() ;
+            getSubsystem().endSwervePlot();
         }
     }
 

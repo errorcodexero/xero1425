@@ -125,6 +125,8 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         Translation2d br = new Translation2d(XeroMath.inchesToMeters(-width_ / 2.0), XeroMath.inchesToMeters(-length_ / 2.0)) ;
 
         kinematics_ = new SwerveDriveKinematics(fl, fr, bl, br) ;
+
+        resetOdometry(new Pose2d(0, 0, Rotation2d.fromDegrees(0))) ;
     }
 
     public void startSwervePlot() {
@@ -138,12 +140,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         endPlot(plot_id_) ;;
     }
 
-    public void startOdometry(Pose2d pose) {
-        if (odometry_ == null) {
-            Rotation2d gyroangle = Rotation2d.fromDegrees(getAngle()) ;
-            Pose2d p = new Pose2d(XeroMath.inchesToMeters(pose.getX()), XeroMath.inchesToMeters(pose.getY()), pose.getRotation()) ;
-            odometry_ = new SwerveDriveOdometry(kinematics_, gyroangle, p);
-        }
+    public void resetOdometry(Pose2d pose) {
+        Rotation2d gyroangle = Rotation2d.fromDegrees(getAngle()) ;
+        Pose2d p = new Pose2d(XeroMath.inchesToMeters(pose.getX()), XeroMath.inchesToMeters(pose.getY()), pose.getRotation()) ;
+        odometry_ = new SwerveDriveOdometry(kinematics_, gyroangle, p);
     }
 
     public Pose2d getPose() {

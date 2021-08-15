@@ -9,8 +9,10 @@ import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.XeroMath;
+import org.xero1425.misc.XeroPathSegment;
 
 import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 public abstract class DriveBaseSubsystem extends Subsystem {
     private XeroGyro gyro_;
@@ -55,6 +57,10 @@ public abstract class DriveBaseSubsystem extends Subsystem {
 
     public static Pose2d metersToInches(Pose2d p) {
         return new Pose2d(XeroMath.metersToInches(p.getX()), XeroMath.metersToInches(p.getY()), p.getRotation()) ;
+    }
+
+    public static Pose2d segmentToPose(XeroPathSegment seg) {
+        return new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading())) ;
     }
 
     /// \brief returns true to indicate this is a drivebase
