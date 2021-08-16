@@ -2,12 +2,9 @@ package org.xero1425.base.swervedrive;
 
 import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.Subsystem.DisplayType;
-import org.xero1425.misc.XeroMath;
 import org.xero1425.misc.XeroPath;
 import org.xero1425.misc.XeroPathSegment;
-
 import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 public class SwerveNewPathAction extends SwerveDriveAction {
     private String pathname_ ;

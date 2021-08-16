@@ -3,6 +3,8 @@ package org.xero1425.base.tankdrive;
 import org.xero1425.base.XeroRobot;
 import org.xero1425.base.Subsystem.DisplayType;
 import org.xero1425.base.utils.LineSegment;
+import org.xero1425.base.utils.LookAheadPoint;
+import org.xero1425.base.utils.PathPoint;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
