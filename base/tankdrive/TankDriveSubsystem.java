@@ -385,6 +385,9 @@ public class TankDriveSubsystem extends Subsystem {
             last_dist_l_ = dist_l_ ;
             last_dist_r_ = dist_r_ ;
 
+            putDashboard("ldist", DisplayType.Verbose, dist_l_);
+            putDashboard("rdist", DisplayType.Verbose, dist_r_);
+
         } catch (Exception ex) {
             //
             // This should never happen
