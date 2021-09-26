@@ -251,7 +251,7 @@ public abstract class XeroRobot extends TimedRobot {
         if (robot_subsystem_ == null)
             return;
 
-        logger_.startMessage(MessageType.Info).add("Staring teleop mode").endMessage();
+        logger_.startMessage(MessageType.Info).add("Starting teleop mode").endMessage();
 
         current_controller_ = teleop_controller_;
         if (current_controller_ != null)
@@ -277,7 +277,7 @@ public abstract class XeroRobot extends TimedRobot {
         if (robot_subsystem_ == null)
             return;
 
-        logger_.startMessage(MessageType.Info).add("Staring teleop mode").endMessage();
+        logger_.startMessage(MessageType.Info).add("Starting test mode").endMessage();
 
         current_controller_ = test_controller_;
         if (current_controller_ != null)
