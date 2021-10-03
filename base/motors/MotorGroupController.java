@@ -187,4 +187,12 @@ public class MotorGroupController extends MotorController
 
         return result.toString() ;
     }
+
+    public void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException {
+        if (motors_.size() == 0)
+            throw new BadMotorRequestException(this, "request made to empty MotorGroupController") ;
+
+        for(MotorController ctrl : motors_)
+            ctrl.setEncoderUpdateFrequncy(freq);
+    }
 } ;

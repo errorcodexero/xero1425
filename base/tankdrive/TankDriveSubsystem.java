@@ -15,6 +15,7 @@ import org.xero1425.base.gyro.XeroGyro;
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.MotorRequestFailedException;
+import org.xero1425.base.motors.MotorController.EncoderUpdateFrequency;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
@@ -441,6 +442,11 @@ public class TankDriveSubsystem extends Subsystem {
             p1 = getRobot().getSettingsParser().get("hw:tankdrive:encoder:right:1").getInteger() ;
             p2 = getRobot().getSettingsParser().get("hw:tankdrive:encoder:right:2").getInteger() ;
             right_encoder_ = new Encoder(p1, p2) ;
+        }
+
+        if (left_motors_.hasPosition() && right_motors_.hasPosition()) {
+            left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
+            right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
         }
     }
 }

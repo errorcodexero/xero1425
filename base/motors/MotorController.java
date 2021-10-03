@@ -13,6 +13,12 @@ public abstract class MotorController
         Brake
     } ;
 
+    public enum EncoderUpdateFrequency {
+        Frequent,
+        Default,
+        Infrequent
+    } ;
+
     MotorController(String name) {
         name_ = name ;
     }
@@ -43,6 +49,7 @@ public abstract class MotorController
     public abstract void setVelocityConversion(double factor) throws BadMotorRequestException , MotorRequestFailedException ;
     public abstract String getFirmwareVersion() throws BadMotorRequestException ;
     public abstract double getAppliedVoltage() throws BadMotorRequestException ;
+    public abstract void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException ;
     
     public boolean hasPosition() throws BadMotorRequestException {
         return false ;

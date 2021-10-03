@@ -4,6 +4,7 @@ import com.revrobotics.CANEncoder;
 import com.revrobotics.CANError;
 import com.revrobotics.CANPIDController;
 import com.revrobotics.CANSparkMax;
+import com.revrobotics.CANSparkMaxLowLevel;
 import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 
@@ -75,8 +76,6 @@ public class SparkMaxMotorController extends MotorController
             encoder_ = controller_.getEncoder() ;
         }
     }
-
-
 
     public String typeName() {
         String ret = "SparkMaxBrushed" ;
@@ -308,4 +307,22 @@ public class SparkMaxMotorController extends MotorController
 
         return String.valueOf((v >> 24) & 0xff) + "." + String.valueOf((v >> 16) & 0xff) ;
     }
+
+    public void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException {
+        if (freq == EncoderUpdateFrequency.Infrequent) {
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 100) ;
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 100) ;
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 100) ;        
+        }
+        else if (freq == EncoderUpdateFrequency.Default) {
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10) ;
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20) ;
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 50) ;  
+        }
+        else if (freq == EncoderUpdateFrequency.Frequent) {
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10) ;
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 10) ;
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 10) ; 
+        }        
+    }    
 } ;
