@@ -4,6 +4,7 @@ import org.xero1425.base.LoopType;
 import org.xero1425.base.Subsystem;
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorRequestFailedException;
+import org.xero1425.base.motors.MotorController.EncoderUpdateFrequency;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;

@@ -318,11 +318,15 @@ public class TankDriveSubsystem extends Subsystem {
             case Autonomous:
                 left_motors_.setNeutralMode(automode_neutral_);
                 right_motors_.setNeutralMode(automode_neutral_);
+                left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
+                right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
                 break;
 
             case Teleop:
                 left_motors_.setNeutralMode(teleop_neutral_);
                 right_motors_.setNeutralMode(teleop_neutral_);
+                left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
+                right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
                 break;
 
             case Test:
@@ -332,7 +336,9 @@ public class TankDriveSubsystem extends Subsystem {
 
             case Disabled:
                 left_motors_.setNeutralMode(disabled_neutral_);
-                right_motors_.setNeutralMode(disabled_neutral_);            
+                right_motors_.setNeutralMode(disabled_neutral_);      
+                left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
+                right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);                      
                 break ;
             }
         } catch (Exception ex) {

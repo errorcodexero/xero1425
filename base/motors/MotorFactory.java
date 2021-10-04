@@ -2,6 +2,8 @@ package org.xero1425.base.motors ;
 
 import java.util.Map ;
 import java.util.HashMap ;
+
+import org.xero1425.base.motors.MotorController.EncoderUpdateFrequency;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType ;
@@ -205,6 +207,10 @@ public class MotorFactory
         MotorController.NeutralMode nm = getNeutralMode(id) ;
         if (nm != null)
             ctrl.setNeutralMode(nm) ;
+
+        if (ctrl.hasPosition()) {
+            ctrl.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
+        }
 
         return ctrl ;
     }
