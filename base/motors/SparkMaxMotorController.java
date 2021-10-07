@@ -321,7 +321,7 @@ public class SparkMaxMotorController extends MotorController
         }
         else if (freq == EncoderUpdateFrequency.Frequent) {
             controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus0, 10) ;
-            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 10) ;
+            controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus1, 20) ;
             controller_.setPeriodicFramePeriod(CANSparkMaxLowLevel.PeriodicFrame.kStatus2, 10) ; 
         }        
     }    

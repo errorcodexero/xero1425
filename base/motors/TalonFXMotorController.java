@@ -294,8 +294,8 @@ public class TalonFXMotorController extends MotorController
 
     public void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException {
         if (freq == EncoderUpdateFrequency.Infrequent) {
-            controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 100) ;
-            controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 100) ;
+            controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 500) ;
+            controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 500) ;
         }
         else if (freq == EncoderUpdateFrequency.Default) {
             controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 10) ;
