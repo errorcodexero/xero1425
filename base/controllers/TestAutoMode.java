@@ -1,20 +1,20 @@
 package org.xero1425.base.controllers ;
 
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 
 public class TestAutoMode extends AutoMode {
-    static private final String Which = "auto:testmode:which";
-    static private final String Power = "auto:testmode:power";
-    static private final String Duration = "auto:testmode:duration";
-    static private final String Distance = "auto:testmode:distance";
-    static private final String Name = "auto:testmode:name";
+    static private final String Which = "testmode:which";
+    static private final String Power = "testmode:power";
+    static private final String Duration = "testmode:duration";
+    static private final String Distance = "testmode:distance";
+    static private final String Name = "testmode:name";
 
     public TestAutoMode(AutoController ctrl, String name) throws BadParameterTypeException, MissingParameterException {
         super(ctrl, name) ;
 
-        SettingsParser parser = ctrl.getRobot().getSettingsParser() ;
+        ISettingsSupplier parser = ctrl.getRobot().getSettingsParser() ;
         which_ = parser.get(Which).getInteger() ;
         power_ = parser.get(Power).getDouble() ;
         duration_ = parser.get(Duration).getDouble() ;

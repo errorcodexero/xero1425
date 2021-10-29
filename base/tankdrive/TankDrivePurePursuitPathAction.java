@@ -4,12 +4,12 @@ import org.xero1425.base.XeroRobot;
 import org.xero1425.base.Subsystem.DisplayType;
 import org.xero1425.base.utils.LineSegment;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.MissingPathException;
 import org.xero1425.misc.PIDCtrl;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.XeroPath;
 import org.xero1425.misc.XeroPathSegment;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -42,14 +42,14 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         super(drive);
 
         path_name_ = path;
-        look_ahead_distance_ = drive.getRobot().getSettingsParser().get("tankdrive:purepursuit:lookahead").getDouble() ;
-        max_accel_ = drive.getRobot().getSettingsParser().get("tankdrive:purepursuit:maxaccel").getDouble() ;       
+        look_ahead_distance_ = drive.getSettingsValue("tankdrive:purepursuit:lookahead").getDouble() ;
+        max_accel_ = drive.getSettingsValue("tankdrive:purepursuit:maxaccel").getDouble() ;       
 
         path_ = getSubsystem().getRobot().getPathManager().getPath(path) ;
         plot_id_ = drive.initPlot(toString(0)) ;
         plot_data_= new Double[plot_columns_.length] ;
 
-        SettingsParser settings = getSubsystem().getRobot().getSettingsParser() ;
+        ISettingsSupplier settings = getSubsystem().getRobot().getSettingsParser() ;
         left_pid_ = new PIDCtrl(settings, "tankdrive:purepursuit:left", false) ;
         right_pid_ = new PIDCtrl(settings, "tankdrive:purepursuit:right", false) ;
     }

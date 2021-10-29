@@ -17,7 +17,7 @@ public class MotorSubsystem extends Subsystem
     public MotorSubsystem(Subsystem parent, String name) {
         super(parent, name) ;
 
-        String mname = "hw:" + name + ":motor" ;
+        String mname = "subsystems:" + name + ":hw:motors" ;
         controller_ = getRobot().getMotorFactory().createMotor(name, mname) ;
         if (controller_ == null)
         {

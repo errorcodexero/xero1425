@@ -15,7 +15,7 @@ public class MotorPowerAction extends MotorAction {
             throws BadParameterTypeException, MissingParameterException {
         super(motor);
 
-        power_ = motor.getRobot().getSettingsParser().get(power).getDouble();
+        power_ = motor.getSettingsValue(power).getDouble();
         timed_ = false;
     }
 
@@ -31,8 +31,8 @@ public class MotorPowerAction extends MotorAction {
             throws BadParameterTypeException, MissingParameterException {
 
         super(motor);
-        power_ = motor.getRobot().getSettingsParser().get(power).getDouble();
-        duration_ = motor.getRobot().getSettingsParser().get(duration).getDouble();
+        power_ = motor.getSettingsValue(power).getDouble();
+        duration_ = motor.getSettingsValue(duration).getDouble();
         timed_ = true;
     }
 

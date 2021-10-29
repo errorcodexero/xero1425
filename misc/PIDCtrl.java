@@ -82,7 +82,7 @@ public class PIDCtrl
     /// \param settings the settings parser
     /// \param name the basename to use to extract params from the settings parser
     /// \param isangle if true it is managing an angle between =180 and +180
-    public PIDCtrl(SettingsParser settings, String name, boolean isangle) throws MissingParameterException, BadParameterTypeException {
+    public PIDCtrl(ISettingsSupplier settings, String name, boolean isangle) throws MissingParameterException, BadParameterTypeException {
         init(settings, name) ;
     }
 
@@ -92,7 +92,7 @@ public class PIDCtrl
     /// the basename + ":kp".  The kd parameter is found by looking up the basename + ":kd".
     /// \param settings the settings parser
     /// \param name the basename to use to extract params from the settings parser
-    public void init(SettingsParser settings, String name)  throws MissingParameterException, BadParameterTypeException {
+    public void init(ISettingsSupplier settings, String name)  throws MissingParameterException, BadParameterTypeException {
         kp_ = settings.get(name + ":kp").getDouble() ;
         ki_ = settings.get(name + ":ki").getDouble() ;
         kd_ = settings.get(name + ":kd").getDouble() ;

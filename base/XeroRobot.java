@@ -20,12 +20,14 @@ import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import org.xero1425.simulator.engine.SimulationEngine;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
+import org.xero1425.misc.SettingsValue;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
+import org.xero1425.misc.JsonSettingsParser;
 import org.xero1425.misc.MessageDestination;
 import org.xero1425.misc.MessageDestinationFile;
 import org.xero1425.misc.MessageDestinationThumbFile;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.SimArgs;
 import org.xero1425.misc.XeroPathManager;
 import org.xero1425.misc.XeroPathType;
@@ -39,7 +41,7 @@ public abstract class XeroRobot extends TimedRobot {
     private final double period_ ;
     private double delta_time_ ;
     private MessageLogger logger_ ;
-    private SettingsParser settings_ ;
+    private ISettingsSupplier settings_ ;
     private PlotManager plot_mgr_ ;
     private XeroPathManager paths_ ;
     private MotorFactory motors_ ;
@@ -144,7 +146,7 @@ public abstract class XeroRobot extends TimedRobot {
         logger_.startMessage(MessageType.Info).add("initializing robot").endMessage();
 
         try {
-            v = settings_.get("plotting:enabled").getBoolean();
+            v = settings_.get("system:plotting").getBoolean();
             if (v == true)
                 plot_mgr_.enable(true);
             else
@@ -369,7 +371,7 @@ public abstract class XeroRobot extends TimedRobot {
         return logger_;
     }
 
-    public SettingsParser getSettingsParser() {
+    public ISettingsSupplier getSettingsParser() {
         return settings_;
     }
 
@@ -428,17 +430,18 @@ public abstract class XeroRobot extends TimedRobot {
     }
 
     private void enableMessagesFromSettingsFile() {
-        String suffix = ":messages" ;
-        SettingsParser p = getSettingsParser() ;
+        String path = "system:messages" ;
+        ISettingsSupplier p = getSettingsParser() ;
         MessageLogger m = getMessageLogger() ;
 
-        for(String key : p.getAllKeys(suffix))
+        for(String key : p.getAllKeys(path))
         {
             try {
-                if (p.get(key).isBoolean() && p.get(key).getBoolean())
+                String longkey = path + ":" + key ;
+                SettingsValue v = p.get(longkey) ;
+                if (v.isBoolean() && v.getBoolean())
                 {
-                    String module = key.substring(0, key.length() - suffix.length());
-                    m.enableSubsystem(module) ;
+                    m.enableSubsystem(key) ;
                 }
             }
             catch(Exception ex)
@@ -613,7 +616,7 @@ public abstract class XeroRobot extends TimedRobot {
     }
 
     private void readParamsFile() {
-        settings_ = new SettingsParser(logger_);
+        JsonSettingsParser file = new JsonSettingsParser(logger_);
 
         String bot ;
         if (isPracticeBot())
@@ -621,12 +624,14 @@ public abstract class XeroRobot extends TimedRobot {
         else
             bot = "COMPETITION" ;
 
-        settings_.addDefine(bot) ;
+        file.addDefine(bot) ;
         logger_.startMessage(MessageType.Info).add("reading params for bot ").addQuoted(bot).endMessage() ;
 
-        if (!settings_.readFile(robot_paths_.deployDirectory() + getName() + ".dat")) {
+        if (!file.readFile(robot_paths_.deployDirectory() + getName() + ".json")) {
             logger_.startMessage(MessageType.Error).add("error reading parameters file").endMessage();
         }
+
+        settings_ = file ;
     }
 
     protected void loadPathsFile() throws Exception {

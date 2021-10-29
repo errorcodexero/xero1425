@@ -33,8 +33,8 @@ public class LimeLightSubsystem extends Subsystem {
         cam_mode_ = CamMode.Invalid ;
         pipeline_ = -1 ;
 
-        camera_latency_ = getRobot().getSettingsParser().get("limelight:camera_latency").getDouble() ;
-        network_latency_ = getRobot().getSettingsParser().get("limelight:network_latency").getDouble() ;
+        camera_latency_ = getSettingsValue("camera_latency").getDouble() ;
+        network_latency_ = getSettingsValue("network_latency").getDouble() ;
 
         nt_ = NetworkTableInstance.getDefault().getTable(LimeLightTableName) ;
 

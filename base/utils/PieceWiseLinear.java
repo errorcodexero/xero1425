@@ -8,7 +8,7 @@ import java.util.Comparator;
 import java.util.List;
 
 import org.xero1425.misc.BadParameterTypeException;
-import org.xero1425.misc.SettingsParser;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.SettingsValue;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
@@ -23,26 +23,9 @@ public class PieceWiseLinear {
     /// piecewise linear value.  The points are sorted on the X value so they do not have
     /// to be in order.
     ///
-    ///      # Example data files for settings file
-    ///      shooter:down:pwl:1:x                                            119
-    ///      shooter:down:pwl:1:y                                            6650
-    ///      shooter:down:pwl:2:x                                            134
-    ///      shooter:down:pwl:2:y                                            6000
-    ///      shooter:down:pwl:3:x                                            153
-    ///      shooter:down:pwl:3:y                                            5780
-    ///      shooter:down:pwl:4:x                                            188
-    ///      shooter:down:pwl:4:y                                            5570
-    ///      shooter:down:pwl:5:x                                            202
-    ///      shooter:down:pwl:5:y                                            5620
-    ///      shooter:down:pwl:6:x                                            227
-    ///      shooter:down:pwl:6:y                                            5700
-    ///      shooter:down:pwl:7:x                                            253.5
-    ///      shooter:down:pwl:7:y                                            5770
-    ///      shooter:down:pwl:8:x                                            316
-    ///      shooter:down:pwl:8:y                                            5910
     /// \param settings settings parser used to extract values from settings file
     /// \param basename the base name of the data
-    public PieceWiseLinear(SettingsParser settings, String basename) throws Exception {
+    public PieceWiseLinear(ISettingsSupplier settings, String basename) throws Exception {
         List<Translation2d> points = readFromSettings(settings, basename);
         init(points) ;
     }
@@ -137,7 +120,7 @@ public class PieceWiseLinear {
         return -1;
     }
 
-    private List<Translation2d> readFromSettings(SettingsParser settings, String base)
+    private List<Translation2d> readFromSettings(ISettingsSupplier settings, String base)
             throws BadParameterTypeException {
         int index = 1 ;
         List<Translation2d> points = new ArrayList<Translation2d>() ;

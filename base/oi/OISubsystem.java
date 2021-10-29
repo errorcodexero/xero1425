@@ -12,7 +12,6 @@ import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsValue;
 
 /// \brief This class controls the various OI devices that are used to control the robot.
 /// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
@@ -33,7 +32,7 @@ public class OISubsystem extends Subsystem {
     private double last_time_ ;
     private boolean use_new_gamepad_ ;
     
-    private final static String DriverGamepadHIDIndexName = "hw:driverstation:hid:driver";
+    private final static String DriverGamepadHIDIndexName = "gamepad:index";
 
     public OISubsystem(Subsystem parent, String name, TankDriveSubsystem db) {
         super(parent, name);
@@ -44,13 +43,6 @@ public class OISubsystem extends Subsystem {
         last_time_ = 0.0 ;
 
         use_new_gamepad_ = false ;
-        SettingsValue v = db.getRobot().getSettingsParser().getOrNull("oi:newdrive") ;
-        try {
-            if (v != null && v.isBoolean() && v.getBoolean())
-                use_new_gamepad_ = true;
-        } catch (BadParameterTypeException e) {
-        }
-
         addTankDriveGamePad();
     }
 
@@ -132,7 +124,7 @@ public class OISubsystem extends Subsystem {
 
             if (gp_index_ == -1) {
                 try {
-                    gp_index_ = getRobot().getSettingsParser().get(DriverGamepadHIDIndexName).getInteger();
+                    gp_index_ = getSettingsValue(DriverGamepadHIDIndexName).getInteger();
                 } catch (BadParameterTypeException e) {
                     logger.startMessage(MessageType.Error) ;
                     logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;

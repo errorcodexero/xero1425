@@ -5,10 +5,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import org.xero1425.base.actions.Action;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.SettingsValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -137,9 +137,9 @@ public class Subsystem {
             fmt_ = new DecimalFormat("00.000");
         }
         try {
-            SettingsParser p = getRobot().getSettingsParser();
-            String pname = name_ + ":verbose";
-            if (p.isDefined(pname) && p.get(pname).isBoolean() && p.get(pname).getBoolean())
+            ISettingsSupplier p = getRobot().getSettingsParser();
+            String pname = "system:verbose:" + name_ ;
+            if (p.get(pname).isBoolean() && p.get(pname).getBoolean())
                 verbose_ = true;
             
         } catch (MissingParameterException e) {
@@ -163,6 +163,10 @@ public class Subsystem {
     /// \param name the name of the current subsystem
     public Subsystem(final Subsystem parent, final String name) {
         this(parent.getRobot(), parent, name) ;
+    }
+
+    public SettingsValue getSettingsValue(String paramname) throws MissingParameterException {
+        return getRobot().getSettingsParser().get("subsystems:" + name_ + ":" + paramname) ;
     }
 
     /// \brief returns true if this is the OI subsystem

@@ -27,8 +27,8 @@ public class TankDrivePowerAction extends TankDriveAction {
             throws BadParameterTypeException, MissingParameterException {
         super(drive);
 
-        left_ = drive.getRobot().getSettingsParser().get(left).getDouble();
-        right_ = drive.getRobot().getSettingsParser().get(right).getDouble() ;
+        left_ = drive.getSettingsValue(left).getDouble();
+        right_ = drive.getSettingsValue(right).getDouble() ;
         timed_ = false;
     }
 
@@ -46,9 +46,9 @@ public class TankDrivePowerAction extends TankDriveAction {
             throws BadParameterTypeException, MissingParameterException {
 
         super(drive);
-        left_ = drive.getRobot().getSettingsParser().get(left).getDouble();
-        right_ = drive.getRobot().getSettingsParser().get(right).getDouble();
-        duration_ = drive.getRobot().getSettingsParser().get(duration).getDouble();
+        left_ = drive.getSettingsValue(left).getDouble();
+        right_ = drive.getSettingsValue(right).getDouble();
+        duration_ = drive.getSettingsValue(duration).getDouble();
         timed_ = true;
         plot_id_ = drive.initPlot("tankdrivepower_"+ Integer.toString(plot_number_++));        
     }

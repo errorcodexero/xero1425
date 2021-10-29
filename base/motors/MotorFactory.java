@@ -3,11 +3,10 @@ package org.xero1425.base.motors;
 import java.util.Map;
 import java.util.HashMap;
 
-import org.xero1425.base.motors.MotorController.EncoderUpdateFrequency;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.SettingsValue;
 import org.xero1425.misc.SettingsValue.SettingsType;
 
@@ -26,13 +25,13 @@ import org.xero1425.misc.SettingsValue.SettingsType;
 ///
 public class MotorFactory {
     private MessageLogger logger_;
-    private SettingsParser settings_;
+    private ISettingsSupplier settings_;
     private Map<Integer, MotorController> motors_;
 
     /// \brief This method creates a new motor factory.
     /// \param logger the message logger for the robot
     /// \param settings the settings file for the robot
-    public MotorFactory(MessageLogger logger, SettingsParser settings) {
+    public MotorFactory(MessageLogger logger, ISettingsSupplier settings) {
         logger_ = logger;
         settings_ = settings;
         motors_ = new HashMap<Integer, MotorController>();

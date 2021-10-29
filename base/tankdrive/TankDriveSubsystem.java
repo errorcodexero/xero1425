@@ -17,46 +17,14 @@ import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.MotorRequestFailedException;
 import org.xero1425.base.motors.MotorController.EncoderUpdateFrequency;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.Speedometer;
 
 /// \brief The tankdrive subsystem for driving a robot using a tank drive type drivebase.
 /// 
-/// This class expects entries in the settings file.
-///
-///      hw:tankdrive:motors:left:type                                           "romi"
-///      hw:tankdrive:motors:left:canid                                          0
-///      hw:tankdrive:encoder:left:1                                             4
-///      hw:tankdrive:encoder:left:2                                             5
-///      hw:tankdrive:motors:right:type                                          "romi"
-///      hw:tankdrive:motors:right:canid                                         1
-///      hw:tankdrive:motors:right:inverted                                      true
-///      hw:tankdrive:encoder:right:1                                            6
-///      hw:tankdrive:encoder:right:2                                            7
-///      
-///      hw:tankdrive:gyro                                                       "LSM6DS33"
-///
-///      tankdrive:inches_per_tick                                               0.00601246292357961603042471078223
-///      tankdrive:width                                                         5.55
-///      tankdrive:scrub                                                         1.0
-///      tankdrive:speedometer:linearsamples                                     4
-///      tankdrive:speedometer:angularsamples                                    2
-///
-///      tankdrive:follower:left:ka                                              0.002624471
-///      tankdrive:follower:left:kv                                              0.02637896
-///      tankdrive:follower:left:kp                                              0.1
-///      tankdrive:follower:left:kd                                              0.0
-///
-///      tankdrive:follower:right:ka                                             0.002624471
-///      tankdrive:follower:right:kv                                             0.02637896
-///      tankdrive:follower:right:kp                                             0.1
-///      tankdrive:follower:right:kd                                             0.0
-///
-///      tankdrive:follower:angle_correction                                     0.0
-///
 public class TankDriveSubsystem extends Subsystem {
 
     private PositionTracker tracker_ ;
@@ -101,12 +69,12 @@ public class TankDriveSubsystem extends Subsystem {
         super(parent, name);
 
         MessageLogger logger = getRobot().getMessageLogger();
-        SettingsParser settings = getRobot().getSettingsParser() ;
+        ISettingsSupplier settings = getRobot().getSettingsParser() ;
 
         recording_ = false ;
 
-        double width = settings.get("tankdrive:width").getDouble() ;
-        double scrub = settings.get("tankdrive:scrub").getDouble() ;
+        double width = getSettingsValue("width").getDouble() ;
+        double scrub = getSettingsValue("scrub").getDouble() ;
         tracker_ = new PositionTracker(width, scrub) ;
 
         dist_l_ = 0.0;
@@ -114,13 +82,13 @@ public class TankDriveSubsystem extends Subsystem {
         last_dist_l_ = 0.0 ;
         last_dist_r_ = 0.0 ;
 
-        left_inches_per_tick_ = getRobot().getSettingsParser().get("tankdrive:inches_per_tick").getDouble();
+        left_inches_per_tick_ = getSettingsValue("inches_per_tick").getDouble();
         right_inches_per_tick_ = left_inches_per_tick_;
 
         int linearsamples = 2 ;
         int angularsamples = 2 ;
-        String linear = "tankdrive:speedometer:linearsamples" ;
-        String angular = "tankdrive:speedometer:angularsamples" ;
+        String linear = "linearsamples" ;
+        String angular = "angularsamples" ;
 
         if (settings.isDefined(linear) && settings.get(linear).isInteger()) {
             linearsamples = settings.get(linear).getInteger() ;
@@ -138,7 +106,7 @@ public class TankDriveSubsystem extends Subsystem {
         teleop_neutral_ = MotorController.NeutralMode.Brake;
         disabled_neutral_ = MotorController.NeutralMode.Coast;
 
-        String gyrotype = getRobot().getSettingsParser().get("hw:tankdrive:gyro").getString() ;
+        String gyrotype = getSettingsValue("hw:gyro").getString() ;
         if (gyrotype.equals("navx")) {
             gyro_ = new NavxGyro() ;
         }
@@ -435,18 +403,18 @@ public class TankDriveSubsystem extends Subsystem {
     }
 
     private void attachHardware() throws BadMotorRequestException, MissingParameterException, BadParameterTypeException {
-        left_motors_ = getRobot().getMotorFactory().createMotor("tankdrive:motors:left", "hw:tankdrive:motors:left") ;
-        right_motors_ = getRobot().getMotorFactory().createMotor("tankdrive:motors:right", "hw:tankdrive:motors:right") ; 
+        left_motors_ = getRobot().getMotorFactory().createMotor("TankDriveLeft", "subsystems:" + getName() + ":hw:left:motors") ;
+        right_motors_ = getRobot().getMotorFactory().createMotor("TankDriveRight", "subsystems:" + getName() + ":hw:right:motors") ;
         
         if (!left_motors_.hasPosition() || !right_motors_.hasPosition()) {
             int p1, p2 ;
 
-            p1 = getRobot().getSettingsParser().get("hw:tankdrive:encoder:left:1").getInteger() ;
-            p2 = getRobot().getSettingsParser().get("hw:tankdrive:encoder:left:2").getInteger() ;
+            p1 = getSettingsValue("hw:left:encoders:1").getInteger() ;
+            p2 = getSettingsValue("hw:left:encoders:2").getInteger() ;
             left_encoder_ = new Encoder(p1, p2) ;
 
-            p1 = getRobot().getSettingsParser().get("hw:tankdrive:encoder:right:1").getInteger() ;
-            p2 = getRobot().getSettingsParser().get("hw:tankdrive:encoder:right:2").getInteger() ;
+            p1 = getSettingsValue("hw:right:encoders:1").getInteger() ;
+            p2 = getSettingsValue("hw:right:encoders:2").getInteger() ;
             right_encoder_ = new Encoder(p1, p2) ;
         }
 

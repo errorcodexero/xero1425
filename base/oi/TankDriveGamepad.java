@@ -9,7 +9,6 @@ import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.base.tankdrive.TankDrivePowerAction;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 
 /// \brief This class controls interprets the input from the game pad to control the drivebase.
 ///
@@ -92,20 +91,19 @@ public class TankDriveGamepad extends Gamepad {
 
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
-        SettingsParser settings = getSubsystem().getRobot().getSettingsParser();
 
-        default_power_ = settings.get("driver:power:default").getDouble();
-        max_power_ = settings.get("driver:power:max").getDouble();
-        turn_power_ = settings.get("driver:turn:default").getDouble();
-        turn_max_power_ = settings.get("driver:turn:max").getDouble();
-        slow_factor_ = settings.get("driver:power:slowby").getDouble();
-        zero_level_ = settings.get("driver:zerolevel").getDouble();
+        default_power_ = getSubsystem().getSettingsValue("gamepad:power:default").getDouble();
+        max_power_ = getSubsystem().getSettingsValue("gamepad:power:max").getDouble();
+        turn_power_ = getSubsystem().getSettingsValue("gamepad:turn:default").getDouble();
+        turn_max_power_ = getSubsystem().getSettingsValue("gamepad:turn:max").getDouble();
+        slow_factor_ = getSubsystem().getSettingsValue("gamepad:power:slowby").getDouble();
+        zero_level_ = getSubsystem().getSettingsValue("gamepad:zerolevel").getDouble();
 
-        tolerance_ = settings.get("driver:power:tolerance").getDouble();
+        tolerance_ = getSubsystem().getSettingsValue("gamepad:power:tolerance").getDouble();
 
-        double nudge_straight = settings.get("driver:power:nudge_straight").getDouble();
-        double nudge_rotate = settings.get("driver:power:nudge_rotate").getDouble();
-        double nudge_time = settings.get("driver:nudge_time").getDouble();
+        double nudge_straight = getSubsystem().getSettingsValue("gamepad:power:nudge_straight").getDouble();
+        double nudge_rotate = getSubsystem().getSettingsValue("gamepad:power:nudge_rotate").getDouble();
+        double nudge_time = getSubsystem().getSettingsValue("gamepad:nudge_time").getDouble();
 
         nudge_forward_ = new TankDrivePowerAction(db_, nudge_straight, nudge_straight, nudge_time);
         nudge_backward_ = new TankDrivePowerAction(db_, -nudge_straight, -nudge_straight, nudge_time);

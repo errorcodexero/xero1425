@@ -2,9 +2,9 @@ package org.xero1425.base.motorsubsystem;
 
 import org.xero1425.base.XeroRobot;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.PIDACtrl;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.TrapezoidalProfile;
 import org.xero1425.misc.XeroMath;
 
@@ -27,19 +27,19 @@ public class MotorEncoderGotoAction extends MotorAction {
         target_ = target ;
         addhold_ = addhold ;
 
-        SettingsParser settings = sub.getRobot().getSettingsParser() ;
-        profile_ = new TrapezoidalProfile(settings, sub.getName() + ":goto") ;
+        ISettingsSupplier settings = sub.getRobot().getSettingsParser() ;
+        profile_ = new TrapezoidalProfile(settings, "subsystems:" + sub.getName() + ":goto") ;
         plot_id_ = sub.initPlot(sub.getName() + "-" + toString(0)) ;
     }
 
     public MotorEncoderGotoAction(MotorEncoderSubsystem sub, String target, boolean addhold)
             throws BadParameterTypeException, MissingParameterException {
         super(sub) ;
-        target_ = getSubsystem().getRobot().getSettingsParser().get(target).getDouble() ;
+        target_ = getSubsystem().getSettingsValue(target).getDouble() ;
         addhold_ = addhold ;
         
-        SettingsParser settings = sub.getRobot().getSettingsParser() ;
-        profile_ = new TrapezoidalProfile(settings, sub.getName() + ":goto") ;
+        ISettingsSupplier settings = sub.getRobot().getSettingsParser() ;
+        profile_ = new TrapezoidalProfile(settings, "subsystems:" + sub.getName() + ":goto") ;
         plot_id_ = sub.initPlot(sub.getName() + "-" + toString(0)) ;        
     }
 
@@ -113,8 +113,8 @@ public class MotorEncoderGotoAction extends MotorAction {
         }
         else
         {
-            String config = sub.getName() + ":follower" ;
-            SettingsParser settings = sub.getRobot().getSettingsParser() ;
+            String config = "subsystems:" + sub.getName() + ":follower" ;
+            ISettingsSupplier settings = sub.getRobot().getSettingsParser() ;
             if (dist < 0)
                 ctrl_ = new PIDACtrl(settings, config + ":down", sub.isAngular());
             else

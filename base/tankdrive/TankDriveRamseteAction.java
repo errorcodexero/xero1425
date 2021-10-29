@@ -36,8 +36,8 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
 
     public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse) throws BadParameterTypeException, MissingParameterException {
         this(sub, pathname, reverse,
-                sub.getRobot().getSettingsParser().get(sub.getName() + ":ramsete:b").getDouble(), 
-                sub.getRobot().getSettingsParser().get(sub.getName() + ":ramsete:zeta").getDouble()) ;
+                sub.getSettingsValue(sub.getName() + ":ramsete:b").getDouble(), 
+                sub.getSettingsValue(sub.getName() + ":ramsete:zeta").getDouble()) ;
     }
 
     @Override
