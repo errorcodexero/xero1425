@@ -434,18 +434,21 @@ public abstract class XeroRobot extends TimedRobot {
         ISettingsSupplier p = getSettingsParser() ;
         MessageLogger m = getMessageLogger() ;
 
-        for(String key : p.getAllKeys(path))
-        {
-            try {
-                String longkey = path + ":" + key ;
-                SettingsValue v = p.get(longkey) ;
-                if (v.isBoolean() && v.getBoolean())
-                {
-                    m.enableSubsystem(key) ;
-                }
-            }
-            catch(Exception ex)
+        var keys = p.getAllKeys(path) ;
+        if (keys != null) {
+            for(String key : p.getAllKeys(path))
             {
+                try {
+                    String longkey = path + ":" + key ;
+                    SettingsValue v = p.get(longkey) ;
+                    if (v.isBoolean() && v.getBoolean())
+                    {
+                        m.enableSubsystem(key) ;
+                    }
+                }
+                catch(Exception ex)
+                {
+                }
             }
         }
     }

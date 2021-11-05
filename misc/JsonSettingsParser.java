@@ -124,6 +124,9 @@ public class JsonSettingsParser implements ISettingsSupplier {
 
         List<String> ret = new ArrayList<String>() ;
 
+        if (parent == null)
+            return null ;
+
         JSONObject obj = (JSONObject)parent.get(path) ;
         if (obj != null) {
             @SuppressWarnings("unchecked")
