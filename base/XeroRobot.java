@@ -201,7 +201,7 @@ public abstract class XeroRobot extends TimedRobot {
 
         try {
             auto_controller_ = createAutoController();
-            if (isSimulation()) {
+            if (auto_controller_ != null && isSimulation()) {
                 checkPaths() ;
             }
         }
@@ -436,7 +436,7 @@ public abstract class XeroRobot extends TimedRobot {
 
         var keys = p.getAllKeys(path) ;
         if (keys != null) {
-            for(String key : p.getAllKeys(path))
+            for(String key : keys)
             {
                 try {
                     String longkey = path + ":" + key ;
