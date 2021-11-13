@@ -107,8 +107,8 @@ public class TankDriveGamepad extends Gamepad {
 
         nudge_forward_ = new TankDrivePowerAction(db_, nudge_straight, nudge_straight, nudge_time);
         nudge_backward_ = new TankDrivePowerAction(db_, -nudge_straight, -nudge_straight, nudge_time);
-        nudge_clockwise_ = new TankDrivePowerAction(db_, -nudge_rotate, nudge_rotate, nudge_time);
-        nudge_counter_clockwise_ = new TankDrivePowerAction(db_, nudge_rotate, -nudge_rotate, nudge_time);
+        nudge_clockwise_ = new TankDrivePowerAction(db_, nudge_rotate, -nudge_rotate, nudge_time);
+        nudge_counter_clockwise_ = new TankDrivePowerAction(db_, -nudge_rotate, nudge_rotate, nudge_time);
     }
 
     @Override
@@ -156,8 +156,8 @@ public class TankDriveGamepad extends Gamepad {
                     double power = scalePower(-ly, boost, slow) ;
                     double spin = (Math.abs(rx) > 0.01) ? scaleTurn(rx, boost, slow) : 0.0 ;
 
-                    left = power + spin ;
-                    right = power - spin ;
+                    left = power - spin ;
+                    right = power + spin ;
                 }
 
                 if (Math.abs(left - left_) > tolerance_ || Math.abs(right - right_) > tolerance_)

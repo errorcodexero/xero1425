@@ -19,7 +19,7 @@ public abstract class AutoController extends BaseController {
     private boolean started_ ;
     private List<AutoMode> automodes_ ;
 
-    private static final String testmode = "auto:testmode:active";
+    private static final String testmode = "testmode:enabled";
 
     public AutoController(XeroRobot robot, String name) throws MissingParameterException, BadParameterTypeException {
         super(robot, name) ;
