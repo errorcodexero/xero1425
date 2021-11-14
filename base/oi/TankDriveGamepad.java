@@ -107,8 +107,8 @@ public class TankDriveGamepad extends Gamepad {
 
         nudge_forward_ = new TankDrivePowerAction(db_, nudge_straight, nudge_straight, nudge_time);
         nudge_backward_ = new TankDrivePowerAction(db_, -nudge_straight, -nudge_straight, nudge_time);
-        nudge_clockwise_ = new TankDrivePowerAction(db_, -nudge_rotate, nudge_rotate, nudge_time);
-        nudge_counter_clockwise_ = new TankDrivePowerAction(db_, nudge_rotate, -nudge_rotate, nudge_time);
+        nudge_clockwise_ = new TankDrivePowerAction(db_, nudge_rotate, -nudge_rotate, nudge_time);
+        nudge_counter_clockwise_ = new TankDrivePowerAction(db_, -nudge_rotate, nudge_rotate, nudge_time);
     }
 
     @Override
@@ -135,9 +135,9 @@ public class TankDriveGamepad extends Gamepad {
             double rx = ds.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
 
             if (povvalue == POVAngle.LEFT)
-                seq.addSubActionPair(db_, nudge_clockwise_, false);
+                seq.addSubActionPair(db_, nudge_counter_clockwise_, false);
             else if (povvalue == POVAngle.RIGHT)
-                seq.addSubActionPair(db_, nudge_counter_clockwise_, false);       
+                seq.addSubActionPair(db_, nudge_clockwise_, false);       
             else if (povvalue == POVAngle.UP)
                 seq.addSubActionPair(db_, nudge_forward_, false);  
             else if (povvalue == POVAngle.DOWN)

@@ -1,4 +1,4 @@
-package org.xero1425.base.tankdrive ;
+package org.xero1425.base.tankdrive;
 
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
