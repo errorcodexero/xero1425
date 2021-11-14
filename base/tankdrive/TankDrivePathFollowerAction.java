@@ -51,7 +51,6 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
 
         plot_id_ = drive.initPlot(toString(0)) ;
         plot_data_ = new Double[plot_columns_.length] ;
-
     }
 
     @Override
@@ -141,16 +140,17 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
             rout += angcorr ;
 
             td.setPower(lout, rout) ;
+            logger.add(", time", robot.getTime() - start_time_) ;
             logger.add(", left", lout) ;
             logger.add(", right", rout) ;
             logger.add(", angerr(degs)", angerr) ;
             logger.add(", angcorr(v)", angcorr) ;
             logger.add(", path-x", (lseg.getX() + rseg.getX()) / 2.0) ;
             logger.add(", path-y", (lseg.getY() + rseg.getY()) / 2.0) ;
-            logger.add(", path-x", lseg.getHeading()) ;
+            logger.add(", path-a", thead) ;
             logger.add(", robot-x", getSubsystem().getPose().getX()) ;
             logger.add(", robot-y", getSubsystem().getPose().getY()) ;
-            logger.add(", robot-a", getSubsystem().getPose().getRotation().getDegrees()) ;
+            logger.add(", robot-a", ahead) ;
 
 
             plot_data_[0] = robot.getTime() - start_time_ ;
