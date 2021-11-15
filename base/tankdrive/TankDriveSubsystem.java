@@ -387,6 +387,14 @@ public class TankDriveSubsystem extends Subsystem {
     }
 
     /// \brief set the power for the tank drive
+    /// \param v the velocity of the left and right sides of the drivebase
+    protected void setPower(TankDriveVelocities v) {
+        setPower(v.getLeft(), v.getRight()) ;
+    }
+
+    /// \brief set the power for the tank drive
+    /// \param left the power for the left side of the drivebase
+    /// \param right the power for the right side of the drivebase
     protected void setPower(double left, double right) {
         left_power_ = left ;
         right_power_ = right ;
