@@ -102,18 +102,26 @@ public class PIDCtrl
         kimax_ = settings.get(name + ":imax").getDouble() ;                                        
     }
 
+    /// \brief return the P component of the PID calculation
+    /// \returns the P component of the PID calculation
     public double getPComponent() {
         return pout_ ;
     }
 
+    /// \brief return the I component of the PID calculation
+    /// \returns the I component of the PID calculation
     public double getIComponent() {
         return iout_ ;
     }
 
+    /// \brief return the D component of the PID calculation
+    /// \returns the D component of the PID calculation    
     public double getDComponent() {
         return dout_ ;
     }
 
+    /// \brief return the F component of the PID calculation
+    /// \returns the F component of the PID calculation    
     public double getFComponent() {
         return fout_ ;
     }

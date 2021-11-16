@@ -377,7 +377,14 @@ public class TankDriveSubsystem extends Subsystem {
         }
     }
 
-    
+    /// \brief This method return reverse kinematics for the drivebase
+    ///
+    /// For a tank drive, the inverse kinematics are the velocities of the
+    /// left and right wheels, given the velocity of the robot.  The velocity 
+    /// of the robot includes a linear velocity and an angular velocity.
+    ///
+    /// \param velocity the desired velocity of the robot
+    /// \returns the inverse kinematics for the robot
     public TankDriveVelocities inverseKinematics(Twist2d velocity) {
         if (Math.abs(velocity.dtheta) < kEpsilon) {
             return new TankDriveVelocities(velocity.dx, velocity.dx);

@@ -9,21 +9,66 @@ import java.util.Set;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONValue;
 
+
+/// \file
+
+/// \brief This class implmements the ISettingsSupplier interface by reading a JSON settings file.
+///
+/// Settings are stored in a JSON file and are accessed by a single string representing the desired hierarchy.
+/// For instance, if the settings file contained the following ...
+///
+///     subsystems : {
+///       tankdrive : {
+///          width : 30.0,
+///          length : 32.0
+///       }        
+///     }
+///
+/// Then the settings name <em>subsystems:tankdrive:width</em> would reference the value 3.0.  Values can be conditional
+/// based on defines. See the method addDefine() for more information about this capability.
+///
 public class JsonSettingsParser implements ISettingsSupplier {
     private MessageLogger logger_ ;
     private List<String> defines_ ;
     private JSONObject contents_ ;
 
+    /// \brief Creates a new JsonSettings parser
+    /// \param logger message logger for logging messages while reading the JSON settings file
     public JsonSettingsParser(MessageLogger logger) {
         logger_ = logger ;
         defines_ = new ArrayList<String>() ;
     }
 
+    /// \brief add a define to the reading process
+    ///
+    /// A define is a value that is stored and used in the settings lookup process
+    /// to find settings specific to that define.  This is most commonly used for settings that are
+    /// specific to the competition robot versus the practice robot.  Either the COMPETITION define is
+    /// set or the PRACTICE setting is set.  The value in the JSON file can be of the form
+    ///
+    ///     subsystems : {
+    ///       subname : {
+    ///          value : { 
+    ///             "PRACTICE" : 1.0,
+    ///             "COMPETITION" : 2.0,
+    ///          }
+    ///       }        
+    ///     }
+    /// 
+    /// With this form, a lookup of the settings value subsystem:subname:value, will pick either PRACTICE or
+    /// COMPETITION depending on the define that is set.
+    ///
+    /// \param name the name of the define to add
     public void addDefine(String name) {
         if (!defines_.contains(name))
             defines_.add(name) ;
     }
 
+    /// \brief read a json settings file
+    /// This method returns true if the file was read successfully.  It returns false if
+    /// the file failed to read and also prints an error to the logfile.
+    /// \param filename the name of the file to read
+    /// \returns true if the file was read sucessfully, otherwise false
     public boolean readFile(String filename) {
 
         logger_.startMessage(MessageType.Info);
@@ -54,6 +99,10 @@ public class JsonSettingsParser implements ISettingsSupplier {
         return true;        
     }
 
+    /// \brief Return a SettingsValue given the settings name.
+    /// \exception throws MissingParameterException if the name does not map to an entry in the JSON file
+    /// \param name the name of the setting to retreive.
+    /// \returns the SettingsValue object that for the setting with the given name
     @Override
     public SettingsValue get(String name) throws MissingParameterException {
         SettingsValue v = getOrNull(name) ;
@@ -64,12 +113,18 @@ public class JsonSettingsParser implements ISettingsSupplier {
         return v ;
     }
 
+    /// \brief Returns true if a setting with the given name is present, otherwise is returns false
+    /// \param name the name of the setting to check
+    /// \returns true if a setting with the given name is present, otherwise is returns false
     @Override
     public boolean isDefined(String name) {
         SettingsValue v = getOrNull(name) ;
         return v != null ;
     }
 
+    /// \brief Return a SettingsValue given the settings name, or returns null if it does not exist
+    /// \param name the name of the setting to retreive.
+    /// \returns the SettingsValue object that for the setting with the given name, or null if it does not exist
     @Override
     public SettingsValue getOrNull(String name) {
         String [] parts = name.split(":") ;
@@ -117,6 +172,23 @@ public class JsonSettingsParser implements ISettingsSupplier {
         return v;
     }
 
+    /// \brief For a given setting entry in the JSON file, return all children
+    ///
+    /// This method returns a list of key given a parent key.
+    ///
+    ///     subsystems : {
+    ///       tankdrive : {
+    ///          width : 30.0,
+    ///          length : 32.0,
+    ///          inches_per_tick: 0.006
+    ///       }        
+    ///     } 
+    ///
+    /// For instance with the setup above, getAllKeys("subsystems:tankdrive") will return
+    /// a list that contains "width", "length", and "inches_per_tick"
+    ///    
+    /// \param path the name of the key to query for children
+    /// \returns a list of keys that are chidren of the key given
     @Override
     public List<String> getAllKeys(String path) {
         String [] parts = path.split(":") ;

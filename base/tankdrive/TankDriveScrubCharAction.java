@@ -12,8 +12,8 @@ import org.xero1425.misc.MessageType;
 public class TankDriveScrubCharAction extends TankDriveAction {
     /// \brief Create the scrub action
     /// \param drive the tankdrive subsystem
-    /// \param the power to use in the action
-    /// \param the total angle to traverse
+    /// \param power the power to use in the action
+    /// \param total the total angle to traverse
     public TankDriveScrubCharAction(final TankDriveSubsystem drive, final double power, final double total) {
         super(drive);
         power_ = power;
