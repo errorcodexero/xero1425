@@ -134,7 +134,7 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
             // Negative angle is clockwise
             //
             double angerr = XeroMath.normalizeAngleDegrees(thead - ahead) ;
-            double angcorr = angle_correction_pid_.getOutput(thead, ahead, dt) ;
+            double angcorr = angle_correction_pid_.getOutput(0, angerr, dt) ;
 
             lout -= angcorr ;
             rout += angcorr ;
