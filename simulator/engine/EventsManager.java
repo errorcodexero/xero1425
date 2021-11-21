@@ -223,7 +223,12 @@ public class EventsManager {
         for(int i = 0 ; i < evs.size() ; i++) {
             Object obj = evs.get(i) ;
             if (!(obj instanceof JSONObject))
+            {
+                logger.startMessage(MessageType.Warning) ;
+                logger.add("in simulation file, at time", t).add(", events at index ").add(i).add(" is not a JSON object") ;
+                logger.endMessage();
                 continue ;
+            }
 
             JSONObject jobj = (JSONObject)obj ;
 

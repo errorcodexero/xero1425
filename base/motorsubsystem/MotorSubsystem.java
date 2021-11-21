@@ -7,6 +7,7 @@ import org.xero1425.base.motors.MotorRequestFailedException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
+import org.xero1425.misc.SettingsValue;
 
 public class MotorSubsystem extends Subsystem
 {
@@ -49,6 +50,13 @@ public class MotorSubsystem extends Subsystem
     public void reset() {
         super.reset() ;
         setPower(0.0) ;
+    }
+
+    public SettingsValue getProperty(String name) {
+        if (name.equals("power"))
+            return new SettingsValue(getPower()) ;
+
+        return null ;
     }
 
     public double getPower() {
