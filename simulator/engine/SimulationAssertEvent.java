@@ -4,17 +4,36 @@ import org.xero1425.base.Subsystem;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
+import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsValue;
 
 public class SimulationAssertEvent extends SimulationEvent {
+
+    private String subsystem_;
+    private String name_;
+    private String setting_;
+    private SettingsValue value_;
+    private double tolerance_;
+
     public SimulationAssertEvent(double t, String subsystem, String name, SettingsValue v) {
         super(t);
 
         subsystem_ = subsystem;
         name_ = name;
         value_ = v;
+        setting_ = null;
 
-        tolerance_ = 1e-9 ;
+        tolerance_ = 1e-9;
+    }
+
+    public SimulationAssertEvent(double t, String subsystem, String name, String setting) {
+        super(t);
+        subsystem_ = subsystem;
+        name_ = name;
+        value_ = null;
+        setting_ = setting;
+
+        tolerance_ = 1e-9;
     }
 
     public void run(SimulationEngine engine) {
@@ -41,51 +60,63 @@ public class SimulationAssertEvent extends SimulationEvent {
             } else {
                 boolean pass = false;
 
+                SettingsValue value = getValue(engine) ;
+
                 if (v.isDouble()) {
                     try {
-                        pass = Math.abs(v.getDouble() - value_.getDouble()) < tolerance_;
+                        pass = Math.abs(v.getDouble() - value.getDouble()) < tolerance_;
                     } catch (BadParameterTypeException e) {
                         // Should never happen
-                        pass = false ;
+                        pass = false;
                     }
-                }
-                else {
-                    pass = v.equals(value_) ;
+                } else {
+                    pass = v.equals(value);
                 }
 
                 if (!pass) {
-                    logger.startMessage(MessageType.Error) ;
-                    logger.add("AssertFailed: ") ;
-                    logger.add("subsystem", subsystem_) ;
-                    logger.add(" property ", name_) ;
-                    logger.add(" expected ").addQuoted(value_.toString()) ;
-                    logger.add(" got ").addQuoted(v.toString()) ;
+                    logger.startMessage(MessageType.Error);
+                    logger.add("AssertFailed: ");
+                    logger.add("subsystem", subsystem_);
+                    logger.add(" property ", name_);
+                    logger.add(" expected ").addQuoted(value.toString());
+                    logger.add(" got ").addQuoted(v.toString());
                     logger.endMessage();
-                    engine.addAssertError();                
-                }
-                else {
-                    logger.startMessage(MessageType.Info) ;
-                    logger.add("AssertPassed: ") ;
-                    logger.add("subsystem", subsystem_) ;
-                    logger.add(" property ", name_) ;
-                    logger.add(" value ").addQuoted(value_.toString()) ;
+                    engine.addAssertError();
+                } else {
+                    logger.startMessage(MessageType.Info);
+                    logger.add("AssertPassed: ");
+                    logger.add("subsystem", subsystem_);
+                    logger.add(" property ", name_);
+                    logger.add(" value ").addQuoted(value.toString());
                     logger.endMessage();
-                    engine.addAssertPassed() ;
+                    engine.addAssertPassed();
                 }
             }
         }
     }
 
     public String toString() {
-        return "SimulationAssertEvent" ;
+        return "SimulationAssertEvent";
     }
 
     public void setTolerance(double v) {
-        tolerance_ = v ;
+        tolerance_ = v;
     }
 
-    private String subsystem_ ;
-    private String name_ ;
-    private SettingsValue value_ ;
-    private double tolerance_ ;
+    private SettingsValue getValue(SimulationEngine engine) {
+        SettingsValue ret = null;
+
+        if (value_ != null) {
+            ret = value_;
+        } else {
+            try {
+                ret = engine.getRobot().getSettingsParser().get(setting_);
+            } catch (MissingParameterException e) {
+                ret = null ;
+            }
+        }
+
+        return ret ;
+    }
+
 }
