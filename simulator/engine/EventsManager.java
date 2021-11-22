@@ -60,6 +60,30 @@ public class EventsManager {
         }
 
         JSONObject jobj = (JSONObject) obj;
+
+        if (jobj.containsKey("purpose")) {
+            obj = jobj.get("purpose") ;
+            if (obj instanceof JSONArray) {
+                JSONArray a = (JSONArray)obj ;
+                logger.startMessage(MessageType.Info).add("  ").endMessage();
+                for(int i = 0 ; i < a.size() ; i++) {
+                    Object o = a.get(i) ;
+                    if (o instanceof String) {
+                        logger.startMessage(MessageType.Info) ;
+                        logger.add((String)o) ;
+                        logger.endMessage();                        
+                    }
+                }
+                logger.startMessage(MessageType.Info).add("  ").endMessage();           
+            }
+            else if (obj instanceof String) {
+                logger.startMessage(MessageType.Info).add("  ").endMessage();           
+                logger.startMessage(MessageType.Info) ;
+                logger.add((String)obj) ;
+                logger.endMessage();
+                logger.startMessage(MessageType.Info).add("  ").endMessage();              
+            }
+        }
         obj = jobj.get("stimulus");
 
         if (!(obj instanceof JSONArray)) {
