@@ -105,7 +105,7 @@ public class TankDriveModel extends SimulationModel {
     //
     // The ticks output per revolution for the encoders
     //
-    private double ticks_per_rev_ ;
+    private double inches_per_tick_ ;
 
     //
     // The maximum velocity of the robot
@@ -380,7 +380,7 @@ public class TankDriveModel extends SimulationModel {
             width_ = getProperty("width").getDouble() ;
             length_ = getProperty("length").getDouble() ;
             scrub_ = getProperty("scrub").getDouble() ;
-            ticks_per_rev_ = getProperty("ticks_per_rev").getDouble() ;
+            inches_per_tick_ = getProperty("inches_per_tick").getDouble() ;
             max_velocity_ = getProperty("maxvelocity").getDouble() ;
             max_accel_ = getProperty("maxacceleration").getDouble() ;
         } catch (Exception e) {
@@ -520,8 +520,8 @@ public class TankDriveModel extends SimulationModel {
         // Compute the encoder ticks based on the position of the left and right
         // sides of the robot
         //
-        left_enc_value_ = (int)(lrevs * ticks_per_rev_ * left_encoder_mult_) ;
-        right_enc_value_ = (int)(rrevs * ticks_per_rev_ * right_encoder_mult_) ;
+        left_enc_value_ = (int)(lrevs * diameter_ * left_encoder_mult_ * inches_per_tick_) ;
+        right_enc_value_ = (int)(rrevs * diameter_ * right_encoder_mult_ * inches_per_tick_) ;
 
         if (left_.usesTicks()) {
             left_.setEncoder(left_enc_value_);
