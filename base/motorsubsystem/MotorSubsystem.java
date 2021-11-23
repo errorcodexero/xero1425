@@ -26,7 +26,8 @@ public class MotorSubsystem extends Subsystem
             getRobot().getMessageLogger().add("could not create motor for name '" + mname + "'") ;
             getRobot().getMessageLogger().endMessage();
         }
-        power_ = 0.0 ;
+        putDashboard(getName() + "-subsystem", DisplayType.Verbose, true);
+        setPower(0.0) ;
     }
 
     public boolean isRunning() {
@@ -71,6 +72,7 @@ public class MotorSubsystem extends Subsystem
         try {
             power_ = limitPower(p) ;
             controller_.set(power_) ;
+            putDashboard(getName() + "-power", DisplayType.Verbose, power_);
         }
         catch(BadMotorRequestException|MotorRequestFailedException ex) {
             MessageLogger logger = getRobot().getMessageLogger() ;
