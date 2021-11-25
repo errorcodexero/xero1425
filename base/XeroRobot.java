@@ -6,6 +6,7 @@ import java.net.NetworkInterface;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.sql.Driver;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.List;
@@ -143,7 +144,12 @@ public abstract class XeroRobot extends TimedRobot {
     public void robotInit() {
         boolean v;
 
-        logger_.startMessage(MessageType.Info).add("initializing robot").endMessage();
+        logger_.startMessage(MessageType.Info).add("initializing robot") ;
+        if (DriverStation.getInstance().isFMSAttached())
+            logger_.add(" - FMS connected") ;
+        else
+            logger_.add(" - No FMS, practice mode") ;
+        logger_.endMessage();
 
         try {
             v = settings_.get("system:plotting").getBoolean();
