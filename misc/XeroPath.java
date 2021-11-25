@@ -17,7 +17,7 @@ public class XeroPath
     //
     // The type of the drivebase for the path
     //
-    private XeroPathType dtype_ ;
+    private int data_count_ ;
 
     //
     // The set of segment for the left side of the robot
@@ -26,38 +26,22 @@ public class XeroPath
 
     /// \brief create a new path with the name given
     /// \param name the name of the path
-    /// \param dtype the type of path algorithm used
-    public XeroPath(String name, XeroPathType dtype) throws Exception {
+    /// \param data_count the number of data per time point
+    public XeroPath(String name, int data_count) throws Exception {
         name_ = name ;
-        dtype_ = dtype ;
+        data_count_ = data_count ;
         data_ = new ArrayList<ArrayList<XeroPathSegment>>() ;
 
-        if (dtype == XeroPathType.TankPathFollowing)
+        for(int i = 0 ; i < data_count ; i++)
         {
             data_.add(new ArrayList<XeroPathSegment>()) ;
-            data_.add(new ArrayList<XeroPathSegment>()) ;
-        }
-        else if (dtype == XeroPathType.SwervePathFollowing)
-        {
-            data_.add(new ArrayList<XeroPathSegment>()) ;
-            data_.add(new ArrayList<XeroPathSegment>()) ;
-            data_.add(new ArrayList<XeroPathSegment>()) ;
-            data_.add(new ArrayList<XeroPathSegment>()) ;
-        }
-        else if (dtype == XeroPathType.TankPurePursuit)
-        {
-            data_.add(new ArrayList<XeroPathSegment>()) ;
-        }
-        else if (dtype == XeroPathType.SwervePurePursuit)
-        {
-            throw new Exception("not supported yet") ;
         }
     }
 
     /// \brief return the path type
     /// \returns the path type
-    public XeroPathType getDriveType() {
-        return dtype_ ;
+    public int getDataCounts() {
+        return data_count_ ;
     }
 
     /// \brief return the name of the path

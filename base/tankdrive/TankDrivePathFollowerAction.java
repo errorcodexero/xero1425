@@ -45,9 +45,9 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
 
         reverse_ = reverse ;
 
-        left_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "subsystems:tankdrive:follower:left", false) ;
-        right_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "subsystems:tankdrive:follower:right", false) ;
-        angle_correction_pid_ = new PIDCtrl(drive.getRobot().getSettingsParser(), "subsystems:tankdrive:angle_correction", false) ;
+        left_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "subsystems:" + getSubsystem().getName() + ":follower:left", false) ;
+        right_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "subsystems:" + getSubsystem().getName() + ":follower:right", false) ;
+        angle_correction_pid_ = new PIDCtrl(drive.getRobot().getSettingsParser(), "subsystems:" + getSubsystem().getName() + ":angle_correction", false) ;
 
         plot_id_ = drive.initPlot(toString(0)) ;
         plot_data_ = new Double[plot_columns_.length] ;

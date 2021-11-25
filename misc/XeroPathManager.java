@@ -73,6 +73,16 @@ public class XeroPathManager
             exts_[0] = "_left.csv" ;
             exts_[1] = "_right.csv" ;
         }
+        else if (path_type_ == XeroPathType.TankPurePursuit)
+        {
+            exts_ = new String[1] ;
+            exts_[0] = "_main.csv" ;
+        }
+        else if (path_type_ == XeroPathType.TankRamsete)
+        {
+            exts_ = new String[1] ;
+            exts_[0] = "_main.csv" ;
+        }
         else if (path_type_ == XeroPathType.SwervePathFollowing)
         {
             exts_ = new String[4] ;
@@ -81,11 +91,7 @@ public class XeroPathManager
             exts_[2] = "_fr.csv" ;
             exts_[3] = "_fr.csv" ;
         }
-        else if (path_type_ == XeroPathType.TankPurePursuit)
-        {
-            exts_ = new String[1] ;
-            exts_[0] = "_main.csv" ;
-        }
+
     }
 
     /// \brief return the types of paths the path manager is managing
@@ -171,11 +177,9 @@ public class XeroPathManager
             }
         }
 
-
-        XeroPath path = new XeroPath(name, path_type_) ;
+        XeroPath path = new XeroPath(name, exts_.length) ;
         boolean first = true ;
         ArrayList<Iterator<CSVRecord>> iters = new ArrayList<Iterator<CSVRecord>>() ;
-
 
         for(int i = 0 ; i < parsers.length ; i++)
         {
