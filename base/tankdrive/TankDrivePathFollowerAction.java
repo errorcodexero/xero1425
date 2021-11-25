@@ -152,7 +152,6 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
             logger.add(", robot-y", getSubsystem().getPose().getY()) ;
             logger.add(", robot-a", ahead) ;
 
-
             plot_data_[0] = robot.getTime() - start_time_ ;
 
             // Left side
@@ -216,6 +215,7 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
 
         getSubsystem().setPower(0.0, 0.0) ;
         getSubsystem().endPlot(plot_id_);
+        getSubsystem().setRecording(false);
     }
 
     @Override
