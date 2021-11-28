@@ -375,6 +375,15 @@ public class TankDriveSubsystem extends Subsystem {
             putDashboard("db-trk-y", DisplayType.Verbose, tracker_.getPose().getY()) ;
             putDashboard("db-trk-a", DisplayType.Verbose, tracker_.getPose().getRotation().getDegrees());
         }
+
+        MessageLogger logger = getRobot().getMessageLogger() ;
+        logger.startMessage(MessageType.Info, getLoggerID()) ;
+        logger.add("TankDrive: ") ;
+        logger.add("db-trk-t", getRobot().getTime() - recording_start_) ;
+        logger.add("db-trk-x", tracker_.getPose().getX()) ;
+        logger.add("db-trk-y", tracker_.getPose().getY()) ;
+        logger.add("db-trk-a", tracker_.getPose().getRotation().getDegrees()) ;
+        logger.endMessage();
     }
 
     
