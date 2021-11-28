@@ -1,6 +1,8 @@
 package org.xero1425.simulator.models;
 
 import org.xero1425.simulator.engine.SimulationModel;
+
+import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -194,6 +196,12 @@ public class TankDriveModel extends SimulationModel {
     private double last_xpos_ ;
     private double last_ypos_ ;
 
+    //
+    // The external encoder indexes, if -1, then encoders are in the motor
+    //
+    private int left_encoder_index_ ;
+    private int right_encoder_index_ ;
+
     /// \brief create a simulation model for a tank drive
     /// \param engine the simulation engine
     /// \param model the name of the model
@@ -207,6 +215,9 @@ public class TankDriveModel extends SimulationModel {
         xpos_ = 0.0 ;
         ypos_ = 0.0 ;
         angle_ = 0.0 ;
+
+        left_encoder_index_ = -1 ;
+        right_encoder_index_ = -1 ;
     }
     
     /// \brief called once at the end of the simulator loop
@@ -341,7 +352,59 @@ public class TankDriveModel extends SimulationModel {
                     right_motor_mult_ = -1.0;
             } catch (BadParameterTypeException e) {
             }
-        }        
+        }
+
+        if (hasProperty("left:encoder:index") || hasProperty("right:encoder:index"))
+        {
+            if (!hasProperty("left:encoder:index"))
+            {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'right:encoder:index' but not 'left:encoder:index'") ;
+                logger.endMessage();
+
+                return false ;
+            }
+
+            if (!hasProperty("left:encoder:index"))
+            {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'left:encoder:index' but not 'right:encoder:index'") ;
+                logger.endMessage();
+
+                return false ;
+            }
+
+            SettingsValue v = getProperty("left:encoder:index") ;
+            try {
+                left_encoder_index_ = v.getInteger() ;
+            }
+            catch(BadParameterTypeException ex) {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'left:encoder:index' existed, but was not an integer") ;
+                logger.endMessage();
+
+                return false ;                
+            }
+
+            try {
+                right_encoder_index_ = v.getInteger() ;
+            }
+            catch(BadParameterTypeException ex) {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'right:encoder:index' existed, but was not an integer") ;
+                logger.endMessage();
+
+                return false ;                
+            }
+        }
 
         //
         // If the left:encoder:inverted property exists and is true, then invert the left encoders
@@ -523,13 +586,19 @@ public class TankDriveModel extends SimulationModel {
         left_enc_value_ = (int)(lrevs * diameter_ * left_encoder_mult_ * inches_per_tick_) ;
         right_enc_value_ = (int)(rrevs * diameter_ * right_encoder_mult_ * inches_per_tick_) ;
 
-        if (left_.usesTicks()) {
-            left_.setEncoder(left_enc_value_);
-            right_.setEncoder(right_enc_value_);
+        if (left_encoder_index_ != -1 && right_encoder_index_ != -1) {
+            EncoderDataJNI.setCount(left_encoder_index_, left_enc_value_) ;
+            EncoderDataJNI.setCount(right_encoder_index_, right_enc_value_) ;
         }
         else {
-            left_.setEncoder(lrevs * left_encoder_mult_);
-            right_.setEncoder(rrevs * right_encoder_mult_) ;
+            if (left_.usesTicks()) {
+                left_.setEncoder(left_enc_value_);
+                right_.setEncoder(right_enc_value_);
+            }
+            else {
+                left_.setEncoder(lrevs * left_encoder_mult_);
+                right_.setEncoder(rrevs * right_encoder_mult_) ;
+            }
         }
 
         //
