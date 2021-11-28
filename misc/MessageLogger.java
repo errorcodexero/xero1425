@@ -533,6 +533,7 @@ public final class MessageLogger
             else
             {
                 per = new ThreadData() ;
+                per.id_ = id ;
                 per.in_message_ = false ;
                 per_thread_data_.put(id, per) ;
             }
@@ -543,6 +544,7 @@ public final class MessageLogger
 
     private class ThreadData
     {
+        public long id_ ;
         public boolean in_message_ ;
         public boolean enabled_ ;
         public MessageType type_ ;

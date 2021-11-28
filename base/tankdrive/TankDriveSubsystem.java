@@ -54,7 +54,6 @@ public class TankDriveSubsystem extends Subsystem {
     private Encoder right_encoder_ ;
 
     private boolean recording_ ;
-    private double recording_start_ ;
 
     private Map<String, Double> trips_ ;
 
@@ -139,7 +138,6 @@ public class TankDriveSubsystem extends Subsystem {
     /// was called with a value of true.  The angle is in degrees.
     public void setRecording(boolean v) {
         recording_ = v ;
-        recording_start_ = getRobot().getTime() ;
     }
 
     /// \brief returns true to indicate this is a drivebase
@@ -370,20 +368,22 @@ public class TankDriveSubsystem extends Subsystem {
         }
 
         if (recording_) {
-            putDashboard("db-trk-t", DisplayType.Verbose, getRobot().getTime() - recording_start_) ;
+            putDashboard("db-trk-t", DisplayType.Verbose, getRobot().getTime()) ;
             putDashboard("db-trk-x", DisplayType.Verbose, tracker_.getPose().getX());
             putDashboard("db-trk-y", DisplayType.Verbose, tracker_.getPose().getY()) ;
             putDashboard("db-trk-a", DisplayType.Verbose, tracker_.getPose().getRotation().getDegrees());
+
+            
+            MessageLogger logger = getRobot().getMessageLogger() ;
+            logger.startMessage(MessageType.Info, getLoggerID()) ;
+            logger.add("TankDrive: ") ;
+            logger.add("db-trk-t", getRobot().getTime()) ;
+            logger.add("db-trk-x", tracker_.getPose().getX()) ;
+            logger.add("db-trk-y", tracker_.getPose().getY()) ;
+            logger.add("db-trk-a", tracker_.getPose().getRotation().getDegrees()) ;
+            logger.endMessage();
         }
 
-        MessageLogger logger = getRobot().getMessageLogger() ;
-        logger.startMessage(MessageType.Info, getLoggerID()) ;
-        logger.add("TankDrive: ") ;
-        logger.add("db-trk-t", getRobot().getTime() - recording_start_) ;
-        logger.add("db-trk-x", tracker_.getPose().getX()) ;
-        logger.add("db-trk-y", tracker_.getPose().getY()) ;
-        logger.add("db-trk-a", tracker_.getPose().getRotation().getDegrees()) ;
-        logger.endMessage();
     }
 
     /// \brief This method return reverse kinematics for the drivebase
@@ -437,9 +437,17 @@ public class TankDriveSubsystem extends Subsystem {
             p2 = getSettingsValue("hw:left:encoders:2").getInteger() ;
             left_encoder_ = new Encoder(p1, p2) ;
 
+
             p1 = getSettingsValue("hw:right:encoders:1").getInteger() ;
             p2 = getSettingsValue("hw:right:encoders:2").getInteger() ;
             right_encoder_ = new Encoder(p1, p2) ;
+
+            MessageLogger logger = getRobot().getMessageLogger() ;
+            logger.startMessage(MessageType.Info, getLoggerID()) ;
+            logger.add("TankDrive FPGA encoder indexes: ") ;
+            logger.add("left", left_encoder_.getFPGAIndex()) ;
+            logger.add("right", right_encoder_.getFPGAIndex()) ;
+            logger.endMessage();
         }
 
         if (left_motors_.hasPosition() && right_motors_.hasPosition()) {

@@ -583,8 +583,8 @@ public class TankDriveModel extends SimulationModel {
         // Compute the encoder ticks based on the position of the left and right
         // sides of the robot
         //
-        left_enc_value_ = (int)(lrevs * diameter_ * left_encoder_mult_ * inches_per_tick_) ;
-        right_enc_value_ = (int)(rrevs * diameter_ * right_encoder_mult_ * inches_per_tick_) ;
+        left_enc_value_ = (int)(lrevs * diameter_ * Math.PI * left_encoder_mult_ / inches_per_tick_) ;
+        right_enc_value_ = (int)(rrevs * diameter_ * Math.PI * right_encoder_mult_ / inches_per_tick_) ;
 
         if (left_encoder_index_ != -1 && right_encoder_index_ != -1) {
             EncoderDataJNI.setCount(left_encoder_index_, left_enc_value_) ;
@@ -609,6 +609,22 @@ public class TankDriveModel extends SimulationModel {
             navx_.setYaw(deg);
             navx_.setTotalAngle(XeroMath.rad2deg(total_angle_));
         }
+
+        MessageLogger logger = getEngine().getRobot().getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, getLoggerID()) ;
+        logger.add("lp", leftpower) ;
+        logger.add("rp", rightpower) ;
+        logger.add("lrps", current_left_rps_) ;
+        logger.add("rrps", current_right_rps_) ;
+        logger.add("dl", dleft) ;
+        logger.add("dr", dright) ;
+        logger.add("lpos", left_pos_) ;
+        logger.add("rpos", right_pos_) ;
+        logger.add("lrevs", lrevs) ;
+        logger.add("rrevs", rrevs) ;
+        logger.add("lenc" , left_enc_value_) ;
+        logger.add("renc", right_enc_value_) ;
+        logger.endMessage();
     }
 
     /// \brief process an event assigned to the subsystem
