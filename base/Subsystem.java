@@ -139,7 +139,7 @@ public class Subsystem {
         try {
             ISettingsSupplier p = getRobot().getSettingsParser();
             String pname = "system:verbose:" + name_ ;
-            if (p.get(pname).isBoolean() && p.get(pname).getBoolean())
+            if (p.isDefined(pname) && p.get(pname).isBoolean() && p.get(pname).getBoolean())
                 verbose_ = true;
             
         } catch (MissingParameterException e) {

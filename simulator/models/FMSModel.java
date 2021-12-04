@@ -31,7 +31,6 @@ public class FMSModel extends SimulationModel {
     private double between_time_ ;
     private double test_time_ ;
     private double closing_time_ ;
-    private double overall_start_time_ ;
 
     public FMSModel(final SimulationEngine engine, final String model, final String inst) {
         super(engine, model, inst);
@@ -77,7 +76,6 @@ public class FMSModel extends SimulationModel {
                 DriverStationSim.setEnabled(false);
                 period_start_time_ = getRobotTime() ;
                 state_ = FMSState.Start ;
-                overall_start_time_ = getRobotTime() ;
                 break ;
 
             case Start:

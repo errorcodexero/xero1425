@@ -192,8 +192,6 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
             plot_data_[32] = angle_correction_pid_.getPComponent() ;
             plot_data_[33] = angle_correction_pid_.getPComponent() ;
             plot_data_[34] = angle_correction_pid_.getPComponent() ;
-
-
             td.addPlotData(plot_id_, plot_data_);
         }
         logger.endMessage();

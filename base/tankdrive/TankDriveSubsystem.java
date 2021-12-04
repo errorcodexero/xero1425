@@ -427,8 +427,20 @@ public class TankDriveSubsystem extends Subsystem {
     }
 
     private void attachHardware() throws BadMotorRequestException, MissingParameterException, BadParameterTypeException {
+        MessageLogger logger = getRobot().getMessageLogger() ;
+
         left_motors_ = getRobot().getMotorFactory().createMotor("TankDriveLeft", "subsystems:" + getName() + ":hw:left:motors") ;
         right_motors_ = getRobot().getMotorFactory().createMotor("TankDriveRight", "subsystems:" + getName() + ":hw:right:motors") ;
+
+        if (left_motors_ == null || right_motors_ == null) {
+
+            logger.startMessage(MessageType.Error, getLoggerID()) ;
+            if (left_motors_ == null)
+                logger.add("could not create left motors, ") ;
+            if (right_motors_ == null)
+                logger.add("could not create right motors") ;            
+            logger.endMessage();
+        }
         
         if (!left_motors_.hasPosition() || !right_motors_.hasPosition()) {
             int p1, p2 ;
@@ -442,7 +454,6 @@ public class TankDriveSubsystem extends Subsystem {
             p2 = getSettingsValue("hw:right:encoders:2").getInteger() ;
             right_encoder_ = new Encoder(p1, p2) ;
 
-            MessageLogger logger = getRobot().getMessageLogger() ;
             logger.startMessage(MessageType.Info, getLoggerID()) ;
             logger.add("TankDrive FPGA encoder indexes: ") ;
             logger.add("left", left_encoder_.getFPGAIndex()) ;
