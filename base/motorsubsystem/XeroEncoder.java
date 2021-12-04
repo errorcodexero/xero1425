@@ -8,8 +8,8 @@ import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.EncoderMapper;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 
 public class XeroEncoder {
     
@@ -20,7 +20,7 @@ public class XeroEncoder {
     private AnalogInput analog_ ;
     private Counter pwm_ ;
     private EncoderMapper mapper_ ;
-    
+
     public XeroEncoder(XeroRobot robot, String cname, boolean angular, MotorController ctrl)
             throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
             BadMotorRequestException {
@@ -30,12 +30,25 @@ public class XeroEncoder {
     private void createEncoder(XeroRobot robot, String cname, MotorController ctrl)
             throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
             BadMotorRequestException {
-        createQuadEncoder(robot, cname, ctrl);
-        createAnalogEncoder(robot, cname);
-        createPWMEncoder(robot, cname);
 
-        if (pwm_ != null && analog_ != null)
-            throw new EncoderConfigException("motor '" + cname + "' - both PWM and ANALOG encoders not valid");
+        ISettingsSupplier settings = robot.getSettingsParser() ;                
+        String type = settings.get(cname + ":type").getString() ;
+
+        if (type.equals("motor")) {
+            createMotorEncoder(robot, cname, ctrl) ;
+        }
+        else if (type.equals("quad")) {
+            createQuadEncoder(robot, cname, ctrl);
+        }
+        else if (type.equals("analog")) {
+            createAnalogEncoder(robot, cname);
+        }
+        else if (type.equals("pwm")) {
+            createPWMEncoder(robot, cname);
+        }
+        else {
+            throw new EncoderConfigException("motor '" + cname + " - unknown encoder type '" + type + "' - expected 'motor' or 'analog' or 'quad' or 'pwm'") ;
+        }
 
         if (pwm_ == null && analog_ == null && quad_ == null && motor_ == null)
             throw new EncoderConfigException("motor '" + cname + "' - must define a QUAD, PWM, MOTOR, or ANALOG encoder");
@@ -143,103 +156,78 @@ public class XeroEncoder {
         }
     }
 
+    private void createMotorEncoder(XeroRobot robot, String cname, MotorController ctrl)
+                throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
+                BadMotorRequestException {
+
+        ISettingsSupplier settings = robot.getSettingsParser() ;                    
+
+        motor_ = ctrl ;
+        if (!motor_.hasPosition())
+            throw new EncoderConfigException("motor '" + cname + "' - motor does not have internal encoder");
+    
+        quad_m_ = settings.get(cname + ":m").getDouble() ;
+        quad_b_ = settings.get(cname + ":b").getDouble() ;
+    }
+
     private void createQuadEncoder(XeroRobot robot, String cname, MotorController ctrl)
             throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
             BadMotorRequestException {
-        SettingsParser settings = robot.getSettingsParser() ;
 
-        //
-        // First check for a quadrature encoder
-        //
-        if (settings.isDefined(cname + ":quad:motor")) {
-            //
-            // The NAME:quad:motor is set,  its required to be true and
-            // indicates we are using the encoder in the motor
-            //
-            motor_ = ctrl ;
-            if (!motor_.hasPosition())
-                throw new EncoderConfigException("motor '" + cname + "' - motor does not have internal encoder");
-        }
-        else if (settings.isDefined(cname + ":quad:1") || settings.isDefined(cname + ":quad:2"))
-        {
-            //
-            // The NAME:quad:1 (or 2) is set, so this is a standard external quadrature encoder
-            // connect to two digital I/Os.
-            //
-            int i1 = settings.get(cname + ":quad:1").getInteger() ;
-            int i2 = settings.get(cname + ":quad:2").getInteger() ;
+        ISettingsSupplier settings = robot.getSettingsParser() ;
 
-            quad_ = new Encoder(i1, i2) ;
-        }
-        else
-        {
-            quad_ = null ;
-        }
+        int i1 = settings.get(cname + ":dinput1").getInteger() ;
+        int i2 = settings.get(cname + ":dinput2").getInteger() ;        
 
-        if (quad_ != null || motor_ != null)
-        {
-            quad_m_ = settings.get(cname + ":quad:m").getDouble() ;
-            quad_b_ = settings.get(cname + ":quad:b").getDouble() ;
-        }
+        quad_ = new Encoder(i1, i2) ;
+        quad_m_ = settings.get(cname + ":m").getDouble() ;
+        quad_b_ = settings.get(cname + ":b").getDouble() ;
     }
 
     private void createAnalogEncoder(XeroRobot robot, String cname)
             throws BadParameterTypeException, MissingParameterException {
-        SettingsParser settings = robot.getSettingsParser() ;
+        ISettingsSupplier settings = robot.getSettingsParser() ;
 
-        if (settings.isDefined(cname + ":analog"))
-        {
-            int a = settings.get(cname+":analog").getInteger() ;
-            analog_ = new AnalogInput(a) ;
+        int a = settings.get(cname+":ainput").getInteger() ;
+        analog_ = new AnalogInput(a) ;
 
-            double rmin, rmax ;
-            double emin, emax ;
-            double rc, ec ;
+        double rmin, rmax ;
+        double emin, emax ;
+        double rc, ec ;
 
-            rmin = settings.get(cname + ":analog:rmin").getDouble() ;
-            rmax = settings.get(cname + ":analog:rmax").getDouble() ;
-            emin = settings.get(cname + ":analog:emin").getDouble() ;
-            emax = settings.get(cname + ":analog:emax").getDouble() ;
-            rc = settings.get(cname + ":analog:rc").getDouble() ;
-            ec = settings.get(cname + ":analog:ec").getDouble() ;
+        rmin = settings.get(cname + ":rmin").getDouble() ;
+        rmax = settings.get(cname + ":rmax").getDouble() ;
+        emin = settings.get(cname + ":emin").getDouble() ;
+        emax = settings.get(cname + ":emax").getDouble() ;
+        rc = settings.get(cname + ":rc").getDouble() ;
+        ec = settings.get(cname + ":ec").getDouble() ;
 
-            mapper_ = new EncoderMapper(rmax, rmin, emax, emin) ;
-            mapper_.calibrate(rc, ec) ;
-        }
-        else
-        {
-            analog_ = null ;
-        }
+        mapper_ = new EncoderMapper(rmax, rmin, emax, emin) ;
+        mapper_.calibrate(rc, ec) ;
     }
 
     private void createPWMEncoder(XeroRobot robot, String cname)
             throws BadParameterTypeException, MissingParameterException {
-        SettingsParser settings = robot.getSettingsParser() ;
                 
-        if (settings.isDefined(cname + ":pwm"))
-        {
-            int a = settings.get(cname+":pwm").getInteger() ;
-            pwm_ = new Counter(a) ;
-            pwm_.setSemiPeriodMode(true);
+        ISettingsSupplier settings = robot.getSettingsParser() ;
+                
+        int a = settings.get(cname + ":dinput").getInteger() ;
+        pwm_ = new Counter(a) ;
+        pwm_.setSemiPeriodMode(true);
 
-            double rmin, rmax ;
-            double emin, emax ;
-            double rc, ec ;
+        double rmin, rmax ;
+        double emin, emax ;
+        double rc, ec ;
 
-            rmin = settings.get(cname + ":analog:rmin").getDouble() ;
-            rmax = settings.get(cname + ":analog:rmax").getDouble() ;
-            emin = settings.get(cname + ":analog:emin").getDouble() ;
-            emax = settings.get(cname + ":analog:emax").getDouble() ;
-            rc = settings.get(cname + ":analog:rc").getDouble() ;
-            ec = settings.get(cname + ":analog:ec").getDouble() ;
+        rmin = settings.get(cname + ":rmin").getDouble() ;
+        rmax = settings.get(cname + ":rmax").getDouble() ;
+        emin = settings.get(cname + ":emin").getDouble() ;
+        emax = settings.get(cname + ":emax").getDouble() ;
+        rc = settings.get(cname + ":rc").getDouble() ;
+        ec = settings.get(cname + ":ec").getDouble() ;
 
-            mapper_ = new EncoderMapper(rmax, rmin, emax, emin) ;
-            mapper_.calibrate(rc, ec) ;
-        }
-        else
-        {
-            pwm_ = null ;
-        }
+        mapper_ = new EncoderMapper(rmax, rmin, emax, emin) ;
+        mapper_.calibrate(rc, ec) ;
     }
 
 } ;

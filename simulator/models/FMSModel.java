@@ -10,6 +10,29 @@ import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsValue;
 
 public class FMSModel extends SimulationModel {
+    
+    private enum FMSState {
+        Initializing,
+        Start,
+        Test,
+        BetweenTestAuto,
+        Auto,
+        BetweenAutoTeleop,
+        Teleop,
+        Closing,
+        Done,
+    } ;
+
+    private FMSState state_ ;
+    private double period_start_time_ ;
+    private double start_time_  ;
+    private double auto_time_ ;
+    private double teleop_time_ ;
+    private double between_time_ ;
+    private double test_time_ ;
+    private double closing_time_ ;
+    private double overall_start_time_ ;
+
     public FMSModel(final SimulationEngine engine, final String model, final String inst) {
         super(engine, model, inst);
 
@@ -17,6 +40,7 @@ public class FMSModel extends SimulationModel {
         auto_time_ = 0.0 ;
         teleop_time_ = 0.0 ;
         between_time_ = 0.0 ;
+        test_time_ = 0.0 ;
         closing_time_ = 0.0 ;        
     }
 
@@ -30,10 +54,13 @@ public class FMSModel extends SimulationModel {
             start_time_ = setProperty("start", getProperty("start"), start_time_) ;
         }        
         else if (hasProperty("between")) {
-            between_time_ = setProperty("between", getProperty("between"), start_time_) ;
+            between_time_ = setProperty("between", getProperty("between"), between_time_) ;
         }     
         else if (hasProperty("teleop")) {
-            teleop_time_ = setProperty("teleop", getProperty("teleop"), start_time_) ;
+            teleop_time_ = setProperty("teleop", getProperty("teleop"), teleop_time_) ;
+        }
+        else if (hasProperty("test")) {
+            teleop_time_ = setProperty("test", getProperty("test"), test_time_) ;
         }
 
         setCreated();
@@ -45,17 +72,64 @@ public class FMSModel extends SimulationModel {
         switch(state_)
         {
             case Initializing:
+                DriverStationSim.setTest(false);
+                DriverStationSim.setAutonomous(false);
+                DriverStationSim.setEnabled(false);
                 period_start_time_ = getRobotTime() ;
                 state_ = FMSState.Start ;
+                overall_start_time_ = getRobotTime() ;
                 break ;
 
             case Start:
                 if (elapsed >= start_time_)
                 {
-                    DriverStationSim.setAutonomous(true);
-                    DriverStationSim.setAutonomous(true);
-                    DriverStationSim.setEnabled(true);
-                    state_ = FMSState.Auto ;
+                    if (test_time_ > 0.0) {
+                        DriverStationSim.setTest(true);
+                        DriverStationSim.setAutonomous(false);
+                        DriverStationSim.setEnabled(true);
+                        state_ = FMSState.Test ;
+                    } else {
+                        if (auto_time_ > 0.0) {
+                            DriverStationSim.setAutonomous(true);
+                            DriverStationSim.setTest(false);
+                            DriverStationSim.setEnabled(true);
+                            state_ = FMSState.Auto ;                        
+                        }
+                        else {
+                            DriverStationSim.setAutonomous(false);
+                            DriverStationSim.setTest(false);
+                            DriverStationSim.setEnabled(true);
+                            state_ = FMSState.Teleop ;                            
+                        }
+                    }
+                    period_start_time_ = getRobotTime() ;
+                }
+                break ;
+
+            case Test:
+                if (elapsed >= test_time_) 
+                {
+                    DriverStationSim.setTest(false);
+                    DriverStationSim.setEnabled(false);
+                    state_ = FMSState.BetweenTestAuto ;
+                    period_start_time_ = getRobotTime() ;
+                }
+                break ;
+
+            case BetweenTestAuto:
+                if (elapsed >= between_time_) 
+                {
+                    if (auto_time_ > 0.0) {
+                        DriverStationSim.setAutonomous(true);
+                        DriverStationSim.setTest(false);
+                        DriverStationSim.setEnabled(true);
+                        state_ = FMSState.Auto ;
+                    } else {
+                        DriverStationSim.setAutonomous(false);
+                        DriverStationSim.setTest(false);
+                        DriverStationSim.setEnabled(true);
+                        state_ = FMSState.Teleop ;                             
+                    }
                     period_start_time_ = getRobotTime() ;
                 }
                 break ;
@@ -63,16 +137,18 @@ public class FMSModel extends SimulationModel {
             case Auto:
                 if (elapsed >= auto_time_)
                 {
+                    DriverStationSim.setAutonomous(false);
                     DriverStationSim.setEnabled(false);
-                    state_ = FMSState.Between ;
+                    state_ = FMSState.BetweenAutoTeleop ;
                     period_start_time_ = getRobotTime() ;
                 }            
                 break ;
 
-            case Between:
+            case BetweenAutoTeleop:
                 if (elapsed >= between_time_)
                 {
                     DriverStationSim.setAutonomous(false);
+                    DriverStationSim.setTest(false);
                     DriverStationSim.setEnabled(true);
                     state_ = FMSState.Teleop ;
                     period_start_time_ = getRobotTime() ;
@@ -82,6 +158,8 @@ public class FMSModel extends SimulationModel {
             case Teleop:
                 if (elapsed >= teleop_time_)
                 {
+                    DriverStationSim.setAutonomous(false);
+                    DriverStationSim.setTest(false);                    
                     DriverStationSim.setEnabled(false);
                     state_ = FMSState.Closing ;
                     period_start_time_ = getRobotTime() ;
@@ -120,6 +198,10 @@ public class FMSModel extends SimulationModel {
         }
         else if (name.equals("teleop")) {
             teleop_time_ = setProperty(name, value, teleop_time_) ;
+            ret = true ;
+        }
+        else if (name.equals("test")) {
+            test_time_ = setProperty(name, value, test_time_) ;
             ret = true ;
         }
         else if (name.equals("fms")) {
@@ -161,21 +243,4 @@ public class FMSModel extends SimulationModel {
         return ret ;
     }
 
-    private enum FMSState {
-        Initializing,
-        Start,
-        Auto,
-        Between,
-        Teleop,
-        Closing,
-        Done,
-    } ;
-
-    private FMSState state_ ;
-    private double period_start_time_ ;
-    private double start_time_  ;
-    private double auto_time_ ;
-    private double teleop_time_ ;
-    private double between_time_ ;
-    private double closing_time_ ;
 }

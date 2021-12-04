@@ -60,6 +60,30 @@ public class EventsManager {
         }
 
         JSONObject jobj = (JSONObject) obj;
+
+        if (jobj.containsKey("purpose")) {
+            obj = jobj.get("purpose") ;
+            if (obj instanceof JSONArray) {
+                JSONArray a = (JSONArray)obj ;
+                logger.startMessage(MessageType.Info).add("  ").endMessage();
+                for(int i = 0 ; i < a.size() ; i++) {
+                    Object o = a.get(i) ;
+                    if (o instanceof String) {
+                        logger.startMessage(MessageType.Info) ;
+                        logger.add((String)o) ;
+                        logger.endMessage();                        
+                    }
+                }
+                logger.startMessage(MessageType.Info).add("  ").endMessage();           
+            }
+            else if (obj instanceof String) {
+                logger.startMessage(MessageType.Info).add("  ").endMessage();           
+                logger.startMessage(MessageType.Info) ;
+                logger.add((String)obj) ;
+                logger.endMessage();
+                logger.startMessage(MessageType.Info).add("  ").endMessage();              
+            }
+        }
         obj = jobj.get("stimulus");
 
         if (!(obj instanceof JSONArray)) {
@@ -223,7 +247,12 @@ public class EventsManager {
         for(int i = 0 ; i < evs.size() ; i++) {
             Object obj = evs.get(i) ;
             if (!(obj instanceof JSONObject))
+            {
+                logger.startMessage(MessageType.Warning) ;
+                logger.add("in simulation file, at time", t).add(", events at index ").add(i).add(" is not a JSON object") ;
+                logger.endMessage();
                 continue ;
+            }
 
             JSONObject jobj = (JSONObject)obj ;
 
@@ -241,16 +270,15 @@ public class EventsManager {
                 continue ;
             }
 
-            if (!jobj.containsKey("value")) {
+            if (!jobj.containsKey("value") && !jobj.containsKey("setting")) {
                 logger.startMessage(MessageType.Warning) ;
-                logger.add("events at index ").add(i).add(" is missing the 'value' property") ;
+                logger.add("events at index ").add(i).add(" is missing the 'value' or the 'setting' property") ;
                 logger.endMessage();                
                 continue ;
             }            
 
             Object mobj = jobj.get("subsystem") ;
             Object iobj = jobj.get("property") ;
-            Object vobj = jobj.get("value") ;
 
 
             if (!(mobj instanceof String)) {
@@ -267,43 +295,58 @@ public class EventsManager {
                 continue ;                
             }
 
-            SettingsValue v = null ;
-            double tolerance = 1e-9 ;
+            if (jobj.containsKey("value")) {
+                Object vobj = jobj.get("value") ;
+                SettingsValue v = null ;
+                double tolerance = 1e-9 ;
 
-            if (vobj instanceof String) {
-                v = new SettingsValue((String)vobj) ;
-            }
-            else if (vobj instanceof Integer) {
-                v = new SettingsValue((Integer)vobj) ;
-            }
-            else if (vobj instanceof Long) {
-                v = new SettingsValue((Long)vobj) ;
-            }            
-            else if (vobj instanceof Boolean) {
-                v = new SettingsValue((Boolean)vobj) ;                        
-            }
-            else if (vobj instanceof Double) {
-                v = new SettingsValue((Double)vobj) ;
-                if (jobj.containsKey("tolerance")) {
-                    Object dobj = jobj.get("tolerance") ;
-                    if (!(dobj instanceof Double)) {
-                        logger.startMessage(MessageType.Warning) ;
-                        logger.add("events at index ").add(i).add(" has 'tolerance' property but it is not a double - tolerance defaults to 1e-9") ;
-                        logger.endMessage();                        
+                if (vobj instanceof String) {
+                    v = new SettingsValue((String)vobj) ;
+                }
+                else if (vobj instanceof Integer) {
+                    v = new SettingsValue((Integer)vobj) ;
+                }
+                else if (vobj instanceof Long) {
+                    v = new SettingsValue((Long)vobj) ;
+                }            
+                else if (vobj instanceof Boolean) {
+                    v = new SettingsValue((Boolean)vobj) ;                        
+                }
+                else if (vobj instanceof Double) {
+                    v = new SettingsValue((Double)vobj) ;
+                    if (jobj.containsKey("tolerance")) {
+                        Object dobj = jobj.get("tolerance") ;
+                        if (!(dobj instanceof Double)) {
+                            logger.startMessage(MessageType.Warning) ;
+                            logger.add("events at index ").add(i).add(" has 'tolerance' property but it is not a double - tolerance defaults to 1e-9") ;
+                            logger.endMessage();                        
+                        }
+                        else {
+                            tolerance = (Double)dobj ;
+                        }
                     }
-                    else {
-                        tolerance = (Double)dobj ;
-                    }
+                }
+                else {
+                    v = null ;
+                }
+
+                if (v != null) {
+                    SimulationAssertEvent ev = new SimulationAssertEvent(t, (String)mobj, (String)iobj, v) ;
+                    if (v.isDouble())
+                        ev.setTolerance(tolerance) ;
+                    insertEvent(ev) ;
                 }
             }
             else {
-                v = null ;
-            }
+                Object vobj = jobj.get("setting") ;
+                if (!(vobj instanceof String)) {
+                    logger.startMessage(MessageType.Warning) ;
+                    logger.add("events at index ").add(i).add(" has 'setting' property but it is not a string") ;
+                    logger.endMessage();
+                    continue ;                
+                }
 
-            if (v != null) {
-                SimulationAssertEvent ev = new SimulationAssertEvent(t, (String)mobj, (String)iobj, v) ;
-                if (v.isDouble())
-                    ev.setTolerance(tolerance) ;
+                SimulationAssertEvent ev = new SimulationAssertEvent(t, (String)mobj, (String)iobj, (String)vobj) ;
                 insertEvent(ev) ;
             }
         }

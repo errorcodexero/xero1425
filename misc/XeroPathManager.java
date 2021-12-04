@@ -56,14 +56,6 @@ public class XeroPathManager
     //
     static final private String LoggerName = "pathmanager" ;
 
-    //
-    // The indexes of the wheels
-    //
-    static public final int FL = 0;                                                             // Index of the front left module
-    static public final int FR = 1;                                                             // Index of the front right module
-    static public final int BL = 2;                                                             // Index of the back left module
-    static public final int BR = 3;                                                             // Index of the back right module
-
     /// \brief create the path manager
     /// \param logger the message logger
     /// \param basedir the base directory where all paths are found
@@ -81,19 +73,25 @@ public class XeroPathManager
             exts_[0] = "_left.csv" ;
             exts_[1] = "_right.csv" ;
         }
-        else if (path_type_ == XeroPathType.SwervePathFollowing)
-        {
-            exts_ = new String[4] ;
-            exts_[0] = "_fl.csv" ;
-            exts_[1] = "_fr.csv" ;
-            exts_[2] = "_bl.csv" ;
-            exts_[3] = "_br.csv" ;
-        }
         else if (path_type_ == XeroPathType.TankPurePursuit)
         {
             exts_ = new String[1] ;
             exts_[0] = "_main.csv" ;
         }
+        else if (path_type_ == XeroPathType.TankRamsete)
+        {
+            exts_ = new String[1] ;
+            exts_[0] = "_main.csv" ;
+        }
+        else if (path_type_ == XeroPathType.SwervePathFollowing)
+        {
+            exts_ = new String[4] ;
+            exts_[0] = "_fl.csv" ;
+            exts_[1] = "_fr.csv" ;
+            exts_[2] = "_fr.csv" ;
+            exts_[3] = "_fr.csv" ;
+        }
+
     }
 
     /// \brief return the types of paths the path manager is managing
@@ -179,11 +177,9 @@ public class XeroPathManager
             }
         }
 
-
-        XeroPath path = new XeroPath(name, path_type_) ;
+        XeroPath path = new XeroPath(name, exts_.length) ;
         boolean first = true ;
         ArrayList<Iterator<CSVRecord>> iters = new ArrayList<Iterator<CSVRecord>>() ;
-
 
         for(int i = 0 ; i < parsers.length ; i++)
         {

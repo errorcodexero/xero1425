@@ -82,10 +82,8 @@ public class PIDCtrl
     /// \param settings the settings parser
     /// \param name the basename to use to extract params from the settings parser
     /// \param isangle if true it is managing an angle between =180 and +180
-    public PIDCtrl(SettingsParser settings, String name, boolean isangle) throws MissingParameterException, BadParameterTypeException {
+    public PIDCtrl(ISettingsSupplier settings, String name, boolean isangle) throws MissingParameterException, BadParameterTypeException {
         init(settings, name) ;
-
-        is_angle_ = isangle ;
     }
 
     /// \brief create a new object by reading parameters from the settings parser.
@@ -94,7 +92,7 @@ public class PIDCtrl
     /// the basename + ":kp".  The kd parameter is found by looking up the basename + ":kd".
     /// \param settings the settings parser
     /// \param name the basename to use to extract params from the settings parser
-    public void init(SettingsParser settings, String name)  throws MissingParameterException, BadParameterTypeException {
+    public void init(ISettingsSupplier settings, String name)  throws MissingParameterException, BadParameterTypeException {
         kp_ = settings.get(name + ":kp").getDouble() ;
         ki_ = settings.get(name + ":ki").getDouble() ;
         kd_ = settings.get(name + ":kd").getDouble() ;
@@ -104,28 +102,28 @@ public class PIDCtrl
         kimax_ = settings.get(name + ":imax").getDouble() ;                                        
     }
 
+    /// \brief return the P component of the PID calculation
+    /// \returns the P component of the PID calculation
     public double getPComponent() {
         return pout_ ;
     }
 
+    /// \brief return the I component of the PID calculation
+    /// \returns the I component of the PID calculation
     public double getIComponent() {
         return iout_ ;
     }
 
+    /// \brief return the D component of the PID calculation
+    /// \returns the D component of the PID calculation    
     public double getDComponent() {
         return dout_ ;
     }
 
+    /// \brief return the F component of the PID calculation
+    /// \returns the F component of the PID calculation    
     public double getFComponent() {
         return fout_ ;
-    }
-
-    public double getLastError() {
-        return last_error_ ;
-    }
-
-    public boolean isAngle() {
-        return is_angle_ ;
     }
 
     /// \brief get the output by using variables & performing the PID calculations
@@ -199,7 +197,7 @@ public class PIDCtrl
             error = XeroMath.normalizeAngleDegrees(target - current) ;
         else
             error = target - current ;
-
+    
         return error ;        
     }
 }

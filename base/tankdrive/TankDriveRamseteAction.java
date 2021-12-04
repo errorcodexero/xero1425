@@ -15,7 +15,7 @@ import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 
 public class TankDriveRamseteAction extends TankDrivePathAction {
     private RamseteController ctrl_;
-    private boolean reverse_ ;
+    // private boolean reverse_ ;
     private int index_ ;
     private PIDCtrl left_pid_ ;
     private PIDCtrl right_pid_ ;
@@ -27,21 +27,17 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
             throws MissingParameterException, BadParameterTypeException {
         super(sub, pathname);
 
-        reverse_ = reverse ;
+        // reverse_ = reverse ;
         ctrl_ = new RamseteController(b, zeta);
         
-        left_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":ramsets:left", false) ;
-        right_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":ramsets:right", false) ;
+        left_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":ramsete:left", false) ;
+        right_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":ramsete:right", false) ;
     }
 
     public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse) throws BadParameterTypeException, MissingParameterException {
         this(sub, pathname, reverse,
-                sub.getRobot().getSettingsParser().get(sub.getName() + ":ramsete:b").getDouble(), 
-                sub.getRobot().getSettingsParser().get(sub.getName() + ":ramsete:zeta").getDouble()) ;
-    }
-
-    public boolean reverse() {
-        return reverse_ ;
+                sub.getSettingsValue("ramsete:b").getDouble(), 
+                sub.getSettingsValue("ramsete:zeta").getDouble()) ;
     }
 
     @Override

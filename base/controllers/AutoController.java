@@ -6,10 +6,10 @@ import java.util.List;
 import edu.wpi.first.wpilibj.DriverStation;
 import org.xero1425.base.XeroRobot;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.SettingsValue;
 
 public abstract class AutoController extends BaseController {
@@ -19,14 +19,14 @@ public abstract class AutoController extends BaseController {
     private boolean started_ ;
     private List<AutoMode> automodes_ ;
 
-    private static final String testmode = "auto:testmode:active";
+    private static final String testmode = "testmode:enabled";
 
     public AutoController(XeroRobot robot, String name) throws MissingParameterException, BadParameterTypeException {
         super(robot, name) ;
 
         automodes_ = new ArrayList<AutoMode>() ;
 
-        SettingsParser settings = robot.getSettingsParser() ;
+        ISettingsSupplier settings = robot.getSettingsParser() ;
         if (settings.isDefined(testmode)) {
             SettingsValue v = settings.get(testmode) ;
             if (v.isBoolean() && v.getBoolean()) {

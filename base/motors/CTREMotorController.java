@@ -1,7 +1,5 @@
 package org.xero1425.base.motors;
 
-
-
 /// \file
 /// This file conatins the implementation of the CTREMotorController class.  This class
 /// is derived from the MotorController class and supports the CTRE devices including the TalonFX,
@@ -11,7 +9,6 @@ package org.xero1425.base.motors;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.ErrorCode;
 
-import com.ctre.phoenix.motorcontrol.StatusFrame;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -85,10 +82,6 @@ public class CTREMotorController extends MotorController
                 throw new MotorRequestFailedException(this, "CTRE configVoltageCompSaturation() call failed during initialization", code) ;
 
             controller_.enableVoltageCompensation(true);
-
-            code = controller_.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, ControllerTimeout) ;
-            if (code != ErrorCode.OK)
-                throw new MotorRequestFailedException(this, "CTRE setStatusFramePeriod() call failed during initialization", code) ;
 
             code = controller_.setSelectedSensorPosition(0, 0, ControllerTimeout) ;
             if (code != ErrorCode.OK)
@@ -293,6 +286,10 @@ public class CTREMotorController extends MotorController
         int v = controller_.getFirmwareVersion() ;
 
         return String.valueOf((v >> 8) & 0xff) + "." + String.valueOf(v & 0xff) ;
+    }
+
+    public void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException {
+        throw new BadMotorRequestException(this, "this motor does not contains integrated encoders") ;
     }
 } ;
 

@@ -1,8 +1,6 @@
 package org.xero1425.base.oi;
 
 import edu.wpi.first.wpilibj.DriverStation;
-
-import org.xero1425.base.DriveBaseSubsystem;
 import org.xero1425.base.LoopType;
 import org.xero1425.base.actions.Action;
 import org.xero1425.base.actions.InvalidActionRequest;
@@ -11,7 +9,6 @@ import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.base.tankdrive.TankDrivePowerAction;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 
 /// \brief This class controls interprets the input from the game pad to control the drivebase.
 ///
@@ -73,7 +70,7 @@ public class TankDriveGamepad extends Gamepad {
     double left_ ;
     double right_ ;
 
-    public TankDriveGamepad(OISubsystem oi, int index, DriveBaseSubsystem drive) throws Exception {
+    public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
         super(oi, "Xero1425GamePad", index);
 
         DriverStation ds = DriverStation.getInstance();
@@ -85,7 +82,7 @@ public class TankDriveGamepad extends Gamepad {
             throw new Exception("invalid gamepad for TankDriveGamepad");
         }
 
-        db_ = (TankDriveSubsystem)drive;
+        db_ = drive_;
     }
 
     @Override
@@ -94,25 +91,24 @@ public class TankDriveGamepad extends Gamepad {
 
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
-        SettingsParser settings = getSubsystem().getRobot().getSettingsParser();
 
-        default_power_ = settings.get("driver:power:default").getDouble();
-        max_power_ = settings.get("driver:power:max").getDouble();
-        turn_power_ = settings.get("driver:turn:default").getDouble();
-        turn_max_power_ = settings.get("driver:turn:max").getDouble();
-        slow_factor_ = settings.get("driver:power:slowby").getDouble();
-        zero_level_ = settings.get("driver:zerolevel").getDouble();
+        default_power_ = getSubsystem().getSettingsValue("gamepad:power:default").getDouble();
+        max_power_ = getSubsystem().getSettingsValue("gamepad:power:max").getDouble();
+        turn_power_ = getSubsystem().getSettingsValue("gamepad:turn:default").getDouble();
+        turn_max_power_ = getSubsystem().getSettingsValue("gamepad:turn:max").getDouble();
+        slow_factor_ = getSubsystem().getSettingsValue("gamepad:power:slowby").getDouble();
+        zero_level_ = getSubsystem().getSettingsValue("gamepad:zerolevel").getDouble();
 
-        tolerance_ = settings.get("driver:power:tolerance").getDouble();
+        tolerance_ = getSubsystem().getSettingsValue("gamepad:power:tolerance").getDouble();
 
-        double nudge_straight = settings.get("driver:power:nudge_straight").getDouble();
-        double nudge_rotate = settings.get("driver:power:nudge_rotate").getDouble();
-        double nudge_time = settings.get("driver:nudge_time").getDouble();
+        double nudge_straight = getSubsystem().getSettingsValue("gamepad:power:nudge_straight").getDouble();
+        double nudge_rotate = getSubsystem().getSettingsValue("gamepad:power:nudge_rotate").getDouble();
+        double nudge_time = getSubsystem().getSettingsValue("gamepad:nudge_time").getDouble();
 
         nudge_forward_ = new TankDrivePowerAction(db_, nudge_straight, nudge_straight, nudge_time);
         nudge_backward_ = new TankDrivePowerAction(db_, -nudge_straight, -nudge_straight, nudge_time);
-        nudge_clockwise_ = new TankDrivePowerAction(db_, -nudge_rotate, nudge_rotate, nudge_time);
-        nudge_counter_clockwise_ = new TankDrivePowerAction(db_, nudge_rotate, -nudge_rotate, nudge_time);
+        nudge_clockwise_ = new TankDrivePowerAction(db_, nudge_rotate, -nudge_rotate, nudge_time);
+        nudge_counter_clockwise_ = new TankDrivePowerAction(db_, -nudge_rotate, nudge_rotate, nudge_time);
     }
 
     @Override
@@ -139,9 +135,9 @@ public class TankDriveGamepad extends Gamepad {
             double rx = ds.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
 
             if (povvalue == POVAngle.LEFT)
-                seq.addSubActionPair(db_, nudge_clockwise_, false);
+                seq.addSubActionPair(db_, nudge_counter_clockwise_, false);
             else if (povvalue == POVAngle.RIGHT)
-                seq.addSubActionPair(db_, nudge_counter_clockwise_, false);       
+                seq.addSubActionPair(db_, nudge_clockwise_, false);       
             else if (povvalue == POVAngle.UP)
                 seq.addSubActionPair(db_, nudge_forward_, false);  
             else if (povvalue == POVAngle.DOWN)
@@ -155,13 +151,13 @@ public class TankDriveGamepad extends Gamepad {
                 }
                 else {
                     double boost = ds.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) ;
-                    boolean slow = isLBackButtonPressed() ;
+                    boolean slow = isLBackButtonPrssed() ;
 
-                    double power = scale(-ly, boost, slow, default_power_, max_power_, slow_factor_) ;
-                    double spin = (Math.abs(rx) > 0.01) ? scale(rx, boost, slow, turn_power_, turn_max_power_, slow_factor_) : 0.0 ;
+                    double power = scalePower(-ly, boost, slow) ;
+                    double spin = (Math.abs(rx) > 0.01) ? scaleTurn(rx, boost, slow) : 0.0 ;
 
                     left = power + spin ;
-                    right = power - spin ;
+                    right = power - spin ;                    
                 }
 
                 if (Math.abs(left - left_) > tolerance_ || Math.abs(right - right_) > tolerance_)
@@ -178,5 +174,17 @@ public class TankDriveGamepad extends Gamepad {
             // This should never happen
             //
         }
+    }
+
+    private double scalePower(double axis, double boost, boolean slow) {
+        double base = default_power_ + (max_power_ - default_power_) * boost ;
+        double slowdown = slow ? default_power_ * slow_factor_ : 0.0 ;
+        return axis * (base - slowdown) ;
+    }
+
+    private double scaleTurn(double axis, double boost, boolean slow) {
+        double base = turn_power_ + (turn_max_power_ - turn_power_) * boost ;
+        double slowdown = slow ? turn_power_ * slow_factor_ : 0.0 ;
+        return axis * (base - slowdown) ;
     }
 }

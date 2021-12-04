@@ -2,12 +2,16 @@ package org.xero1425.base;
 
 import org.xero1425.base.alarms.AlarmSubsystem;
 import org.xero1425.base.oi.OISubsystem;
+import org.xero1425.base.tankdrive.TankDriveSubsystem;
 
 public class RobotSubsystem extends Subsystem
-{   
-    private OISubsystem oi_ ;
-    private DriveBaseSubsystem db_ ;
-    private AlarmSubsystem alarms_;
+{
+    public enum SubsystemType
+    {
+        DriveBase,
+        OI,
+        Other
+    };
 
     public RobotSubsystem(XeroRobot robot, String name) throws Exception {
         super(robot, name) ;
@@ -31,7 +35,7 @@ public class RobotSubsystem extends Subsystem
             if (db_ != null)
                 throw new Exception("multiple drivebase subsystems added to robot subsystem") ;
 
-            db_ = (DriveBaseSubsystem)child ;
+            db_ = (TankDriveSubsystem)child ;
         }
     }
 
@@ -39,7 +43,7 @@ public class RobotSubsystem extends Subsystem
         return oi_ ;
     }
 
-    public DriveBaseSubsystem getDB() {
+    public TankDriveSubsystem getDB() {
         return db_ ;
     }
 
@@ -47,4 +51,7 @@ public class RobotSubsystem extends Subsystem
         return alarms_ ;
     }
 
+    private OISubsystem oi_ ;
+    private TankDriveSubsystem db_ ;
+    private AlarmSubsystem alarms_;
 } ;

@@ -8,12 +8,6 @@ import java.lang.Math ;
 /// \brief a set of general math functions
 public class XeroMath
 {
-    private final static double inchesToMeters = 0.0254 ;
-
-    public static double interpolate(double pcnt, double before, double after) {
-        return before + pcnt * (after - before) ;
-    }
-
     /// \brief normalize an angle in degrees
     /// This method converts the input angle to an angle between -180 and +180 degrees
     /// \param a the angle in degrees
@@ -101,14 +95,4 @@ public class XeroMath
         }
         return result ;        
     }
-
-
-    public static double inchesToMeters(double v) {
-        return v * inchesToMeters ;
-    }
-
-
-    public static double metersToInches(double v) {
-        return v / inchesToMeters ;
-    }      
 }

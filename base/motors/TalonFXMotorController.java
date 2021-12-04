@@ -9,7 +9,7 @@ import com.ctre.phoenix.ErrorCode;
 ///
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
-import com.ctre.phoenix.motorcontrol.StatusFrame;
+import com.ctre.phoenix.motorcontrol.StatusFrameEnhanced;
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.TalonFXControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
@@ -69,10 +69,6 @@ public class TalonFXMotorController extends MotorController
                 throw new MotorRequestFailedException(this, "CTRE configVoltageCompSaturation() call failed during initialization", code) ;
 
             controller_.enableVoltageCompensation(true);
-
-            code = controller_.setStatusFramePeriod(StatusFrame.Status_2_Feedback0, 10, ControllerTimeout) ;
-            if (code != ErrorCode.OK)
-                throw new MotorRequestFailedException(this, "CTRE setStatusFramePeriod() call failed during initialization", code) ;
 
             code = controller_.setSelectedSensorPosition(0, 0, ControllerTimeout) ;
             if (code != ErrorCode.OK)
@@ -294,4 +290,22 @@ public class TalonFXMotorController extends MotorController
 
         return String.valueOf((v >> 8) & 0xff) + "." + String.valueOf(v & 0xff) ;
     }
+
+    public void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException {
+        if (controller_ != null)
+        {
+            if (freq == EncoderUpdateFrequency.Infrequent) {
+                controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 500) ;
+                controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 500) ;
+            }
+            else if (freq == EncoderUpdateFrequency.Default) {
+                controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 10) ;
+                controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 20) ;            
+            }
+            else if (freq == EncoderUpdateFrequency.Frequent) {
+                controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_1_General, 10) ;
+                controller_.setStatusFramePeriod(StatusFrameEnhanced.Status_2_Feedback0, 10) ;             
+            }
+        }        
+    }     
 } ;

@@ -8,10 +8,10 @@ import org.xero1425.base.tankdrive.TankDrivePowerAction;
 import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.base.tankdrive.TankDriveVelocities;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 
 
 import edu.wpi.first.wpilibj.DriverStation;
@@ -39,7 +39,7 @@ public class NewDriveGamepad extends Gamepad {
     public NewDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
         super(oi, "NewDriveGamepad", index);
 
-        SettingsParser settings = drive_.getRobot().getSettingsParser() ;
+        ISettingsSupplier settings = drive_.getRobot().getSettingsParser() ;
         DriverStation ds = DriverStation.getInstance();
         if (ds.getStickPOVCount(getIndex()) == 0) {
             MessageLogger logger = oi.getRobot().getMessageLogger();
@@ -76,7 +76,7 @@ public class NewDriveGamepad extends Gamepad {
 
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
-        SettingsParser settings = getSubsystem().getRobot().getSettingsParser();
+        ISettingsSupplier settings = getSubsystem().getRobot().getSettingsParser();
 
         double nudge_straight = settings.get("newdrive:power:nudge_straight").getDouble();
         double nudge_rotate = settings.get("newdrive:power:nudge_rotate").getDouble();

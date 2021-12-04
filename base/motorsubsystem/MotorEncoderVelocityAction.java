@@ -4,11 +4,11 @@ import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorRequestFailedException;
 import org.xero1425.base.motors.MotorController.PidType;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.PIDCtrl;
-import org.xero1425.misc.SettingsParser;
 
 import edu.wpi.first.wpilibj.RobotBase;
 
@@ -31,7 +31,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
         forcesw_ = RobotBase.isSimulation();
 
         if (!sub.hasHWPID() || forcesw_) {
-            pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), sub.getName() + ":velocity", false);
+            pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":velocity", false);
             plot_id_ = sub.initPlot(toString() + "-" + String.valueOf(which_++)) ;     
         }
     }
@@ -40,7 +40,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
             throws BadParameterTypeException, MissingParameterException {
         super(sub) ;
 
-        target_ = getSubsystem().getRobot().getSettingsParser().get(target).getDouble() ;
+        target_ = getSubsystem().getSettingsValue(target).getDouble() ;
         forcesw_ = RobotBase.isSimulation();
 
         if (!sub.hasHWPID() || forcesw_) {
@@ -66,7 +66,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
         super.start() ;
 
         if (!useSWPID()) {
-            SettingsParser settings = getSubsystem().getRobot().getSettingsParser() ;
+            ISettingsSupplier settings = getSubsystem().getRobot().getSettingsParser() ;
             double p = settings.get("shooter:velocity:kp").getDouble() ;
             double i = settings.get("shooter:velocity:ki").getDouble() ;
             double d = settings.get("shooter:velocity:kd").getDouble() ;

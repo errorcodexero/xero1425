@@ -45,13 +45,12 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
 
         reverse_ = reverse ;
 
-        left_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:left", false) ;
-        right_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "tankdrive:follower:right", false) ;
-        angle_correction_pid_ = new PIDCtrl(drive.getRobot().getSettingsParser(), "tankdrive:angle_correction", false) ;
+        left_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "subsystems:" + getSubsystem().getName() + ":follower:left", false) ;
+        right_follower_ = new PIDACtrl(drive.getRobot().getSettingsParser(), "subsystems:" + getSubsystem().getName() + ":follower:right", false) ;
+        angle_correction_pid_ = new PIDCtrl(drive.getRobot().getSettingsParser(), "subsystems:" + getSubsystem().getName() + ":angle_correction", false) ;
 
         plot_id_ = drive.initPlot(toString(0)) ;
         plot_data_ = new Double[plot_columns_.length] ;
-
     }
 
     @Override
@@ -135,23 +134,23 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
             // Negative angle is clockwise
             //
             double angerr = XeroMath.normalizeAngleDegrees(thead - ahead) ;
-            double angcorr = angle_correction_pid_.getOutput(thead, ahead, dt) ;
+            double angcorr = angle_correction_pid_.getOutput(0, angerr, dt) ;
 
             lout -= angcorr ;
             rout += angcorr ;
 
             td.setPower(lout, rout) ;
+            logger.add(", time", robot.getTime() - start_time_) ;
             logger.add(", left", lout) ;
             logger.add(", right", rout) ;
             logger.add(", angerr(degs)", angerr) ;
             logger.add(", angcorr(v)", angcorr) ;
             logger.add(", path-x", (lseg.getX() + rseg.getX()) / 2.0) ;
             logger.add(", path-y", (lseg.getY() + rseg.getY()) / 2.0) ;
-            logger.add(", path-x", lseg.getHeading()) ;
+            logger.add(", path-a", thead) ;
             logger.add(", robot-x", getSubsystem().getPose().getX()) ;
             logger.add(", robot-y", getSubsystem().getPose().getY()) ;
-            logger.add(", robot-a", getSubsystem().getPose().getRotation().getDegrees()) ;
-
+            logger.add(", robot-a", ahead) ;
 
             plot_data_[0] = robot.getTime() - start_time_ ;
 
@@ -216,6 +215,7 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
 
         getSubsystem().setPower(0.0, 0.0) ;
         getSubsystem().endPlot(plot_id_);
+        getSubsystem().setRecording(false);
     }
 
     @Override

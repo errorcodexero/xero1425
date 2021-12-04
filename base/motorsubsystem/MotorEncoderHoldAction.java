@@ -20,7 +20,7 @@ public class MotorEncoderHoldAction extends MotorAction {
             throws BadParameterTypeException, MissingParameterException {
         super(subsystem) ;
         has_explicit_target_ = true ;
-        target_ = subsystem.getRobot().getSettingsParser().get(target).getDouble() ;
+        target_ = subsystem.getSettingsValue(target).getDouble() ;
     }      
 
     public double getTarget() {
@@ -35,7 +35,8 @@ public class MotorEncoderHoldAction extends MotorAction {
         if (!has_explicit_target_)
             target_ = me.getPosition() ;
 
-        pid_ = new PIDCtrl(me.getRobot().getSettingsParser(), me.getName() + ":hold", me.isAngular()) ;
+        String subname = "subsystems:" + me.getName() + ":hold" ;
+        pid_ = new PIDCtrl(me.getRobot().getSettingsParser(), subname, me.isAngular()) ;
     }
 
     @Override

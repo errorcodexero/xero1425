@@ -30,8 +30,6 @@ public class RomiMotorController extends MotorController {
         return inverted_ ;
     }
 
-
-
     public void reapplyInverted() throws BadMotorRequestException {
         motor_.setInverted(inverted_);
     }
@@ -82,5 +80,9 @@ public class RomiMotorController extends MotorController {
 
     public String getFirmwareVersion() throws BadMotorRequestException {
         return "?.?" ;
+    }
+    
+    public void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException {
+        throw new BadMotorRequestException(this, "this motor does not contains integrated encoders") ;
     }
 }

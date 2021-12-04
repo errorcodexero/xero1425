@@ -1,4 +1,4 @@
-package org.xero1425.misc ;
+package org.xero1425.misc;
 
 /// \file
 
@@ -66,7 +66,7 @@ public class PIDACtrl
     /// \param settings the settings parser
     /// \param name the basename to use to extract params from the settings parser
     /// \param angle if true it is managing an angle between =180 and +180
-    public PIDACtrl(SettingsParser settings, String name, boolean angle) 
+    public PIDACtrl(ISettingsSupplier settings, String name, boolean angle) 
                     throws BadParameterTypeException, MissingParameterException {
         kv_ = settings.get(name + ":kv").getDouble() ;
         ka_ = settings.get(name + ":ka").getDouble() ;

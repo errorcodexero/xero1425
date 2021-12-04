@@ -70,15 +70,28 @@ public class SimulationEngine {
 
         if (failed_count_ == 0)
         {
-            logger_.startMessage(MessageType.Info).add("Simulation completed normally").endMessage();
-            logger_.startMessage(MessageType.Info).add("    ").add(passed_count_).add(" asserts passed") ;
+            if (events_.size() > 0) {
+                logger_.startMessage(MessageType.Info).add("Simulation failed").endMessage();
+                if (passed_count_ > 0)
+                    logger_.startMessage(MessageType.Info).add("    ").add(passed_count_).add(" asserts passed").endMessage();
+                logger_.startMessage(MessageType.Info).add("    ").add("but there were", events_.size()).add(" events left to be processed").endMessage();
+                code = 1 ;
+            }
+            else {
+                logger_.startMessage(MessageType.Info).add("Simulation completed sucessfully").endMessage();
+                logger_.startMessage(MessageType.Info).add("    ").add(passed_count_).add(" asserts passed").endMessage();
+            }
         }
         else
         {
             code = 1 ;
-            logger_.startMessage(MessageType.Info).add("Simulation complete with " + failed_count_ + " errors").endMessage();
+            logger_.startMessage(MessageType.Info).add("Simulation failed with " + failed_count_ + " errors").endMessage();
             logger_.startMessage(MessageType.Info).add("    ").add(passed_count_).add(" asserts passed").endMessage();
-            logger_.startMessage(MessageType.Info).add("    ").add(failed_count_).add(" asserts failed").endMessage();            
+            logger_.startMessage(MessageType.Info).add("    ").add(failed_count_).add(" asserts failed").endMessage();
+
+            if (events_.size() > 0) {
+                logger_.startMessage(MessageType.Info).add("    ").add("there were", events_.size()).add(" events left to be processed") ;
+            }
         }
 
         //

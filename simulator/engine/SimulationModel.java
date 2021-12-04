@@ -66,7 +66,7 @@ public abstract class SimulationModel {
         created_ = true ;
     }
 
-    public int getLoggerID() {
+    protected int getLoggerID() {
         return logger_id_ ;
     }
 

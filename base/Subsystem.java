@@ -5,10 +5,10 @@ import java.text.DecimalFormat;
 import java.util.ArrayList;
 import org.xero1425.base.actions.Action;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
-import org.xero1425.misc.SettingsParser;
 import org.xero1425.misc.SettingsValue;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 
@@ -137,9 +137,9 @@ public class Subsystem {
             fmt_ = new DecimalFormat("00.000");
         }
         try {
-            SettingsParser p = getRobot().getSettingsParser();
-            String pname = name_ + ":verbose";
-            if (p.isDefined(pname) && p.get(pname).isBoolean() && p.get(pname).getBoolean())
+            ISettingsSupplier p = getRobot().getSettingsParser();
+            String pname = "system:verbose:" + name_ ;
+            if (p.get(pname).isBoolean() && p.get(pname).getBoolean())
                 verbose_ = true;
             
         } catch (MissingParameterException e) {
@@ -153,7 +153,7 @@ public class Subsystem {
 
     /// \brief Create a new subsystem with no parent
     /// \param robot the robot this subsystem belongs to
-    /// \param name the name of hte subsystem
+    /// \param name the name of this subsystem
     public Subsystem(XeroRobot robot, final String name) {
         this(robot, null, name) ;
     }
@@ -163,6 +163,30 @@ public class Subsystem {
     /// \param name the name of the current subsystem
     public Subsystem(final Subsystem parent, final String name) {
         this(parent.getRobot(), parent, name) ;
+    }
+
+    /// \brief Return a settings file value associated with this subsystem
+    ///
+    /// This method searches for a settings value assocaited with the given subsystem.  Subsystem values
+    /// are stored under the "subsystems" key in the settings file, and then under a key that is the same as the 
+    /// name of the subsystem. So, if the subsystem is named "tankdrive", the getSettingsValue("width"), would 
+    /// return the value of the setting stored at subsystems:tankedrive:width.
+    ///
+    ///     subsystems : {
+    ///       tankdrive : {
+    ///          width : 30.0,
+    ///          length : 32.0,
+    ///          inches_per_tick: 0.006
+    ///       }        
+    ///     } 
+    ///
+    /// So, as shown above, <em>getSettingsValue("width")</em> would return 30.0
+    ///
+    /// \param name the name of the setting associated with a subsystem
+    /// \exception throws MissingParameterException if the setting is not present in the settings file
+    /// \returns the SettingsValue for the given name
+    public SettingsValue getSettingsValue(String name) throws MissingParameterException {
+        return getRobot().getSettingsParser().get("subsystems:" + name_ + ":" + name) ;
     }
 
     /// \brief returns true if this is the OI subsystem

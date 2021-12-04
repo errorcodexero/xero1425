@@ -1,6 +1,8 @@
 package org.xero1425.simulator.models;
 
 import org.xero1425.simulator.engine.SimulationModel;
+
+import edu.wpi.first.hal.simulation.EncoderDataJNI;
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
@@ -105,7 +107,7 @@ public class TankDriveModel extends SimulationModel {
     //
     // The ticks output per revolution for the encoders
     //
-    private double ticks_per_rev_ ;
+    private double inches_per_tick_ ;
 
     //
     // The maximum velocity of the robot
@@ -194,6 +196,12 @@ public class TankDriveModel extends SimulationModel {
     private double last_xpos_ ;
     private double last_ypos_ ;
 
+    //
+    // The external encoder indexes, if -1, then encoders are in the motor
+    //
+    private int left_encoder_index_ ;
+    private int right_encoder_index_ ;
+
     /// \brief create a simulation model for a tank drive
     /// \param engine the simulation engine
     /// \param model the name of the model
@@ -207,6 +215,9 @@ public class TankDriveModel extends SimulationModel {
         xpos_ = 0.0 ;
         ypos_ = 0.0 ;
         angle_ = 0.0 ;
+
+        left_encoder_index_ = -1 ;
+        right_encoder_index_ = -1 ;
     }
     
     /// \brief called once at the end of the simulator loop
@@ -238,7 +249,6 @@ public class TankDriveModel extends SimulationModel {
     /// Model creation is a two step process. The constructor does very basic variable initialization.  This
     /// method completes the model creation process.  This method can rely on all of the other models required being in
     /// place.  However, the create() function on other models may or may not have been called.
-    @Override
     public boolean create() {
         MessageLogger logger = getEngine().getMessageLogger() ;
 
@@ -342,7 +352,59 @@ public class TankDriveModel extends SimulationModel {
                     right_motor_mult_ = -1.0;
             } catch (BadParameterTypeException e) {
             }
-        }        
+        }
+
+        if (hasProperty("left:encoder:index") || hasProperty("right:encoder:index"))
+        {
+            if (!hasProperty("left:encoder:index"))
+            {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'right:encoder:index' but not 'left:encoder:index'") ;
+                logger.endMessage();
+
+                return false ;
+            }
+
+            if (!hasProperty("left:encoder:index"))
+            {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'left:encoder:index' but not 'right:encoder:index'") ;
+                logger.endMessage();
+
+                return false ;
+            }
+
+            SettingsValue v = getProperty("left:encoder:index") ;
+            try {
+                left_encoder_index_ = v.getInteger() ;
+            }
+            catch(BadParameterTypeException ex) {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'left:encoder:index' existed, but was not an integer") ;
+                logger.endMessage();
+
+                return false ;                
+            }
+
+            try {
+                right_encoder_index_ = v.getInteger() ;
+            }
+            catch(BadParameterTypeException ex) {
+                logger.startMessage(MessageType.Error);
+                logger.add("event: model ").addQuoted(getModelName());
+                logger.add(" instance ").addQuoted(getInstanceName());
+                logger.add(" the model parameters include 'right:encoder:index' existed, but was not an integer") ;
+                logger.endMessage();
+
+                return false ;                
+            }
+        }
 
         //
         // If the left:encoder:inverted property exists and is true, then invert the left encoders
@@ -381,7 +443,7 @@ public class TankDriveModel extends SimulationModel {
             width_ = getProperty("width").getDouble() ;
             length_ = getProperty("length").getDouble() ;
             scrub_ = getProperty("scrub").getDouble() ;
-            ticks_per_rev_ = getProperty("ticks_per_rev").getDouble() ;
+            inches_per_tick_ = getProperty("inches_per_tick").getDouble() ;
             max_velocity_ = getProperty("maxvelocity").getDouble() ;
             max_accel_ = getProperty("maxacceleration").getDouble() ;
         } catch (Exception e) {
@@ -465,7 +527,6 @@ public class TankDriveModel extends SimulationModel {
 
     /// \brief run on simlator loop
     /// \param dt the amount of time that has passed since the last simulator loop
-    @Override
     public void run(double dt) {
 
         //
@@ -522,16 +583,22 @@ public class TankDriveModel extends SimulationModel {
         // Compute the encoder ticks based on the position of the left and right
         // sides of the robot
         //
-        left_enc_value_ = (int)(lrevs * ticks_per_rev_ * left_encoder_mult_) ;
-        right_enc_value_ = (int)(rrevs * ticks_per_rev_ * right_encoder_mult_) ;
+        left_enc_value_ = (int)(lrevs * diameter_ * Math.PI * left_encoder_mult_ / inches_per_tick_) ;
+        right_enc_value_ = (int)(rrevs * diameter_ * Math.PI * right_encoder_mult_ / inches_per_tick_) ;
 
-        if (left_.usesTicks()) {
-            left_.setEncoder(left_enc_value_);
-            right_.setEncoder(right_enc_value_);
+        if (left_encoder_index_ != -1 && right_encoder_index_ != -1) {
+            EncoderDataJNI.setCount(left_encoder_index_, left_enc_value_) ;
+            EncoderDataJNI.setCount(right_encoder_index_, right_enc_value_) ;
         }
         else {
-            left_.setEncoder(lrevs * left_encoder_mult_);
-            right_.setEncoder(rrevs * right_encoder_mult_) ;
+            if (left_.usesTicks()) {
+                left_.setEncoder(left_enc_value_);
+                right_.setEncoder(right_enc_value_);
+            }
+            else {
+                left_.setEncoder(lrevs * left_encoder_mult_);
+                right_.setEncoder(rrevs * right_encoder_mult_) ;
+            }
         }
 
         //
@@ -542,6 +609,22 @@ public class TankDriveModel extends SimulationModel {
             navx_.setYaw(deg);
             navx_.setTotalAngle(XeroMath.rad2deg(total_angle_));
         }
+
+        MessageLogger logger = getEngine().getRobot().getMessageLogger() ;
+        logger.startMessage(MessageType.Debug, getLoggerID()) ;
+        logger.add("lp", leftpower) ;
+        logger.add("rp", rightpower) ;
+        logger.add("lrps", current_left_rps_) ;
+        logger.add("rrps", current_right_rps_) ;
+        logger.add("dl", dleft) ;
+        logger.add("dr", dright) ;
+        logger.add("lpos", left_pos_) ;
+        logger.add("rpos", right_pos_) ;
+        logger.add("lrevs", lrevs) ;
+        logger.add("rrevs", rrevs) ;
+        logger.add("lenc" , left_enc_value_) ;
+        logger.add("renc", right_enc_value_) ;
+        logger.endMessage();
     }
 
     /// \brief process an event assigned to the subsystem

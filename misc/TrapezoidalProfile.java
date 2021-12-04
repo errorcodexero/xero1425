@@ -80,7 +80,7 @@ public class TrapezoidalProfile {
     /// ":maxv" to the basename.
     /// \param settings the settings file parser
     /// \param name the basename used to look up parameters.
-    public TrapezoidalProfile(SettingsParser settings, String name) throws BadParameterTypeException, MissingParameterException {
+    public TrapezoidalProfile(ISettingsSupplier settings, String name) throws BadParameterTypeException, MissingParameterException {
         maxa_ = settings.get(name + ":maxa").getDouble() ;
         maxd_ = settings.get(name + ":maxd").getDouble() ;
         maxv_ = settings.get(name + ":maxv").getDouble() ;

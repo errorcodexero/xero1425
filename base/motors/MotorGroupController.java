@@ -12,8 +12,6 @@ public class MotorGroupController extends MotorController
         motors_ = new ArrayList<MotorController>() ;
     }
 
-
-
     public String typeName() {
         if (motors_.size() == 0)
             return "NoMotors" ;
@@ -43,8 +41,6 @@ public class MotorGroupController extends MotorController
 
         return motors_.get(0).getAppliedVoltage() ;
     }
-
-
 
     public boolean hasPID() throws BadMotorRequestException, MotorRequestFailedException {
         if (motors_.size() == 0)
@@ -186,5 +182,19 @@ public class MotorGroupController extends MotorController
         }
 
         return result.toString() ;
+    }
+
+    public void setEncoderUpdateFrequncy(EncoderUpdateFrequency freq) throws BadMotorRequestException {
+        if (motors_.size() == 0)
+            throw new BadMotorRequestException(this, "request made to empty MotorGroupController") ;
+
+        int which = 0 ;
+        for(MotorController ctrl : motors_)
+        {
+            if (which == 0)
+                ctrl.setEncoderUpdateFrequncy(freq);
+            else
+                ctrl.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
+        }
     }
 } ;

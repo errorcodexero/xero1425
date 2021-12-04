@@ -1,13 +1,17 @@
 package org.xero1425.base.oi;
 
-import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
 
 import org.xero1425.base.LoopType;
 import org.xero1425.base.Subsystem;
 import org.xero1425.base.actions.InvalidActionRequest;
 import org.xero1425.base.actions.SequenceAction;
+import org.xero1425.base.tankdrive.TankDriveSubsystem;
+import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
+import org.xero1425.misc.MissingParameterException;
 
 /// \brief This class controls the various OI devices that are used to control the robot.
 /// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
@@ -19,65 +23,33 @@ import org.xero1425.misc.MessageType;
 ///      # The driver station index of the driver gamepad
 ///      hw:driverstation:hid:driver                                             0     
 ///
-public abstract class OISubsystem extends Subsystem {
-    class OIDeviceNeeded
-    {
-        private String name_ ;
-        private boolean error_ ;
-        HIDDevice dev_ ;
-
-        public OIDeviceNeeded(String name) {
-            name_ = name ;
-            error_ = false ;
-            dev_ = null ;
-        }
-
-        public String getName() {
-            return name_ ;
-        }
-
-        public boolean hasError() {
-            return error_ ;
-        }
-
-        public void setError() {
-            error_ = true ;
-        }
-
-        public boolean hasDevice() {
-            return dev_ != null ;
-        }
-
-        public HIDDevice getDevice() {
-            return dev_ ;
-        }
-
-        void setDevice(HIDDevice dev) {
-            dev_ = dev ;
-        }
-    }
+public class OISubsystem extends Subsystem {
     
-    private HashMap<String, OIDeviceNeeded> devices_ ;
+    private List<HIDDevice> devices_ ;
+    private TankDriveSubsystem db_ ;
+    private Gamepad gp_ ;
+    private int gp_index_ ;
+    private double last_time_ ;
+    private boolean use_new_gamepad_ ;
+    
+    private final static String DriverGamepadHIDIndexName = "gamepad:index";
 
-    public OISubsystem(Subsystem parent, String name, String [] devices) {
+    public OISubsystem(Subsystem parent, String name, TankDriveSubsystem db) {
         super(parent, name);
 
-        devices_ = new HashMap<String, OIDeviceNeeded>() ;
-        for(String devname : devices) {
-            devices_.put(devname, new OIDeviceNeeded(devname)) ;
-        }
+        devices_ = new ArrayList<HIDDevice>();
+        db_ = db ;
+        gp_index_ = -1 ;
+        last_time_ = 0.0 ;
+
+        use_new_gamepad_ = false ;
+        addTankDriveGamePad();
     }
 
-    public abstract HIDDevice createDevice(String name) throws Exception ; 
-
-    public HIDDevice getDevice(String name) {
-        OIDeviceNeeded dn = devices_.get(name) ;
-        if (dn == null || dn.hasError())
-        {
-            return null ;
-        }
-
-        return dn.getDevice() ;
+    /// \brief return the gamepad
+    /// \returs the gamepad
+    public Gamepad getGamePad() {
+        return gp_ ;
     }
 
     /// \brief returns true if this is the OI subsystem
@@ -89,61 +61,30 @@ public abstract class OISubsystem extends Subsystem {
 
     @Override
     public void init(LoopType ltype) {
-        for(OIDeviceNeeded dev : devices_.values())
-        {
-            if (dev.hasDevice())
-            {
-                dev.getDevice().init(ltype) ;
-            }
-        }
+        for (HIDDevice dev : devices_)
+            dev.init(ltype);
     }
 
     @Override
     public void computeMyState() throws Exception {
-        for(OIDeviceNeeded dev : devices_.values())
-        {
-            if (!dev.hasDevice() && !dev.hasError())
-            {
-                //
-                // No device, but not error, so try and create the device
-                //
-                try {
-                    HIDDevice hid = createDevice(dev.getName()) ;
-                    hid.createStaticActions();
-                    dev.setDevice(hid);
+        if (gp_ == null) {
+            addTankDriveGamePad() ;
 
-                    MessageLogger logger = getRobot().getMessageLogger() ;
-                    logger.startMessage(MessageType.Debug, getLoggerID()) ;
-                    logger.add("Created HID device:") ;
-                    logger.add("name", dev.getName()) ;
-                    logger.endMessage() ;
-                }
-                catch(Exception ex)
-                {
-                    //
-                    // There was an exception in the creation process, this device will never
-                    // be created
-                    //
-                    MessageLogger logger = getRobot().getMessageLogger() ;
-                    logger.startMessage(MessageType.Error) ;
-                    logger.add("Error creating OI device") ;
-                    logger.add("name", dev.getName()) ;
-                    logger.add("reason", ex.getMessage()) ;
-                    logger.endMessage() ;
-                    dev.setError();
-                }
+            if (gp_ != null) {
+                gp_.createStaticActions();
             }
+        }
 
-            if (dev.hasDevice() && dev.getDevice().isEnabled())
-                dev.getDevice().computeState(); ;
+        for (HIDDevice dev : devices_) {
+            if (dev.isEnabled())
+                dev.computeState();
         }
     }
 
     public void generateActions(SequenceAction seq) throws InvalidActionRequest {
-        for(OIDeviceNeeded dev : devices_.values())
+        for(HIDDevice dev : devices_)
         {
-            if (!dev.hasError() && dev.getDevice().isEnabled())
-                dev.getDevice().generateActions(seq) ;
+            dev.generateActions(seq) ;
         }
     }
 
@@ -152,17 +93,75 @@ public abstract class OISubsystem extends Subsystem {
         super.run() ;
     }
 
+    @Override
+    public void postHWInit() throws Exception {
+        //
+        // This is done here because we are guarenteed to have created
+        // all subsystems and established their parent child relationship
+        //
+        for(HIDDevice dev : devices_)
+            dev.createStaticActions();
+    }
+
     public int getAutoModeSelector() {
-        for(OIDeviceNeeded dev : devices_.values())
+        for(HIDDevice dev : devices_)
         {
-            if (dev.hasDevice() && dev.getDevice().isEnabled())
-            {
-                int mode = dev.getDevice().getAutoModeSelector() ;
-                if (mode != -1)
-                    return mode ;
-            }
+            int mode = dev.getAutoModeSelector() ;
+            if (mode != -1)
+                return mode ;
         }
 
         return -1 ;
+    }
+
+    protected void addHIDDevice(HIDDevice dev) {
+        devices_.add(dev) ;
+    }
+
+    private void addTankDriveGamePad() {
+        if (db_ != null) {           
+            MessageLogger logger = getRobot().getMessageLogger() ;
+
+            if (gp_index_ == -1) {
+                try {
+                    gp_index_ = getSettingsValue(DriverGamepadHIDIndexName).getInteger();
+                } catch (BadParameterTypeException e) {
+                    logger.startMessage(MessageType.Error) ;
+                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
+                    logger.add(" exists, but is not an integer").endMessage();
+                    gp_index_ = -1 ;
+                } catch (MissingParameterException e) {
+                    logger.startMessage(MessageType.Error) ;
+                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
+                    logger.add(" does not exist").endMessage();
+                    gp_index_ = -1 ;            
+                }
+            }
+            
+            if (gp_index_ != -1 &&  gp_ == null) {
+                try {
+                    if (use_new_gamepad_)
+                        gp_ = new NewDriveGamepad(this, gp_index_, db_) ;
+                    else
+                        gp_ = new TankDriveGamepad(this, gp_index_, db_) ;
+                        
+                    addHIDDevice(gp_);
+
+                    logger.startMessage(MessageType.Info) ;
+                    logger.add("driver gamepad HID device was sucessfully created ").endMessage();
+                    logger.endMessage();
+                }
+                catch(Exception ex) {
+                    if (getRobot().getTime() - last_time_ > 10.0) {
+                        logger.startMessage(MessageType.Error) ;
+                        logger.add("driver gamepad HID device was not created ").endMessage();
+                        logger.endMessage();
+
+                        last_time_ = getRobot().getTime() ;
+                    }
+                    gp_ = null ;
+                }
+            }
+        }
     }
 }

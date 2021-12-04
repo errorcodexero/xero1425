@@ -21,7 +21,7 @@ public class MotorEncoderSubsystem extends MotorSubsystem
         speedometer_ = new Speedometer(name, 2, angle) ;
         angular_ = angle ;
 
-        String encname = "hw:" + name + ":encoder" ;
+        String encname = "subsystems:" + name + ":hw:encoder" ;
         encoder_ = new XeroEncoder(parent.getRobot(), encname, angle, getMotorController()) ;
     }
 
@@ -32,7 +32,7 @@ public class MotorEncoderSubsystem extends MotorSubsystem
         speedometer_ = new Speedometer(name, samples, angle) ;
         angular_ = angle ;
 
-        String encname = "hw:" + name + ":encoder" ;
+        String encname = "subsystems:" + name + ":hw:encoder" ;
         encoder_ = new XeroEncoder(parent.getRobot(), encname, angle, getMotorController()) ;
     }
 

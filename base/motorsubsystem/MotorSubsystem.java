@@ -7,6 +7,7 @@ import org.xero1425.base.motors.MotorRequestFailedException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
+import org.xero1425.misc.SettingsValue;
 
 public class MotorSubsystem extends Subsystem
 {
@@ -17,7 +18,7 @@ public class MotorSubsystem extends Subsystem
     public MotorSubsystem(Subsystem parent, String name) {
         super(parent, name) ;
 
-        String mname = "hw:" + name + ":motor" ;
+        String mname = "subsystems:" + name + ":hw:motors" ;
         controller_ = getRobot().getMotorFactory().createMotor(name, mname) ;
         if (controller_ == null)
         {
@@ -25,7 +26,8 @@ public class MotorSubsystem extends Subsystem
             getRobot().getMessageLogger().add("could not create motor for name '" + mname + "'") ;
             getRobot().getMessageLogger().endMessage();
         }
-        power_ = 0.0 ;
+        putDashboard(getName() + "-subsystem", DisplayType.Verbose, true);
+        setPower(0.0) ;
     }
 
     public boolean isRunning() {
@@ -51,6 +53,13 @@ public class MotorSubsystem extends Subsystem
         setPower(0.0) ;
     }
 
+    public SettingsValue getProperty(String name) {
+        if (name.equals("power"))
+            return new SettingsValue(getPower()) ;
+
+        return null ;
+    }
+
     public double getPower() {
         return power_ ;
     }
@@ -63,6 +72,7 @@ public class MotorSubsystem extends Subsystem
         try {
             power_ = limitPower(p) ;
             controller_.set(power_) ;
+            putDashboard(getName() + "-power", DisplayType.Verbose, power_);
         }
         catch(BadMotorRequestException|MotorRequestFailedException ex) {
             MessageLogger logger = getRobot().getMessageLogger() ;

@@ -33,6 +33,7 @@ public abstract class TankDrivePathAction extends TankDriveAction {
     }
 
     public void start() throws Exception {
+        super.start() ;
         path_ = getSubsystem().getRobot().getPathManager().getPath(getPathName()) ;
     }
 }
