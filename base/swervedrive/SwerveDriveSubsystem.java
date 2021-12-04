@@ -6,6 +6,7 @@ import org.xero1425.base.Subsystem;
 import org.xero1425.base.motors.BadMotorRequestException;
 import org.xero1425.base.motors.MotorController;
 import org.xero1425.base.motors.MotorRequestFailedException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.SettingsParser;
@@ -49,7 +50,7 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
 
     static private Names[] names_ = new Names[4] ;                                              // The names of each module (short name and long name)
 
-    static private final String AngularSamplesName = "swervedrive:angular:samples";              // The settings file entry for the angular speedometer
+    static private final String AngularSamplesName = "samples:angular";              // The settings file entry for the angular speedometer
 
     private SwerveDriveKinematics kinematics_ ;
     private SwerveDriveOdometry odometry_ ;
@@ -87,10 +88,10 @@ public class SwerveDriveSubsystem extends DriveBaseSubsystem {
         //
         // Get the parameters from the settings file
         //
-        SettingsParser settings = getRobot().getSettingsParser();
-        width_ = settings.get("swervedrive:width").getDouble();
-        length_ = settings.get("swervedrive:length").getDouble();
-        maxspeed_ = settings.get("swervedrive:maxspeed").getDouble();
+        ISettingsSupplier settings = getRobot().getSettingsParser();
+        width_ = getSettingsValue("physical:width").getDouble() ;
+        length_ = getSettingsValue("physical:length").getDouble();
+        maxspeed_ = getSettingsValue("physical:maxspeed").getDouble();
 
         //
         // Create the swerve modules

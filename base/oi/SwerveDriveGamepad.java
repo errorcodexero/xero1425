@@ -6,6 +6,7 @@ import org.xero1425.base.actions.SequenceAction;
 import org.xero1425.base.swervedrive.SwerveDirectionRotateAction;
 import org.xero1425.base.swervedrive.SwerveDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsParser;
 
@@ -42,15 +43,15 @@ public class SwerveDriveGamepad extends Gamepad {
 
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
-        SettingsParser settings = getSubsystem().getRobot().getSettingsParser();
+        ISettingsSupplier settings = getSubsystem().getRobot().getSettingsParser();
 
-        deadband_pos_x_ = getSubsystem().getRobot().getSettingsParser().get("driver:position:x:deadband").getDouble() ;
-        deadband_pos_y_ = getSubsystem().getRobot().getSettingsParser().get("driver:position:y:deadband").getDouble() ;
-        deadband_rotate_ = getSubsystem().getRobot().getSettingsParser().get("driver:rotate:deadband").getDouble() ;
+        deadband_pos_x_ = getSubsystem().getSettingsValue("driver:deadband:x").getDouble() ;
+        deadband_pos_y_ = getSubsystem().getRobot().getSettingsParser().get("driver:deadband:y").getDouble() ;
+        deadband_rotate_ = getSubsystem().getRobot().getSettingsParser().get("driver:deadband:rotate").getDouble() ;
         power_ = getSubsystem().getRobot().getSettingsParser().get("driver:axis:power").getDouble() ;
         
-        angle_maximum_ = settings.get("driver:angle:maximum").getDouble();
-        pos_maximum_ = settings.get("driver:position:maximum").getDouble();        
+        angle_maximum_ = settings.get("driver:maximum:angle").getDouble();
+        pos_maximum_ = settings.get("driver:maximum:position").getDouble();        
 
         action_ = new SwerveDirectionRotateAction(db_, 0.0, 0.0, 0.0) ;
     }
