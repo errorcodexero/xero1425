@@ -286,6 +286,8 @@ public class TankDriveSubsystem extends Subsystem {
                 right_motors_.setNeutralMode(automode_neutral_);
                 //left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
                 //right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
+                left_motors_.setOpenLoopRampRate(0.0);
+                right_motors_.setOpenLoopRampRate(0.0);                
                 break;
 
             case Teleop:
@@ -293,6 +295,8 @@ public class TankDriveSubsystem extends Subsystem {
                 right_motors_.setNeutralMode(teleop_neutral_);
                 //left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
                 //right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
+                left_motors_.setOpenLoopRampRate(0.3);
+                right_motors_.setOpenLoopRampRate(0.3);
                 break;
 
             case Test:
@@ -441,7 +445,8 @@ public class TankDriveSubsystem extends Subsystem {
                 logger.add("could not create right motors") ;            
             logger.endMessage();
         }
-        
+
+
         if (!left_motors_.hasPosition() || !right_motors_.hasPosition()) {
             int p1, p2 ;
 

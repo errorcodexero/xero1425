@@ -11,6 +11,7 @@ import com.ctre.phoenix.ErrorCode;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
+import com.ctre.phoenix.motorcontrol.can.BaseTalon;
 import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
@@ -269,16 +270,16 @@ public class CTREMotorController extends MotorController
 
     public void setCurrentLimit(double limit) throws BadMotorRequestException {
         if (sim_ == null) {
-            TalonFX fx = (TalonFX)controller_ ;
+            VictorSPX fx = (VictorSPX)controller_ ;
             SupplyCurrentLimitConfiguration cfg = new SupplyCurrentLimitConfiguration(true, limit, limit, 1) ;
-            fx.configSupplyCurrentLimit(cfg) ;
         }
     }     
     
     public void setOpenLoopRampRate(double limit) throws BadMotorRequestException {
         if (sim_ == null) {
-            TalonFX fx = (TalonFX)controller_ ;
-            fx.configOpenloopRamp(limit, 20) ;
+            // TODO: generalize this to work across all motor types
+            VictorSPX fx = (VictorSPX)controller_ ;
+            fx.configOpenloopRamp(limit) ;
         }
     }  
     
