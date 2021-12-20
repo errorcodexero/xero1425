@@ -73,7 +73,6 @@ public class TankDrivePathFollowerAction extends TankDrivePathAction {
         Pose2d startpose = new Pose2d((lseg.getX() + rseg.getX()) / 2.0, (lseg.getY() + rseg.getY()) / 2.0, Rotation2d.fromDegrees(lseg.getHeading())) ;
         getSubsystem().setPose(startpose);
 
-        getSubsystem().startTrip("pathfollower") ;
         getSubsystem().startPlot(plot_id_, plot_columns_);
     }
 

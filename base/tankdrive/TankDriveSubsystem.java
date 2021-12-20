@@ -1,7 +1,5 @@
 package org.xero1425.base.tankdrive;
 
-import java.util.Map;
-import java.util.HashMap;
 import edu.wpi.first.wpilibj.Encoder;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
@@ -48,14 +46,15 @@ public class TankDriveSubsystem extends Subsystem {
     private Speedometer left_linear_ ;
     private Speedometer right_linear_ ;
 
+    private double teleop_ramp_rate_ ;
+    private double auto_ramp_rate_ ;
+
     private MotorController left_motors_ ;
     private MotorController right_motors_ ;
     private Encoder left_encoder_ ;
     private Encoder right_encoder_ ;
 
     private boolean recording_ ;
-
-    private Map<String, Double> trips_ ;
 
     private final static double kEpsilon = 1e-9 ;
 
@@ -126,9 +125,15 @@ public class TankDriveSubsystem extends Subsystem {
             gyro_ = null;
         }
 
-        trips_ = new HashMap<String, Double>();
+        teleop_ramp_rate_ = 0.0 ;
+        auto_ramp_rate_ = 0.0 ;
 
         attachHardware();
+    }
+
+    public void setOpenLoopRampRates(double teleop, double auto) {
+        teleop_ramp_rate_ = teleop ;
+        auto_ramp_rate_ = auto ;
     }
 
     /// \brief sets the recording flag for the drive base.  
@@ -158,27 +163,6 @@ public class TankDriveSubsystem extends Subsystem {
     /// \returns the scrub value for the robot
     public double getScrub() {
         return tracker_.getScrub() ;
-    }
-
-    /// \brief start a new trip with the given name
-    /// A trip measures the distance traveled since a given point in time.  The trip is named and
-    /// the name is used to reference the given trip.  This method starts a trip with the given name.
-    /// The name can be used in a call to getTripDistance() to see how far the robot has traveled since
-    /// the trip was started.
-    /// \param name the name of the trip
-    public void startTrip(String name) {
-        trips_.put(name, getDistance());
-    }
-
-    /// \brief returns the distance traveled by the robot since the trip given was started
-    /// \param name the name of the trip of interest
-    /// \sa startTrip
-    /// \returns the distance traveled by the left sdie of the robot 
-    public double getTripDistance(String name) {
-        if (!trips_.containsKey(name))
-            return 0.0;
-
-        return trips_.get(name);
     }
 
     /// \brief returns the distance traveled by the left sdie of the robot
@@ -286,8 +270,8 @@ public class TankDriveSubsystem extends Subsystem {
                 right_motors_.setNeutralMode(automode_neutral_);
                 //left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
                 //right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Frequent);
-                left_motors_.setOpenLoopRampRate(0.0);
-                right_motors_.setOpenLoopRampRate(0.0);                
+                left_motors_.setOpenLoopRampRate(auto_ramp_rate_) ;
+                right_motors_.setOpenLoopRampRate(auto_ramp_rate_) ;    
                 break;
 
             case Teleop:
@@ -295,8 +279,8 @@ public class TankDriveSubsystem extends Subsystem {
                 right_motors_.setNeutralMode(teleop_neutral_);
                 //left_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
                 //right_motors_.setEncoderUpdateFrequncy(EncoderUpdateFrequency.Infrequent);
-                left_motors_.setOpenLoopRampRate(0.3);
-                right_motors_.setOpenLoopRampRate(0.3);
+                left_motors_.setOpenLoopRampRate(teleop_ramp_rate_) ;
+                right_motors_.setOpenLoopRampRate(teleop_ramp_rate_) ;
                 break;
 
             case Test:

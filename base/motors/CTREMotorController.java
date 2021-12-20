@@ -7,12 +7,11 @@ package org.xero1425.base.motors;
 ///
 
 import com.ctre.phoenix.motorcontrol.ControlMode;
+
 import com.ctre.phoenix.ErrorCode;
 
 import com.ctre.phoenix.motorcontrol.SupplyCurrentLimitConfiguration;
 import com.ctre.phoenix.motorcontrol.can.BaseMotorController;
-import com.ctre.phoenix.motorcontrol.can.BaseTalon;
-import com.ctre.phoenix.motorcontrol.can.TalonFX;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 
@@ -21,7 +20,7 @@ import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDouble;
 import edu.wpi.first.wpilibj.RobotBase;
 
-/// \brief This class is MotorController class that supports the TalonFX, TalonSRX, and the VictorSPX motors.
+/// \brief This class is MotorController class that supports the TalonSRX, and the VictorSPX motors.
 public class CTREMotorController extends MotorController
 {  
     private BaseMotorController controller_ ;
@@ -270,16 +269,38 @@ public class CTREMotorController extends MotorController
 
     public void setCurrentLimit(double limit) throws BadMotorRequestException {
         if (sim_ == null) {
-            VictorSPX fx = (VictorSPX)controller_ ;
-            SupplyCurrentLimitConfiguration cfg = new SupplyCurrentLimitConfiguration(true, limit, limit, 1) ;
+            if (controller_ instanceof TalonSRX)
+            {
+                TalonSRX srx = (TalonSRX)controller_ ;
+                SupplyCurrentLimitConfiguration cfg = new SupplyCurrentLimitConfiguration();
+                cfg.currentLimit = limit ;
+                cfg.enable = true ;
+                srx.configSupplyCurrentLimit(cfg) ;
+            }
+            else
+            {
+                throw new BadMotorRequestException(this, "motor does not support setCurrentLimit()") ;
+            }
+
         }
     }     
     
     public void setOpenLoopRampRate(double limit) throws BadMotorRequestException {
         if (sim_ == null) {
-            // TODO: generalize this to work across all motor types
-            VictorSPX fx = (VictorSPX)controller_ ;
-            fx.configOpenloopRamp(limit) ;
+            if (controller_ instanceof VictorSPX)
+            {
+                VictorSPX spx = (VictorSPX)controller_ ;
+                spx.configOpenloopRamp(limit) ;
+            }
+            else if (controller_ instanceof TalonSRX)
+            {
+                TalonSRX srx = (TalonSRX)controller_ ;
+                srx.configOpenloopRamp(limit) ;
+            }
+            else
+            {
+                throw new BadMotorRequestException(this, "motor does not support setCurrentLimit()") ;
+            }            
         }
     }  
     
