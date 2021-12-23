@@ -13,9 +13,13 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Twist2d;
 import edu.wpi.first.wpilibj.kinematics.ChassisSpeeds;
 
+/// \file
+
+/// \brief This class implements an action to do path following for the Xero1425 framework tankdrive
+///
+/// The controller used to perform the path following is the RamseteController from the WPILibrary.
 public class TankDriveRamseteAction extends TankDrivePathAction {
     private RamseteController ctrl_;
-    // private boolean reverse_ ;
     private int index_ ;
     private PIDCtrl left_pid_ ;
     private PIDCtrl right_pid_ ;
@@ -23,6 +27,12 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
     private final int MainRobot = 0;
     private final double inchesToMeters = 0.0254 ;
 
+    /// \brief create the new action to follow a path using the Ramsete controller from the WPI Library
+    /// \param sub the tankdrive subsystem
+    /// \param pathname the name of the path to follow
+    /// \param reverse if true, follow the path in reverse
+    /// \param b the b value for the ramsette algorithm
+    /// \param zeta the zeta value for teh ramsette algorithm
     public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse, double b, double zeta)
             throws MissingParameterException, BadParameterTypeException {
         super(sub, pathname);
@@ -34,12 +44,19 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         right_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":ramsete:right", false) ;
     }
 
+    /// \brief create the new action to follow a path using the Ramsete controller from the WPI Library
+    /// This form of the constructore gets the B and ZETA value from the settings file.
+    /// \param sub the tankdrive subsystem
+    /// \param pathname the name of the path to follow
+    /// \param reverse if true, follow the path in reverse
     public TankDriveRamseteAction(TankDriveSubsystem sub, String pathname, boolean reverse) throws BadParameterTypeException, MissingParameterException {
         this(sub, pathname, reverse,
                 sub.getSettingsValue("ramsete:b").getDouble(), 
                 sub.getSettingsValue("ramsete:zeta").getDouble()) ;
     }
 
+    /// \brief start the action
+    /// \throws Exception if the path is empty
     @Override
     public void start() throws Exception {
         super.start() ;
@@ -70,7 +87,7 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
             getSubsystem().putDashboard("db-path-a", DisplayType.Verbose, seg.getHeading()) ;
 
             // Desired pose in meters
-            Pose2d desiredPose = inchesToMeters(new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading()))) ;
+            Pose2d desiredPose = XeroMath.inchesToMeters(new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading()))) ;
 
             // The desired linear velocity in meters
             double linearVelocityRefMeters = inchesToMeters(seg.getVelocity()) ;
