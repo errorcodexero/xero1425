@@ -87,7 +87,7 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
             getSubsystem().putDashboard("db-path-a", DisplayType.Verbose, seg.getHeading()) ;
 
             // Desired pose in meters
-            Pose2d desiredPose = XeroMath.inchesToMeters(new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading()))) ;
+            Pose2d desiredPose = inchesToMeters(new Pose2d(seg.getX(), seg.getY(), Rotation2d.fromDegrees(seg.getHeading()))) ;
 
             // The desired linear velocity in meters
             double linearVelocityRefMeters = inchesToMeters(seg.getVelocity()) ;

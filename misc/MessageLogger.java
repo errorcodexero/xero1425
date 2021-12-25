@@ -265,6 +265,7 @@ public final class MessageLogger
     private void outputMessage(final ThreadData per)
     {
         String timestr ;
+        String threadstr ;
         String typestr ;
         String substr ;
 
@@ -273,6 +274,8 @@ public final class MessageLogger
         } else {
             timestr = format_.format(time_src_.getTime()) ;
         }
+
+        threadstr = ":" + Long.toString(per.id_) ;
 
         typestr = ": " + per.type_.toString() + ": "  ;
 
@@ -290,7 +293,7 @@ public final class MessageLogger
         }
 
         StringBuilder bld = new StringBuilder() ;
-        for(int i = 0 ; i < timestr.length() + typestr.length() ; i++)
+        for(int i = 0 ; i < timestr.length() + typestr.length() + threadstr.length() ; i++)
             bld.append(' ') ;
         String spaces = bld.toString() ;
 
@@ -300,7 +303,7 @@ public final class MessageLogger
             String msg ;
 
             if (first)
-                msg = timestr + typestr + substr + line ;
+                msg = timestr + threadstr + typestr + substr + line ;
             else
                 msg = spaces + substr + line ;
 

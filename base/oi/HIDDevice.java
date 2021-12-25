@@ -52,15 +52,18 @@ public abstract class HIDDevice
 
     /// \brief Called when the mode is initializating
     /// \param ltype the mode being initialized
-    public abstract void init(LoopType ltype) ;
+    public void init(LoopType ltype) {
+    }
 
     /// \brief Called each robot loop to generate actions
     /// \param seq the sequence where generated actions are added
     /// \throws InvalidActionRequest when an invalid action reqested
-    public abstract void generateActions(SequenceAction seq) throws InvalidActionRequest ;
+    public void generateActions(SequenceAction seq) throws InvalidActionRequest {
+    }
 
     /// \brief Create the set of static actions that will be reused each robot loop
-    public abstract void createStaticActions() throws Exception ;
+    public void createStaticActions() throws Exception {
+    }
 
     /// \brief Compute the current state of the HID device.
     public abstract void computeState() throws Exception ;

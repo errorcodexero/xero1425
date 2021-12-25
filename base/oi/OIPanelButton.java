@@ -1,7 +1,5 @@
 package org.xero1425.base.oi ;
 
-import javax.xml.namespace.QName;
-
 /// \file
 
 /// \brief This class represents a button on the OI. This is a logical button which is tied to

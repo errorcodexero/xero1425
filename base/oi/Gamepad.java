@@ -37,10 +37,8 @@ public abstract class Gamepad extends HIDDevice
     /// \param amount the magnitude of the rumble
     /// \param duration the duration of the rumble
     public void rumble(double amount, double duration) {
-        GenericHID.RumbleType rtype ;
-
         controller_.setRumble(GenericHID.RumbleType.kRightRumble, amount);
-        controller_.setRumble(GenericHID.RumbleType.kLeftRumble, amout) ;
+        controller_.setRumble(GenericHID.RumbleType.kLeftRumble, amount) ;
         start_ = getSubsystem().getRobot().getTime() ;
         duration_ = duration ;
         rumbling_ = true ;

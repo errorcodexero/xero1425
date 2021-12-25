@@ -73,10 +73,6 @@ public class MotorEncoderSubsystem extends MotorSubsystem
         return speedometer_.getAcceleration() ;
     }
 
-    public void calibrate() {
-        encoder_.calibrate(); 
-    }
-
     public void calibrate(double pos) {
         encoder_.calibrate(pos) ;
     }

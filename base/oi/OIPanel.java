@@ -3,9 +3,6 @@ package org.xero1425.base.oi;
 import java.util.Map;
 import java.util.HashMap;
 import edu.wpi.first.wpilibj.DriverStation;
-import org.xero1425.base.LoopType;
-import org.xero1425.base.actions.InvalidActionRequest;
-import org.xero1425.base.actions.SequenceAction;
 
 /// \file
 
@@ -81,7 +78,7 @@ public class OIPanel extends HIDDevice
         DriverStation ds = DriverStation.getInstance() ;
         
         for(OIPanelItem item : items_.values()) {
-            if (item.getDashboardType() == OIPanelItem.JoystickResourceType.Button)
+            if (item.getResourceType() == OIPanelItem.JoystickResourceType.Button)
             {
                 boolean v = ds.getStickButton(getIndex(), item.getItemNumber()) ;
                 item.setButtonValue(v);

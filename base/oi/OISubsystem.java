@@ -48,6 +48,9 @@ public class OISubsystem extends Subsystem {
 
     // If true, use
     private GamePadType gamepad_type_ ;
+
+    // The index of the gamepad
+    private final String DriverGamepadHIDIndexName = "gamepad:index" ;
     
     /// \brief Create a new OI subsystem
     /// \param parent the subsystem that manages this one
@@ -183,8 +186,8 @@ public class OISubsystem extends Subsystem {
                 try {
                     if (gamepad_type_ == GamePadType.Xero1425Historic)
                         gp_ = new Xero1425Gamepad(this, gp_index_, db_) ;
-                    else if (gamepad_type_ = GamePadType.Standard)
-                        gp_ = new StandardGamepad(this, gp_index, db_) ;
+                    else if (gamepad_type_ == GamePadType.Standard)
+                        gp_ = new StandardGamepad(this, gp_index_, db_) ;
                         
                     addHIDDevice(gp_);
 
