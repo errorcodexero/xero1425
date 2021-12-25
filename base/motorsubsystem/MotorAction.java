@@ -2,16 +2,24 @@ package org.xero1425.base.motorsubsystem ;
 
 import org.xero1425.base.actions.Action;
 
+/// \file
+
+/// \brief The base class for all actions that target the MotorSubsystem
 public abstract class MotorAction extends Action
 {
-    public MotorAction(final MotorSubsystem drive) {
-        super(drive.getRobot().getMessageLogger());
-        motor_subsystem_ = drive;
+    // The subsystem of interest
+    private final MotorSubsystem motor_subsystem_;
+
+    /// \brief Create the MotorAction
+    /// \param subsystem the subsystem for the action
+    public MotorAction(final MotorSubsystem subsystem) {
+        super(subsystem.getRobot().getMessageLogger());
+        motor_subsystem_ = subsystem;
     }
 
+    /// \brief Return the subsystem this action targets
+    /// \returns the subsystem this action targets
     public MotorSubsystem getSubsystem() {
         return motor_subsystem_;
     }
-
-    private final MotorSubsystem motor_subsystem_;
 }
