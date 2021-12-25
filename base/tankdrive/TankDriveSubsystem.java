@@ -131,6 +131,9 @@ public class TankDriveSubsystem extends Subsystem {
         attachHardware();
     }
 
+    /// \brief set the open loop ramp rate for the tank drive motors
+    /// \param teleop the ramp rate for teleop mode
+    /// \param auto the ramp rate for auto mode
     public void setOpenLoopRampRates(double teleop, double auto) {
         teleop_ramp_rate_ = teleop ;
         auto_ramp_rate_ = auto ;

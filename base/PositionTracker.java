@@ -3,9 +3,18 @@ package org.xero1425.base;
 import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
+
+/// \file
+
+/// \brief This class tracks the position of the drivebase.
 public class PositionTracker {
+    /// The current pose of the robot (X position, Y position, and heading)
     private Pose2d pose_ ;
+
+    /// The width of the robot
     private double width_ ;
+
+    // The scrub for the robot
     private double scrub_ ;
 
     public PositionTracker(double width, double scrub) {

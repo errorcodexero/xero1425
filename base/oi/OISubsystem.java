@@ -15,26 +15,46 @@ import org.xero1425.misc.MissingParameterException;
 
 /// \brief This class controls the various OI devices that are used to control the robot.
 /// This class is the OI subsystem for the robot.  It will add a gamepad controller to control the drive
-/// base, and an OI device can be added for a game specific OI device.
+/// base, and an OI device can be added for a game specific OI device.          
 ///
-/// This class has requirements for the settings file.  The following entries must be in the settings file or
-/// this class will not work properly
-///
-///      # The driver station index of the driver gamepad
-///      hw:driverstation:hid:driver                                             0     
+/// There is code in this device to manage how the robot comes up in both the practice space and on the field
+/// during a competition.  In either case, when the robot code is initialized, the driver station may not be 
+/// connected and therefore the OI and gamepad may not exist.  This subsystem keeps trying until the driver station
+/// is connected and then initializes the OI.
 ///
 public class OISubsystem extends Subsystem {
-    
-    private List<HIDDevice> devices_ ;
-    private TankDriveSubsystem db_ ;
-    private Gamepad gp_ ;
-    private int gp_index_ ;
-    private double last_time_ ;
-    private boolean use_new_gamepad_ ;
-    
-    private final static String DriverGamepadHIDIndexName = "gamepad:index";
 
-    public OISubsystem(Subsystem parent, String name, TankDriveSubsystem db) {
+    /// \brief the type of gamepad to use for the tank drive
+    public enum GamePadType
+    {
+        Xero1425Historic,           ///< The gamepad used historically by 1425
+        Standard,                   ///< The gamepad used by most teams (gamepad axis raised to a power)
+    }
+    
+    // The list of devices attached to the OI subsystem
+    private List<HIDDevice> devices_ ;
+
+    // The tankdrive subsystem
+    private TankDriveSubsystem db_ ;
+
+    // The gamepad subsystem used to control the drivebase
+    private Gamepad gp_ ;
+
+    // The gamepad index
+    private int gp_index_ ;
+
+    // The last time a meesage was printed about no gamepad connected
+    private double last_time_ ;
+
+    // If true, use
+    private GamePadType gamepad_type_ ;
+    
+    /// \brief Create a new OI subsystem
+    /// \param parent the subsystem that manages this one
+    /// \param name the name of the subsystem
+    /// \param type the type of gamepad to attach
+    /// \param db the drivebase to control via the gamepad
+    public OISubsystem(Subsystem parent, String name, GamePadType type, TankDriveSubsystem db) {
         super(parent, name);
 
         devices_ = new ArrayList<HIDDevice>();
@@ -42,12 +62,12 @@ public class OISubsystem extends Subsystem {
         gp_index_ = -1 ;
         last_time_ = 0.0 ;
 
-        use_new_gamepad_ = false ;
+        gamepad_type_ = type ;
         addTankDriveGamePad();
     }
 
     /// \brief return the gamepad
-    /// \returs the gamepad
+    /// \returns the gamepad
     public Gamepad getGamePad() {
         return gp_ ;
     }
@@ -59,14 +79,21 @@ public class OISubsystem extends Subsystem {
         return true ;
     }
 
+    /// \brief called when a new mode is initialized (e.g. teleop, auto, etc.).  
+    /// Calls init() on each child device.
     @Override
     public void init(LoopType ltype) {
         for (HIDDevice dev : devices_)
             dev.init(ltype);
     }
 
+    /// \brief Called each robot loop to compute the state of the OI device.  This method
+    /// also tries to create a new gamepad if one does not exist.
     @Override
     public void computeMyState() throws Exception {
+        // If the gp_ is null, this means an error occured when creating the gamepad at starting
+        // time.  This can occur if the driver station is not connected when the robot code initializes.
+        // This method keeps checking each robot loop and tries to create a gamepad until one can be created.
         if (gp_ == null) {
             addTankDriveGamePad() ;
 
@@ -75,24 +102,32 @@ public class OISubsystem extends Subsystem {
             }
         }
 
+        // Iterate through each of the devices in the subsystem and if enabled, call device level computeState().
         for (HIDDevice dev : devices_) {
             if (dev.isEnabled())
                 dev.computeState();
         }
     }
 
+    /// \brief Called each robot loop to generate actions to assign for each enable OI HID device.
     public void generateActions(SequenceAction seq) throws InvalidActionRequest {
         for(HIDDevice dev : devices_)
         {
-            dev.generateActions(seq) ;
+            if (dev.isEnabled())
+                dev.generateActions(seq) ;
         }
     }
 
+    /// \brief run the subsystem
     @Override
     public void run() throws Exception {
         super.run() ;
     }
 
+    /// \brief Called by the robot framework after all subsystems have been created.  This method
+    /// calls the createStaticActions() methods on each HIDDevice managed by this OISubsystem to create
+    /// any static actions.  This is necessary here to ensure the actions that need to be created have
+    /// access to the subsystems on the robot.
     @Override
     public void postHWInit() throws Exception {
         //
@@ -103,6 +138,10 @@ public class OISubsystem extends Subsystem {
             dev.createStaticActions();
     }
 
+    /// \brief Return the auto mode selector for the robot.  It does this by querying each managed HIDDevice
+    /// and asking for the automode selector.  Note the first OI device that answers with an automode number that
+    /// is not -1 is used.
+    /// \returns the automode number to use
     public int getAutoModeSelector() {
         for(HIDDevice dev : devices_)
         {
@@ -114,6 +153,8 @@ public class OISubsystem extends Subsystem {
         return -1 ;
     }
 
+    /// \brief Add a new HID device to this OI subsystem
+    /// \param dev the HID device to add
     protected void addHIDDevice(HIDDevice dev) {
         devices_.add(dev) ;
     }
@@ -140,10 +181,10 @@ public class OISubsystem extends Subsystem {
             
             if (gp_index_ != -1 &&  gp_ == null) {
                 try {
-                    if (use_new_gamepad_)
-                        gp_ = new NewDriveGamepad(this, gp_index_, db_) ;
-                    else
-                        gp_ = new TankDriveGamepad(this, gp_index_, db_) ;
+                    if (gamepad_type_ == GamePadType.Xero1425Historic)
+                        gp_ = new Xero1425Gamepad(this, gp_index_, db_) ;
+                    else if (gamepad_type_ = GamePadType.Standard)
+                        gp_ = new StandardGamepad(this, gp_index, db_) ;
                         
                     addHIDDevice(gp_);
 

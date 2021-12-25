@@ -4,13 +4,28 @@ import edu.wpi.first.wpilibj.GenericHID;
 import edu.wpi.first.wpilibj.XboxController ;
 import edu.wpi.first.wpilibj.DriverStation ;
 
+/// \file
+
+/// \brief a base class for a gamepad.  This class provides access to the various axis, buttons, and POV
+/// switches.  It does not provide any mapping to the drivebase.  This is done by derived classes.
 public abstract class Gamepad extends HIDDevice
 {
+    // The XBOX Controller attached
     private XboxController controller_ ;
+
+    // The start time for a rumble functgion
     private double start_ ;
+
+    // The duration of the rumble function
     private double duration_ ;
+
+    // If true, we are rumbling
     private boolean rumbling_ ;
     
+    /// \brief Create the new gamepad
+    /// \param oi the OI subsystem that owns this device
+    /// \param name the name of this device
+    /// \param index the index used to access this device in the WPILib.
     public Gamepad(OISubsystem oi, String name, int index) {
         super(oi, name, index) ;
 
@@ -18,17 +33,21 @@ public abstract class Gamepad extends HIDDevice
         rumbling_ = false ;
     }
 
-    public void rumble(boolean left_side, double amount, double duration) {
-        GenericHID.RumbleType rtype = GenericHID.RumbleType.kRightRumble ;
-        if (left_side)
-            rtype = GenericHID.RumbleType.kLeftRumble ;
+    /// \brief Rumble the gamepad for a fixed magnitude and duraction
+    /// \param amount the magnitude of the rumble
+    /// \param duration the duration of the rumble
+    public void rumble(double amount, double duration) {
+        GenericHID.RumbleType rtype ;
 
-        controller_.setRumble(rtype, amount);
+        controller_.setRumble(GenericHID.RumbleType.kRightRumble, amount);
+        controller_.setRumble(GenericHID.RumbleType.kLeftRumble, amout) ;
         start_ = getSubsystem().getRobot().getTime() ;
         duration_ = duration ;
         rumbling_ = true ;
     }
 
+    /// \brief Compute the state of this Gamepad device.  For the gamepad the
+    /// rumble function is processed.
     @Override
     public void computeState() {
         if (rumbling_ && getSubsystem().getRobot().getTime() - start_ > duration_)
@@ -38,67 +57,86 @@ public abstract class Gamepad extends HIDDevice
             rumbling_ = false ;
         }
     }
-    
+
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed
     public boolean isRTriggerPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickAxis(getIndex(), AxisNumber.RTRIGGER.value) > 0.5 ;
     }
 
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isLTriggerPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) > 0.5 ;
     }    
 
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isAPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.A.value) ;
     }
 
-
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isBPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.B.value) ;
     }
 
-
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isXPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.X.value) ;
     }
 
-
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isYPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.Y.value) ;
     }
 
-
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isLJoyButtonPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.L_JOY.value) ;
     }
 
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isRJoyButtonPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.R_JOY.value) ;
     }
 
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isRBackButtonPressed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.RB.value) ;        
     }
 
+    /// \brief Returns true if the right trigger is pressed
+    /// \returns true if the right trigger is pressed    
     public boolean isLBackButtonPrssed() {
         DriverStation ds = DriverStation.getInstance() ;
         return ds.getStickButton(getIndex(), ButtonNumber.LB.value) ;        
     }
 
+    /// \brief Returns the POV angle for the gamepad
+    /// \returns the POV angle for the gamepad
     public POVAngle getPOVAngle() {
         DriverStation ds = DriverStation.getInstance() ;
         int povval = ds.getStickPOV(getIndex(), 0) ;
         return POVAngle.fromInt(povval) ;
     }
 
+    /// \brief The axis numbers on the joystick
     protected enum AxisNumber {
         LEFTX(0),              ///< Left X axis
         LEFTY(1),              ///< Left Y axis
@@ -107,7 +145,9 @@ public abstract class Gamepad extends HIDDevice
         RIGHTX(4),             ///< Right X axis
         RIGHTY(5) ;            ///< Right Y axis
 
+        /// \brief the value of the axis enum
         public final int value ;
+        
         private AxisNumber(int value) {
             this.value = value ;
         }
@@ -124,9 +164,11 @@ public abstract class Gamepad extends HIDDevice
         BACK(7),               ///< Back button
         START(8),              ///< Start button
         L_JOY(9),              ///< Left joystick button
-        R_JOY(10);               ///< Right joystick button
+        R_JOY(10);             ///< Right joystick button
 
+        /// The value of the enum
         public final int value ;
+
         private ButtonNumber(int value) {
             this.value = value ;
         }        
@@ -144,12 +186,14 @@ public abstract class Gamepad extends HIDDevice
         UPLEFT(315),           ///< UpLeft, 315 degrees
         NONE(-1) ;             ///< Not pressed in any direction
 
+        /// \brief the value of the enum
         public final int value ;
 
         private POVAngle(int value) {
             this.value = value ;
         }
 
+        /// \brief convert to an enum from an integer value
         public static POVAngle fromInt(int id) {
             POVAngle[] As = POVAngle.values() ;
             for(int i = 0 ; i < As.length ; i++) {
@@ -160,5 +204,4 @@ public abstract class Gamepad extends HIDDevice
             return NONE ;
         }
     } ;    
-
 }

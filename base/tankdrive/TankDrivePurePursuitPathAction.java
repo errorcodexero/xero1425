@@ -16,6 +16,11 @@ import edu.wpi.first.wpilibj.geometry.Pose2d;
 import edu.wpi.first.wpilibj.geometry.Rotation2d;
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
+/// \file
+
+/// \brief This class implements the pure pursuit path following algorithm
+/// Note, this code is not working yet. It is experimental and should be used to
+/// play with the algorithm only.
 public class TankDrivePurePursuitPathAction extends TankDriveAction {
     private double start_time_ ;
     private String path_name_;
@@ -29,14 +34,20 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
     private double current_vel_ ;
     private double max_accel_ ;
 
-    static final String[] plot_columns_ = {             
+    // The values to plot when using this action
+    static private final String[] plot_columns_ = {             
         "time", 
         "lavel", "ltvel", "lout", 
         "ravel", "rtvel", "rout", 
     } ;
 
+    // The data to extract from a path
     private final int MainRobot = 0;
 
+    /// \brief Create the action to follow a path using the pure pursuit algorithm
+    /// \param drive the tank drive subsystem
+    /// \param path the name of the path to follow, it must be present in the XeroPathManager
+    /// \param reverse if true follow the path in reverse
     public TankDrivePurePursuitPathAction(TankDriveSubsystem drive, String path, boolean reverse)
             throws MissingPathException, MissingParameterException, BadParameterTypeException {
         super(drive);
@@ -54,6 +65,9 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         right_pid_ = new PIDCtrl(settings, "tankdrive:purepursuit:right", false) ;
     }
 
+    /// \brief Start the path following action
+    /// Called once to initializa the action to follow the path.  This method sets the initial
+    /// robot pose, stores the initial time, and starts plotting.
     @Override
     public void start() {
 
@@ -70,6 +84,8 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         cycle_ = 0 ;
     }
 
+    /// \brief Run the path following action
+    /// Called each robot loop to adjust the robot's velocity to follow the path
     @Override
     public void run() {
         //
@@ -98,6 +114,10 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         //
         LookAheadPoint look = findLookAheadPoint(closest) ;
 
+        //
+        // Publish the tank drive path time and position to the dashboard, used by programs like XeroSim to
+        // follow the path.
+        //
         getSubsystem().putDashboard("db-path-t", DisplayType.Verbose, getSubsystem().getRobot().getTime()) ;
         getSubsystem().putDashboard("db-path-x", DisplayType.Verbose, look.getPose().getX()) ;
         getSubsystem().putDashboard("db-path-y", DisplayType.Verbose, look.getPose().getY()) ;
@@ -105,7 +125,6 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
 
         if (!look.atEnd())
         {
-
             //
             // Find the curved arc we need to drive from the current
             // position to the look ahead position
@@ -165,20 +184,24 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
 
     }
 
+    /// \brief Cancel the path follower action
+    /// This marks the action done and sets the motor power to zero
     @Override
     public void cancel() {
         super.cancel() ;
 
         getSubsystem().setPower(0.0, 0.0) ;
     }
-    
+
+    /// \brief Returns a human readable string for the action
+    /// \returns a human readable string for the action
     @Override
     public String toString(int indent) {
         String ret = prefix(indent) + "TankDrivePurePursuitPathAction-" + path_name_ ;
         return ret ;
     }
 
-    TankDriveVelocities inverseKinematics(double curvature, double velocity, double width) {
+    private TankDriveVelocities inverseKinematics(double curvature, double velocity, double width) {
 
         double l = velocity * (2 + curvature * width) / 2.0 ;
         double r = velocity * (2 - curvature * width) / 2.0 ;

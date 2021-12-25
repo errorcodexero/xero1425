@@ -7,14 +7,30 @@ import edu.wpi.first.networktables.NetworkTableEntry ;
 import java.util.Map ;
 import java.util.HashMap ;
 
+/// \file
+
+/// \brief This class manages "plots". 
+///
+/// Plots are data sets that are stored to the network table.  The data stored there
+/// contains a set of points, per robot loop, for each robot loop that is processed while
+/// the plot is ednabled.  A plot is defined by a name and a set of named columns.  Each named
+/// column has a value for each robot loop.
+/// This data can be processed by the xerotune toon located here <a href="https://www.mewserver.org/xeroprogs/" here </a>
 class PlotManager
 {
     static private String CompleteEntry = "complete" ;
     static private String PointsEntry = "points" ;
     static private String ColumnsEntry = "columns" ;
     static private String DataEntry = "data" ;
+    
+    int next_plot_id_ ;
+    String plot_table_ ;
+    Map<Integer, PlotInfo> plots_ ;
+    boolean enabled_ ;
 
-    protected PlotManager(String key)
+    /// \brief create a new plot manager
+    /// \param key the name of the key in the network table to hold plot data
+    public PlotManager(String key)
     {
         plots_ = new HashMap<Integer, PlotInfo>() ;
         next_plot_id_ = 0 ;
@@ -22,11 +38,13 @@ class PlotManager
         enabled_ = false ;
     }
 
+    /// \brief enable or disable the storage of plotting data in the network tables
+    /// \param b if true, enable plotting, otherwise disable
     public void enable(boolean b) {
         enabled_ = b ;
     }
 
-    int initPlot(String name)
+    public int initPlot(String name)
     {
         if (!enabled_ || DriverStation.getInstance().isFMSAttached())
             return -1 ;
@@ -43,7 +61,7 @@ class PlotManager
         return info.index_ ;
     }
 
-    void startPlot(int id, String[] cols)
+    public void startPlot(int id, String[] cols)
     {
         if (!enabled_ || DriverStation.getInstance().isFMSAttached() || !plots_.containsKey(id))
             return ;
@@ -68,7 +86,7 @@ class PlotManager
         table.delete(DataEntry) ;
     }
 
-    void addPlotData(int id, Double[] data)
+    public void addPlotData(int id, Double[] data)
     {
         if (!enabled_ || DriverStation.getInstance().isFMSAttached() || !plots_.containsKey(id))
             return ;
@@ -86,7 +104,7 @@ class PlotManager
         }
     }
 
-    void endPlot(int id)
+    public void endPlot(int id)
     {
         if (!enabled_ || DriverStation.getInstance().isFMSAttached() || !plots_.containsKey(id))
             return ;
@@ -117,8 +135,4 @@ class PlotManager
         public int index_ ;
     } ;
 
-    int next_plot_id_ ;
-    String plot_table_ ;
-    Map<Integer, PlotInfo> plots_ ;
-    boolean enabled_ ;
 } ;

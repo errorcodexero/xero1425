@@ -2,6 +2,8 @@ package org.xero1425.base.tankdrive;
 
 import edu.wpi.first.wpilibj.geometry.Translation2d;
 
+/// \file
+
 /// \brief describes a point along a path that might lie between two segments
 public class PathPoint {
     //
@@ -19,20 +21,24 @@ public class PathPoint {
     //
     private Translation2d loc_ ;
 
+    /// \brief Create a new path point
     public PathPoint(int which, double pcnt, Translation2d loc) {
         which_ = which ;
         pcnt_ = pcnt ;
         loc_ = loc ;
     }
 
+    /// \brief return the first segment this path point derived from
     public int which() {
         return which_ ;
     }
 
+    /// \brief return the percentage the path point is located from the first segment to the second segment
     public double percent() {
         return pcnt_ ;
     }
 
+    /// \brief return the actual location of this path point
     public Translation2d loc() {
         return loc_ ;
     }

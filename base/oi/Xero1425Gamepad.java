@@ -11,67 +11,85 @@ import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
 
 /// \brief This class controls interprets the input from the game pad to control the drivebase.
+/// This class expects values stored in the JSON settings file.
 ///
-/// This class has requirements for the settings file.  The following entries must be in the settings file or
-/// this class will not work properly
+///     {
+///         "subsystems" : {
+///             "oisubsystemname" : {
+///                 "gamepadname" : {
+///                     "index" : 0,
+///                     "power" : {
+///                         "max" : 1.0,
+///                         "default" : 0.6,
+///                         "nudge_straight" : 0.2,
+///                         "nudge_rotate" : 0.2,
+///                         "slowby" : 0.5,
+///                         "tolerance" : 0.05
+///                     },
+///                     "turn" : {
+///                         "max" : 0.8,
+///                         "default" : 0.4
+///                     },
+///                     "zerolevel" : 0.1,
+///                     "nudge_time" : 0.1
+///                 }
+///             }
+///         }
+///     }
 ///
-///      # The magnitude of the maximum power applied to the drive base
-///      driver:power:max                                                       1.0
-///
-///      # The default power applied to the drive base by the velocity stick
-///      # without the turbo button
-///      driver:power:default                                                   0.6
-///
-///      # The maximum power applied to the drive base by the turn stick
-///      driver:turn:max                                                         0.8
-///
-///      # The default power applied to the drive base by the turn stick without the
-///      # turbo button
-///      driver:turn:default                                                     0.4
-///
-///      # The maximum power applied to the drive base when the slow button is pressed
-///      driver:power:slowby                                                     0.5
-///
-///      # The tolerance between the current motor power and the desired motor power to
-///      # determine if a new power number should be sent to the motor controllers.
-///      driver:power:tolerance                                                  0.05
-///
-///      # The power to apply when using the nudge button to go straight
-///      driver:power:nudge_straight                                             0.2
-///
-///      # The power to apply when using the nudge button to turn
-///      driver:power:nudge_rotate                                               0.2
-///
-///      # The amount of time to apply power during a nudge operation 
-///      driver:nudge_time                                                       0.1 
-///
-///      # The value from the joystick that is considered a zero level.  Anything below
-///      # this value is interpreted as a desire to stop the robot and zero power is 
-///      # applied to the robot.
-///      driver:zerolevel                                                        0.1
-///
-public class TankDriveGamepad extends Gamepad {
+public class Xero1425Gamepad extends Gamepad {
     
+    // The drivebase subsystem to control
     private TankDriveSubsystem db_ ;
+
+    // The action for nudging forward
     private Action nudge_forward_ ;
+
+    // The action for nudging backward
     private Action nudge_backward_ ;
+
+    // The action for nudging clockwise
     private Action nudge_clockwise_ ;
+
+    // The action for nudging counter clockwise
     private Action nudge_counter_clockwise_ ;
+
+    // The POV index
     private int pov_ ;
 
+    // The default power to apply based on the joystick axis
     private double default_power_ ;
+
+    // The max power to apply based on the joystick axis
     private double max_power_ ;
+
+    // The default turn power to apply
     private double turn_power_ ;
+
+    // The max turn power to apply
     private double turn_max_power_ ;
+
+    // The factor to apply to the power when the slow button is pressed
     private double slow_factor_ ;
+
+    // The level of the gamepad axis, below which we consider zero
     private double zero_level_ ;
+
+    // The amount the power output must change before we assign new power valus
     private double tolerance_ ;
 
-    double left_ ;
-    double right_ ;
+    // The current left drivebase power
+    private double left_ ;
 
-    public TankDriveGamepad(OISubsystem oi, int index, TankDriveSubsystem drive_) throws Exception {
-        super(oi, "Xero1425GamePad", index);
+    // The current right drivebase power
+    private double right_ ;
+
+    /// \brief Create a new TankDrive gamepad device
+    /// \param oi the subsystems that owns this device
+    /// \param index the index to use when access this device in the WPILib library
+    /// \param drive the drivebase to control
+    public Xero1425Gamepad(OISubsystem oi, int index, TankDriveSubsystem drive) throws Exception {
+        super(oi, "xero1425_gamepad", index);
 
         DriverStation ds = DriverStation.getInstance();
         if (ds.getStickPOVCount(getIndex()) == 0) {
@@ -82,28 +100,30 @@ public class TankDriveGamepad extends Gamepad {
             throw new Exception("invalid gamepad for TankDriveGamepad");
         }
 
-        db_ = drive_;
+        db_ = drive;
     }
 
+    /// \brief initialize the gamepad per robot mode, does nothing
     @Override
     public void init(LoopType ltype) {
     }
 
+    /// \brief create the required static actions
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
 
-        default_power_ = getSubsystem().getSettingsValue("gamepad:power:default").getDouble();
-        max_power_ = getSubsystem().getSettingsValue("gamepad:power:max").getDouble();
-        turn_power_ = getSubsystem().getSettingsValue("gamepad:turn:default").getDouble();
-        turn_max_power_ = getSubsystem().getSettingsValue("gamepad:turn:max").getDouble();
-        slow_factor_ = getSubsystem().getSettingsValue("gamepad:power:slowby").getDouble();
-        zero_level_ = getSubsystem().getSettingsValue("gamepad:zerolevel").getDouble();
+        default_power_ = getSubsystem().getSettingsValue(getName() + ":power:default").getDouble();
+        max_power_ = getSubsystem().getSettingsValue(getName() + ":power:max").getDouble();
+        turn_power_ = getSubsystem().getSettingsValue(getName() + ":turn:default").getDouble();
+        turn_max_power_ = getSubsystem().getSettingsValue(getName() + ":turn:max").getDouble();
+        slow_factor_ = getSubsystem().getSettingsValue(getName() + ":power:slowby").getDouble();
+        zero_level_ = getSubsystem().getSettingsValue(getName() + ":zerolevel").getDouble();
 
-        tolerance_ = getSubsystem().getSettingsValue("gamepad:power:tolerance").getDouble();
+        tolerance_ = getSubsystem().getSettingsValue(getName() + ":power:tolerance").getDouble();
 
-        double nudge_straight = getSubsystem().getSettingsValue("gamepad:power:nudge_straight").getDouble();
-        double nudge_rotate = getSubsystem().getSettingsValue("gamepad:power:nudge_rotate").getDouble();
-        double nudge_time = getSubsystem().getSettingsValue("gamepad:nudge_time").getDouble();
+        double nudge_straight = getSubsystem().getSettingsValue(getName() + ":power:nudge_straight").getDouble();
+        double nudge_rotate = getSubsystem().getSettingsValue(getName() + ":power:nudge_rotate").getDouble();
+        double nudge_time = getSubsystem().getSettingsValue(getName() + ":nudge_time").getDouble();
 
         nudge_forward_ = new TankDrivePowerAction(db_, nudge_straight, nudge_straight, nudge_time);
         nudge_backward_ = new TankDrivePowerAction(db_, -nudge_straight, -nudge_straight, nudge_time);
@@ -111,18 +131,13 @@ public class TankDriveGamepad extends Gamepad {
         nudge_counter_clockwise_ = new TankDrivePowerAction(db_, -nudge_rotate, nudge_rotate, nudge_time);
     }
 
-    @Override
-    public void computeState() {
-        super.computeState();
-    }
-
+    /// \brief generate the actions for the drivebase for the current robot loop
     @Override
     public void generateActions(SequenceAction seq) {
         if (db_ == null || !isEnabled())
             return ;
 
         try {
-
             POVAngle povvalue ;
 
             DriverStation ds = DriverStation.getInstance() ;

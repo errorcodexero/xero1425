@@ -11,49 +11,50 @@ import org.xero1425.misc.EncoderMapper;
 import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MissingParameterException;
 
+// TODO: This really needs to be four seperate classes with the right hierarchy
+
+/// \file
+
+/// \brief This class is a generalization of an encoder.  It can represent the encoder that is part of a
+/// brushless motor, an quadrature encoder that is connected to two digital inputs on the RoboRio, an encoder
+/// connected to an analog input, or an encoder connected to a PWM.  This class can also represent either an
+/// absolute encoder or a relative encoder.  This class manages the translation of the encoder value to real
+/// world values (e.g. encoder ticks to inches or degrees).
 public class XeroEncoder {
     
+    // The quadrature encoder if this is a quadrature encoder type
     private Encoder quad_ ;
+
+    // The coefficients of the quadurature encoder equation (Y = MX + B) to conver
+    // encoder units to physical units.
     private double quad_m_ ;
     private double quad_b_ ;
+
+    // If the encoder is part of a brushless motor, this is the motor
     private MotorController motor_ ;
+
+    // If the encoder is an analog encoder
     private AnalogInput analog_ ;
+
+    // If the encoder is a PWM based encoder
     private Counter pwm_ ;
+
+    // The mapper that maps units from encoder units to real world units
     private EncoderMapper mapper_ ;
 
+    /// \brief Create a new XeroEncoder object
+    /// \param robot the robot this encoder is part of, used to get settings and the message logger
+    /// \param cname the name of the encoder
+    /// \param angular if true, the real world units are angles that range from -180 to 180
+    /// \param ctrl if non-null the motor that contains the encoder
     public XeroEncoder(XeroRobot robot, String cname, boolean angular, MotorController ctrl)
             throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
             BadMotorRequestException {
         createEncoder(robot, cname, ctrl);
     }
 
-    private void createEncoder(XeroRobot robot, String cname, MotorController ctrl)
-            throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
-            BadMotorRequestException {
-
-        ISettingsSupplier settings = robot.getSettingsParser() ;                
-        String type = settings.get(cname + ":type").getString() ;
-
-        if (type.equals("motor")) {
-            createMotorEncoder(robot, cname, ctrl) ;
-        }
-        else if (type.equals("quad")) {
-            createQuadEncoder(robot, cname, ctrl);
-        }
-        else if (type.equals("analog")) {
-            createAnalogEncoder(robot, cname);
-        }
-        else if (type.equals("pwm")) {
-            createPWMEncoder(robot, cname);
-        }
-        else {
-            throw new EncoderConfigException("motor '" + cname + " - unknown encoder type '" + type + "' - expected 'motor' or 'analog' or 'quad' or 'pwm'") ;
-        }
-
-        if (pwm_ == null && analog_ == null && quad_ == null && motor_ == null)
-            throw new EncoderConfigException("motor '" + cname + "' - must define a QUAD, PWM, MOTOR, or ANALOG encoder");
-    }
-
+    /// \brief get the raw encoder count from the encoder
+    /// \returns the raw encoder count from the encoder
     public double getRawCount() {
         double result = 0.0 ;
 
@@ -74,6 +75,8 @@ public class XeroEncoder {
         return result ;
     }
 
+    /// \brief get the real world position for the encoder
+    /// \returns the real world position for the encoder
     public double getPosition() {
         double result = 0.0;
 
@@ -102,32 +105,24 @@ public class XeroEncoder {
         return result;
     }
 
-    private double getAbsolutePosition() {
-        double result = 0.0;
-
-        if (analog_ != null) {
-            result = mapper_.toRobot(analog_.getVoltage()) ;
-        }
-        else if (pwm_ != null) {
-            result = mapper_.toRobot(pwm_.getPeriod()) ;
-        }
-        return result;        
-    }
-
+    /// \brief reset the encoder values to zero at the current position
+    /// If the encoder does not support reset (absolute analog encoder), 
+    /// this method does nothing.
     public void reset() {
         try {
             if (motor_ != null)
                 motor_.resetEncoder();
             else if (quad_ != null)
                 quad_.reset() ;
-
-            calibrate() ;
         }
         catch(Exception ex) {
 
         }
     }
 
+    /// \brief Calibrate the encoder to the current real world position.  This
+    /// method resets the encoder count to zero and sets the B term in the mapping
+    /// function Y = MX + B to the given position.
     public void calibrate(double pos) {
         if (quad_ != null)
             quad_.reset() ;
@@ -143,17 +138,31 @@ public class XeroEncoder {
         quad_b_ = pos ;
     }
 
-    public void calibrate() {
-        if ((quad_ != null || motor_ != null) && (analog_ != null && pwm_ != null))
-        {
-            //
-            // We have one of QUAD or MOTOR encoder which are relative
-            // We have one of ANALOG or PWM encoder which are absolute
-            //
-            // Use the absolute encoder to calibrate the relative encoder
-            //
-            calibrate(getAbsolutePosition());
+    private void createEncoder(XeroRobot robot, String cname, MotorController ctrl)
+            throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
+            BadMotorRequestException {
+
+        ISettingsSupplier settings = robot.getSettingsParser() ;                
+        String type = settings.get(cname + ":type").getString() ;
+
+        if (type.equals("motor")) {
+            createMotorEncoder(robot, cname, ctrl) ;
         }
+        else if (type.equals("quad")) {
+            createQuadEncoder(robot, cname);
+        }
+        else if (type.equals("analog")) {
+            createAnalogEncoder(robot, cname);
+        }
+        else if (type.equals("pwm")) {
+            createPWMEncoder(robot, cname);
+        }
+        else {
+            throw new EncoderConfigException("motor '" + cname + " - unknown encoder type '" + type + "' - expected 'motor' or 'analog' or 'quad' or 'pwm'") ;
+        }
+
+        if (pwm_ == null && analog_ == null && quad_ == null && motor_ == null)
+            throw new EncoderConfigException("motor '" + cname + "' - must define a QUAD, PWM, MOTOR, or ANALOG encoder");
     }
 
     private void createMotorEncoder(XeroRobot robot, String cname, MotorController ctrl)
@@ -170,7 +179,7 @@ public class XeroEncoder {
         quad_b_ = settings.get(cname + ":b").getDouble() ;
     }
 
-    private void createQuadEncoder(XeroRobot robot, String cname, MotorController ctrl)
+    private void createQuadEncoder(XeroRobot robot, String cname)
             throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
             BadMotorRequestException {
 
@@ -229,5 +238,4 @@ public class XeroEncoder {
         mapper_ = new EncoderMapper(rmax, rmin, emax, emin) ;
         mapper_.calibrate(rc, ec) ;
     }
-
 } ;
