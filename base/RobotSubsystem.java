@@ -4,15 +4,11 @@ import org.xero1425.base.alarms.AlarmSubsystem;
 import org.xero1425.base.oi.OISubsystem;
 import org.xero1425.base.tankdrive.TankDriveSubsystem;
 
+/// \file
+
+/// \brief This class is the top level subsystem for the robot
 public class RobotSubsystem extends Subsystem
 {
-    public enum SubsystemType
-    {
-        DriveBase,
-        OI,
-        Other
-    };
-
     public RobotSubsystem(XeroRobot robot, String name) throws Exception {
         super(robot, name) ;
 

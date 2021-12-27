@@ -2,15 +2,17 @@
 // Open Source Software; you can modify and/or share it under the terms of
 // the WPILib BSD license file in the root directory of this project.
 
-package org.xero1425.base.gyro ;
+package org.xero1425.base.gyro;
 
 import org.xero1425.misc.XeroMath;
-
 import edu.wpi.first.hal.SimDevice;
 import edu.wpi.first.hal.SimDevice.Direction;
 import edu.wpi.first.wpilibj.interfaces.Gyro;
 import edu.wpi.first.hal.SimDouble;
 
+/// \file
+
+/// \brief This class represents the ROMI Gyro on the Romi robot
 public class RomiGyro implements Gyro, XeroGyro {
   private SimDouble m_simRateX;
   private SimDouble m_simRateY;
@@ -25,7 +27,7 @@ public class RomiGyro implements Gyro, XeroGyro {
 
   private SimDevice m_gyroSimDevice;
 
-  /** Create a new RomiGyro. */
+  /// \brief Create a new Romi gyro object
   public RomiGyro() {
     m_gyroSimDevice = SimDevice.create("Gyro:RomiGyro");
     if (m_gyroSimDevice != null) {
@@ -40,11 +42,8 @@ public class RomiGyro implements Gyro, XeroGyro {
     }
   }
 
-  /**
-   * Get the rate of turn in degrees-per-second around the X-axis.
-   *
-   * @return rate of turn in degrees-per-second
-   */
+  /// \brief Return the X rate of change
+  /// \returns the X rate of change
   public double getRateX() {
     if (m_simRateX != null) {
       return m_simRateX.get();
@@ -53,11 +52,8 @@ public class RomiGyro implements Gyro, XeroGyro {
     return 0.0;
   }
 
-  /**
-   * Get the rate of turn in degrees-per-second around the Y-axis.
-   *
-   * @return rate of turn in degrees-per-second
-   */
+  /// \brief Return the Y rate of change
+  /// \returns the T rate of change
   public double getRateY() {
     if (m_simRateY != null) {
       return m_simRateY.get();
@@ -66,11 +62,8 @@ public class RomiGyro implements Gyro, XeroGyro {
     return 0.0;
   }
 
-  /**
-   * Get the rate of turn in degrees-per-second around the Z-axis.
-   *
-   * @return rate of turn in degrees-per-second
-   */
+  /// \brief Return the Z rate of change
+  /// \returns the Z rate of change
   public double getRateZ() {
     if (m_simRateZ != null) {
       return m_simRateZ.get();
@@ -79,11 +72,8 @@ public class RomiGyro implements Gyro, XeroGyro {
     return 0.0;
   }
 
-  /**
-   * Get the currently reported angle around the X-axis.
-   *
-   * @return current angle around X-axis in degrees
-   */
+  /// \brief Return the X angle
+  /// \returns the X angle
   public double getAngleX() {
     if (m_simAngleX != null) {
       return m_simAngleX.get() - m_angleXOffset;
@@ -92,11 +82,8 @@ public class RomiGyro implements Gyro, XeroGyro {
     return 0.0;
   }
 
-  /**
-   * Get the currently reported angle around the X-axis.
-   *
-   * @return current angle around Y-axis in degrees
-   */
+  /// \brief Return the Y angle
+  /// \returns the Y angle
   public double getAngleY() {
     if (m_simAngleY != null) {
       return m_simAngleY.get() - m_angleYOffset;
@@ -105,11 +92,8 @@ public class RomiGyro implements Gyro, XeroGyro {
     return 0.0;
   }
 
-  /**
-   * Get the currently reported angle around the Z-axis.
-   *
-   * @return current angle around Z-axis in degrees
-   */
+  /// \brief Return the Z angle
+  /// \returns the Z angle
   public double getAngleZ() {
     if (m_simAngleZ != null) {
       return m_simAngleZ.get() - m_angleZOffset;
@@ -118,7 +102,7 @@ public class RomiGyro implements Gyro, XeroGyro {
     return 0.0;
   }
 
-  /** Reset the gyro angles to 0. */
+  /// \brief Reset the gyro all to zero
   public void reset() {
     if (m_simAngleX != null) {
       m_angleXOffset = m_simAngleX.get();
@@ -127,6 +111,7 @@ public class RomiGyro implements Gyro, XeroGyro {
     }
   }
 
+  /// \brief close the gyro connection
   @Override
   public void close() throws Exception {
     if (m_gyroSimDevice != null) {
@@ -134,28 +119,34 @@ public class RomiGyro implements Gyro, XeroGyro {
     }
   }
 
+  /// \brief calibrate the gyro, does not do anything for the Romi.  Calbration is
+  /// done via the Web Interface to the Romi robot.
   @Override
   public void calibrate() {
     // no-op
   }
 
+  /// \brief return the total angle change from the last gyro reset
   @Override
   public double getAngle() {
     return -getAngleZ();
   }
 
+  /// \brief return the rate of change of the gyro Z axis
   @Override
   public double getRate() {
     return getRateZ();
   }
- 
+
+  /// \brief return the effective YAW angle.
   @Override
   public double getYaw() {
     return XeroMath.normalizeAngleDegrees(-getAngleZ()) ;
   }
 
+  /// \brief Return true if the Romi GYRO is connected
   @Override
   public boolean isConnected() {
-    return true ;
+    return m_gyroSimDevice != null ;
   }
 }
