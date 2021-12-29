@@ -69,6 +69,8 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         getSubsystem().setRecording(true);
     }
 
+    /// \brief Called once per robot loop to update the motors on the drivebase to follow the path
+    /// per the defined alborithm.
     @Override
     public void run() {
 
@@ -123,6 +125,7 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         }
     }
 
+    /// \brief Cancel the current action, stopping all motors
     @Override
     public void cancel() {
         super.cancel() ;
@@ -130,6 +133,8 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         getSubsystem().setPower(0.0, 0.0) ;
     }
     
+    /// \brief Returns a human readable string describing the action
+    /// \returns a human readable string describing the action
     @Override
     public String toString(int indent) {
         String ret = prefix(indent) + "TankDriveRamseteAction-" + getPathName() ;
