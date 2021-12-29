@@ -4,6 +4,8 @@ import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MissingParameterException;
 
+/// \file
+
 /// \brief This class is the base class for the standard test mode auto mode that is
 /// created for each robot.  There is expected to be a derived class that is robot specific
 /// that supplies the specific test modes needed.

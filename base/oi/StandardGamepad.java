@@ -6,6 +6,8 @@ import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.MissingParameterException;
 
+/// \file
+
 /// \brief This class controls interprets the input from the game pad to control the drivebase.
 /// This class expects values stored in the JSON settings file.
 ///
