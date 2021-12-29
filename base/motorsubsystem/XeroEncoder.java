@@ -11,8 +11,6 @@ import org.xero1425.misc.EncoderMapper;
 import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MissingParameterException;
 
-// TODO: This really needs to be four seperate classes with the right hierarchy
-
 /// \file
 
 /// \brief This class is a generalization of an encoder.  It can represent the encoder that is part of a
@@ -142,7 +140,7 @@ public class XeroEncoder {
             throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
             BadMotorRequestException {
 
-        ISettingsSupplier settings = robot.getSettingsParser() ;                
+        ISettingsSupplier settings = robot.getSettingsSupplier() ;                
         String type = settings.get(cname + ":type").getString() ;
 
         if (type.equals("motor")) {
@@ -169,7 +167,7 @@ public class XeroEncoder {
                 throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
                 BadMotorRequestException {
 
-        ISettingsSupplier settings = robot.getSettingsParser() ;                    
+        ISettingsSupplier settings = robot.getSettingsSupplier() ;                    
 
         motor_ = ctrl ;
         if (!motor_.hasPosition())
@@ -183,7 +181,7 @@ public class XeroEncoder {
             throws BadParameterTypeException, MissingParameterException, EncoderConfigException,
             BadMotorRequestException {
 
-        ISettingsSupplier settings = robot.getSettingsParser() ;
+        ISettingsSupplier settings = robot.getSettingsSupplier() ;
 
         int i1 = settings.get(cname + ":dinput1").getInteger() ;
         int i2 = settings.get(cname + ":dinput2").getInteger() ;        
@@ -195,7 +193,7 @@ public class XeroEncoder {
 
     private void createAnalogEncoder(XeroRobot robot, String cname)
             throws BadParameterTypeException, MissingParameterException {
-        ISettingsSupplier settings = robot.getSettingsParser() ;
+        ISettingsSupplier settings = robot.getSettingsSupplier() ;
 
         int a = settings.get(cname+":ainput").getInteger() ;
         analog_ = new AnalogInput(a) ;
@@ -218,7 +216,7 @@ public class XeroEncoder {
     private void createPWMEncoder(XeroRobot robot, String cname)
             throws BadParameterTypeException, MissingParameterException {
                 
-        ISettingsSupplier settings = robot.getSettingsParser() ;
+        ISettingsSupplier settings = robot.getSettingsSupplier() ;
                 
         int a = settings.get(cname + ":dinput").getInteger() ;
         pwm_ = new Counter(a) ;

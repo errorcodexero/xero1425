@@ -67,7 +67,7 @@ public class TankDriveSubsystem extends Subsystem {
         super(parent, name);
 
         MessageLogger logger = getRobot().getMessageLogger();
-        ISettingsSupplier settings = getRobot().getSettingsParser() ;
+        ISettingsSupplier settings = getRobot().getSettingsSupplier() ;
 
         recording_ = false ;
 

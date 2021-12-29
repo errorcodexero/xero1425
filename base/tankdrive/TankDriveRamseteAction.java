@@ -40,8 +40,8 @@ public class TankDriveRamseteAction extends TankDrivePathAction {
         // reverse_ = reverse ;
         ctrl_ = new RamseteController(b, zeta);
         
-        left_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":ramsete:left", false) ;
-        right_pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":ramsete:right", false) ;
+        left_pid_ = new PIDCtrl(sub.getRobot().getSettingsSupplier(), "subsystems:" + sub.getName() + ":ramsete:left", false) ;
+        right_pid_ = new PIDCtrl(sub.getRobot().getSettingsSupplier(), "subsystems:" + sub.getName() + ":ramsete:right", false) ;
     }
 
     /// \brief create the new action to follow a path using the Ramsete controller from the WPI Library

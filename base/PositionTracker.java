@@ -8,6 +8,7 @@ import edu.wpi.first.wpilibj.geometry.Rotation2d;
 
 /// \brief This class tracks the position of the drivebase.
 public class PositionTracker {
+
     /// The current pose of the robot (X position, Y position, and heading)
     private Pose2d pose_ ;
 
@@ -17,28 +18,43 @@ public class PositionTracker {
     // The scrub for the robot
     private double scrub_ ;
 
+    /// \brief Create a new tank drive position tracker
+    /// \param width the width of the robot in inches
+    /// \param scrub the scrub factor for the robot
     public PositionTracker(double width, double scrub) {
         width_ = width ;
         scrub_ = scrub ;
         pose_ = new Pose2d(0.0, 0.0, new Rotation2d(0.0)) ;
     }
 
+    /// \brief Retrunt he current pose of the robot
+    /// \returns the current pose of the robot
     public Pose2d getPose() {
         return pose_ ;
     }
 
+    /// \brief Set the current pose of the robot
+    /// \param pose the pose for the robot
     public void setPose(Pose2d pose) {
         pose_ = pose ;
     }
 
+    /// \brief Return the width of the robot
+    /// \returns the width of the robot
     public double getWidth() {
         return width_ ;
     }
 
+    /// \brief Return the scrub factor for the robot
+    /// \returns the scrub factor for the robot
     public double getScrub() {
         return scrub_ ;
     }
-        
+
+    /// \brief Update the current robot position
+    /// \param dleft the distance the left wheel has traveled in the last robot loop
+    /// \param dright the distance the right wheel has traveled in the last robot loop
+    /// \param dangle the current heading of the robot
     public void updatePosition(double dleft, double dright, double dangle) {
 
         double xpos, ypos ;

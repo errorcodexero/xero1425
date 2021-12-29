@@ -137,7 +137,7 @@ public class Subsystem {
             fmt_ = new DecimalFormat("00.000");
         }
         try {
-            ISettingsSupplier p = getRobot().getSettingsParser();
+            ISettingsSupplier p = getRobot().getSettingsSupplier();
             String pname = "system:verbose:" + name_ ;
             if (p.isDefined(pname) && p.get(pname).isBoolean() && p.get(pname).getBoolean())
                 verbose_ = true;
@@ -186,7 +186,7 @@ public class Subsystem {
     /// \exception throws MissingParameterException if the setting is not present in the settings file
     /// \returns the SettingsValue for the given name
     public SettingsValue getSettingsValue(String name) throws MissingParameterException {
-        return getRobot().getSettingsParser().get("subsystems:" + name_ + ":" + name) ;
+        return getRobot().getSettingsSupplier().get("subsystems:" + name_ + ":" + name) ;
     }
 
     /// \brief returns true if this is the OI subsystem

@@ -110,7 +110,7 @@ public class SimulationAssertEvent extends SimulationEvent {
             ret = value_;
         } else {
             try {
-                ret = engine.getRobot().getSettingsParser().get(setting_);
+                ret = engine.getRobot().getSettingsSupplier().get(setting_);
             } catch (MissingParameterException e) {
                 ret = null ;
             }

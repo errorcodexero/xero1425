@@ -93,7 +93,7 @@ public class MotorEncoderGotoAction extends MotorAction {
         target_ = target ;
         addhold_ = addhold ;
 
-        ISettingsSupplier settings = sub.getRobot().getSettingsParser() ;
+        ISettingsSupplier settings = sub.getRobot().getSettingsSupplier() ;
         profile_ = new TrapezoidalProfile(settings, "subsystems:" + sub.getName() + ":goto") ;
         plot_id_ = sub.initPlot(sub.getName() + "-" + toString(0)) ;
     }
@@ -112,7 +112,7 @@ public class MotorEncoderGotoAction extends MotorAction {
         target_ = getSubsystem().getSettingsValue(target).getDouble() ;
         addhold_ = addhold ;
         
-        ISettingsSupplier settings = sub.getRobot().getSettingsParser() ;
+        ISettingsSupplier settings = sub.getRobot().getSettingsSupplier() ;
         profile_ = new TrapezoidalProfile(settings, "subsystems:" + sub.getName() + ":goto") ;
         plot_id_ = sub.initPlot(sub.getName() + "-" + toString(0)) ;        
     }
@@ -204,7 +204,7 @@ public class MotorEncoderGotoAction extends MotorAction {
             // Initialize the follower
             //
             String config = "subsystems:" + sub.getName() + ":follower" ;
-            ISettingsSupplier settings = sub.getRobot().getSettingsParser() ;
+            ISettingsSupplier settings = sub.getRobot().getSettingsSupplier() ;
             if (dist < 0)
                 ctrl_ = new PIDACtrl(settings, config + ":down", sub.isAngular());
             else

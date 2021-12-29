@@ -28,7 +28,7 @@ public class DelayAction extends Action {
     /// \param delay a string specifying a delay value to look up in the settings file
     public DelayAction(XeroRobot robot, String delay) throws BadParameterTypeException, MissingParameterException {
         super(robot.getMessageLogger()) ;
-        delay_ = robot.getSettingsParser().get(delay).getDouble() ;
+        delay_ = robot.getSettingsSupplier().get(delay).getDouble() ;
     }
 
     /// \brief start the delay action

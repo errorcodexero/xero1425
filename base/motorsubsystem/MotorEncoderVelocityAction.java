@@ -55,7 +55,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
         forcesw_ = RobotBase.isSimulation();
 
         if (!sub.hasHWPID() || forcesw_) {
-            pid_ = new PIDCtrl(sub.getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":" + name_, false);
+            pid_ = new PIDCtrl(sub.getRobot().getSettingsSupplier(), "subsystems:" + sub.getName() + ":" + name_, false);
             plot_id_ = sub.initPlot(toString() + "-" + String.valueOf(which_++)) ;     
         }
     }
@@ -71,7 +71,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
         forcesw_ = RobotBase.isSimulation();
 
         if (!sub.hasHWPID() || forcesw_) {
-            pid_ = new PIDCtrl(getSubsystem().getRobot().getSettingsParser(), "subsystems:" + sub.getName() + ":" + name_, false);
+            pid_ = new PIDCtrl(getSubsystem().getRobot().getSettingsSupplier(), "subsystems:" + sub.getName() + ":" + name_, false);
             plot_id_ = - 1 ;
         }
     }
@@ -104,7 +104,7 @@ public class MotorEncoderVelocityAction extends MotorAction {
         if (!useSWPID()) {
             //
             // We are using a control loop in the motor controller, get the 
-            ISettingsSupplier settings = getSubsystem().getRobot().getSettingsParser() ;
+            ISettingsSupplier settings = getSubsystem().getRobot().getSettingsSupplier() ;
             double p = getSubsystem().getSettingsValue(name_ + ":kp").getDouble() ;
             double i = getSubsystem().getSettingsValue(name_ + ":ki").getDouble() ;
             double d = getSubsystem().getSettingsValue(name_ + ":kd").getDouble() ;

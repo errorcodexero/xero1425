@@ -40,7 +40,7 @@ public abstract class AutoController extends BaseController {
         automodes_ = new ArrayList<AutoMode>() ;
 
         // Check the settings file to see if the settings file is requesting test mode
-        ISettingsSupplier settings = robot.getSettingsParser() ;
+        ISettingsSupplier settings = robot.getSettingsSupplier() ;
         if (settings.isDefined(testmode)) {
             SettingsValue v = settings.get(testmode) ;
             if (v.isBoolean() && v.getBoolean()) {

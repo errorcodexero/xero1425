@@ -60,7 +60,7 @@ public class TankDrivePurePursuitPathAction extends TankDriveAction {
         plot_id_ = drive.initPlot(toString(0)) ;
         plot_data_= new Double[plot_columns_.length] ;
 
-        ISettingsSupplier settings = getSubsystem().getRobot().getSettingsParser() ;
+        ISettingsSupplier settings = getSubsystem().getRobot().getSettingsSupplier() ;
         left_pid_ = new PIDCtrl(settings, "tankdrive:purepursuit:left", false) ;
         right_pid_ = new PIDCtrl(settings, "tankdrive:purepursuit:right", false) ;
     }

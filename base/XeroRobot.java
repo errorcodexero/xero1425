@@ -34,42 +34,97 @@ import org.xero1425.misc.XeroPathType;
 import org.xero1425.base.motors.MotorFactory;
 import org.xero1425.base.tankdrive.TankDrivePathFollowerAction;
 import org.xero1425.base.actions.Action;
-import org.xero1425.base.controllers.*;
+import org.xero1425.base.controllers.BaseController;
+import org.xero1425.base.controllers.AutoController;
+import org.xero1425.base.controllers.AutoMode;
+import org.xero1425.base.controllers.TeleopController;
+import org.xero1425.base.controllers.TestController ;
 
+/// \file
+
+/// \brief This is the base class for any XeroFramework robot.  It is derived from the
+/// WPILib TimedRobot class and provides a complete infrastructure for robot code including
+/// a settings file, a message logger, and a plotting system.  It is expected that a class will
+/// be derived from this class that is specific to the robot being programmed.
 public abstract class XeroRobot extends TimedRobot {
+
+    // This object contains important file system paths for the robot code
     private final RobotPaths robot_paths_;
+
+    // The period of the robot (generally 20 ms)
     private final double period_ ;
+
+    // The amount of time between the current robot loop and the previous robot loop.  Should be
+    // approximately 20 ms but may vary some.
     private double delta_time_ ;
-    private MessageLogger logger_ ;
-    private ISettingsSupplier settings_ ;
-    private PlotManager plot_mgr_ ;
-    private XeroPathManager paths_ ;
-    private MotorFactory motors_ ;
+
+    // The time of the last robot loop
     private double last_time_;
+
+    // The message logger for the robot
+    private MessageLogger logger_ ;
+
+    // The settings file supplier for the robot
+    private ISettingsSupplier settings_ ;
+
+    // The plot manager for the robot
+    private PlotManager plot_mgr_ ;
+
+    // The path following paths 
+    private XeroPathManager paths_ ;
+
+    // The motor factor for creating new motors
+    private MotorFactory motors_ ;
+
+    // The MAC address for the ethernet controller
     private byte[] mac_addr_ ;
+
+    // The base robot subsystem
     private RobotSubsystem robot_subsystem_ ;
 
+    // The current automode number as provided by the OI
     private int automode_ ;
+
+    // The game data as provided by the WPILib Driver Station APIs
     private String game_data_ ;
+
+    // if true, we have an FMS connection.  If true, the ploting manager is
+    // disabled.
     private boolean fms_connection_ ;
+
+    // The number of robot loops we have run in the current mode
     private int loop_count_ ;
+
+    // The LOGGER id for the XeroRobot class
     private int logger_id_ ;
 
+    // The current controller for the robot.  Will be one of the following three depending on the mode
     private BaseController current_controller_ ;
+
+    // The auto controller for the robot
     private AutoController auto_controller_ ;
+
+    // The teleop controller for the robot
     private TeleopController teleop_controller_ ;
+
+    // The test controller for the robot
     private TestController test_controller_ ;
 
+    /// \brief The "subsystem" name for the message logger for this class
     public static final String LoggerName = "xerorobot" ;
+
+    // A array to convert hex characters to integers
     private static final char[] HEX_ARRAY = "0123456789ABCDEF".toCharArray();
 
+    /// \brief Create a new XeroRobot robot
+    /// \param period the robot loop timing (generally 20 ms)
     public XeroRobot(final double period) {
         super(period);
 
         period_ = period;
 
-        final String name = getName();
-        robot_paths_ = new RobotPaths(RobotBase.isSimulation(), name);
+        // Generate the paths to the various important places (logfile directory, settings file, path follow paths directoryh, etc.)
+        robot_paths_ = new RobotPaths(RobotBase.isSimulation(), getName());
 
         // Setup the mesasge logger to log messages
         enableMessageLogger();
@@ -80,7 +135,7 @@ public abstract class XeroRobot extends TimedRobot {
             String str = getSimulationFileName() ;
             if (str == null) {
                 System.out.println("The code is setup to simulate, but the derived robot class did not provide a stimulus file") ;
-                System.out.println("Not initializing the Xero1425 Simulation engine - assuming Romi") ;
+                System.out.println("Not initializing the Xero1425 Simulation engine - assuming Romi robot") ;
             }
             else {
                 SimulationEngine.initializeSimulator(this, logger_);
@@ -119,26 +174,41 @@ public abstract class XeroRobot extends TimedRobot {
         automode_ = -1;
     }
 
+    /// \brief Returns the message logger id for this class
+    /// \returns the message logger id for this class
     public int getLoggerID() {
         return logger_id_ ;
     }
 
+    /// \brief Returns the simulation stimulus file (JSON) name.  This method should be overridden by the 
+    /// derived robot specific class.
+    /// \returns the simulation stimulus file (JSON) name
     protected String getSimulationFileName() {
         return null ;
     }
 
+    /// \brief Returns the type of paths needed based on the path following
+    /// algorithm implemented for this robot.  Expected to be overridden by the derived robot specific class.
+    /// \returns tye type of paths needed
     protected XeroPathType getPathType() {
         return XeroPathType.TankPathFollowing ;
     }
 
+    /// \brief Set the top level robot subsystem.  A robot is implemented as a hierarchy of subsystems.  The top
+    /// level subsystem is expected to be derived from the RobotSubsystem class and is expected to contain the
+    /// drivebase subsystem and the OI subsystem.  This method provides the manner to set this top level subsystem
+    /// class.
     public void setRobotSubsystem(RobotSubsystem sub) {
         robot_subsystem_ = sub;
     }
 
+    /// \brief Returns the number of robot loops that have been executed in the current mode
+    /// \returns the number of robot loops that have been executed in the current mode
     public int getLoopCount() {
         return loop_count_ ;
     }
 
+    /// \brief Initialize the robot
     @Override
     public void robotInit() {
         boolean v;
@@ -150,6 +220,7 @@ public abstract class XeroRobot extends TimedRobot {
             logger_.add(" - No FMS, practice mode") ;
         logger_.endMessage();
 
+        /// Initialize the plotting subsystem
         try {
             v = settings_.get("system:plotting").getBoolean();
             if (v == true)
@@ -167,9 +238,17 @@ public abstract class XeroRobot extends TimedRobot {
         // initialize the basic hardware
         //
         try {
+            // Create the robot hardware
             hardwareInit();
+
+
             if (RobotBase.isSimulation() && SimulationEngine.getInstance() != null)
+            {
+                //
+                // If we are simulating, create the simulation modules required
+                //
                 SimulationEngine.getInstance().createModels() ;
+            }
         } catch (Exception ex) {
             logger_.startMessage(MessageType.Error);
             logger_.add("exception thrown in hardwareInit() - ").add(ex.getMessage());
@@ -186,6 +265,7 @@ public abstract class XeroRobot extends TimedRobot {
             return;
         }
 
+        // Now that all subsystem are in place, compute the initial state of the robot
         delta_time_ = period_;
         try {
             robot_subsystem_.computeState();
@@ -196,6 +276,8 @@ public abstract class XeroRobot extends TimedRobot {
             ;
         }
 
+        // Now perform any initialization that might depend on the subsystem hierarchy
+        // being in place or the initial state of the subsystems being ready.
         try {
             robot_subsystem_.postHWInit();
         } catch (Exception ex) {
@@ -204,6 +286,7 @@ public abstract class XeroRobot extends TimedRobot {
             logger_.endMessage();
         }
 
+        // Create the auto mode controller
         try {
             auto_controller_ = createAutoController();
             if (auto_controller_ != null && isSimulation()) {
@@ -216,6 +299,7 @@ public abstract class XeroRobot extends TimedRobot {
             logger_.endMessage();
         }
 
+        // Create the teleop controller
         try {
             teleop_controller_ = createTeleopController();
         }
@@ -226,6 +310,7 @@ public abstract class XeroRobot extends TimedRobot {
         }
     }
 
+    /// \brief Called from the base class to indicate we are entering auto mode.
     @Override
     public void autonomousInit() {
         if (robot_subsystem_ == null)
@@ -243,6 +328,7 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_ = 0 ;
     }
 
+    /// \brief Called from the base class each robot loop while in autonmous
     @Override
     public void autonomousPeriodic() {
         if (robot_subsystem_ == null)
@@ -253,6 +339,7 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_++ ;
     }
 
+    /// \brief Called from the base class to indicate we are entering teleop mode.    
     @Override
     public void teleopInit() {
         if (robot_subsystem_ == null)
@@ -269,6 +356,7 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_ = 0 ;
     }
 
+    /// \brief Called from the base class each robot loop while in teleop
     @Override
     public void teleopPeriodic() {
         if (robot_subsystem_ == null)
@@ -279,6 +367,7 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_++ ;
     }
 
+    /// \brief Called from the base class to indicate we are entering test mode
     @Override
     public void testInit() {
         if (robot_subsystem_ == null)
@@ -295,6 +384,7 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_ = 0 ;
     }
 
+    /// \brief Called from the base class each robot loop while in test mode    
     @Override
     public void testPeriodic() {
         if (robot_subsystem_ == null)
@@ -303,14 +393,17 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_++ ;
     }
 
+    /// \brief Called from the base class to indicate we are a simulation    
     @Override
     public void simulationInit() {
     }
 
+    /// \brief Called from the base class each robot loop while in simulation    
     @Override
     public void simulationPeriodic() {
     }
 
+    /// \brief Called when the robot enters the disabled state
     @Override
     public void disabledInit() {
         if (robot_subsystem_ == null)
@@ -325,6 +418,7 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_ = 0 ;
     }
 
+    /// \brief Called from the base class each robot loop while in the disabled state    
     @Override
     public void disabledPeriodic() {
         if (robot_subsystem_ == null)
@@ -354,62 +448,86 @@ public abstract class XeroRobot extends TimedRobot {
         loop_count_++ ;
     }
 
+    /// \brief Called from the base class, must be overridden
     @Override
     public void robotPeriodic() {
-        if (robot_subsystem_ == null)
-            return;
     }
 
+    /// \brief Returns the top level robot subsystem
+    /// \returns the top level robot subsystem
     public RobotSubsystem getRobotSubsystem() {
         return robot_subsystem_;
     }
 
+    /// \brief Returns the current robot time in seconds
+    /// \returns the current robot time in seconds
     public double getTime() {
         return Timer.getFPGATimestamp();
     }
 
+    /// \brief Returns the time between the last robot loop and the current robot loop
+    /// \returns the time between the last robot loop and the current robot loop
     public double getDeltaTime() {
         return delta_time_;
     }
 
+    /// \brief Returns the mesasge logger
+    /// \returns the message logger
     public MessageLogger getMessageLogger() {
         return logger_;
     }
 
-    public ISettingsSupplier getSettingsParser() {
+    /// \brief Returns the settings supplier
+    /// \returns the setting supplier
+    public ISettingsSupplier getSettingsSupplier() {
         return settings_;
     }
 
+    /// \brief Returns the path following path manager
+    /// \returns the path following path manager
     public XeroPathManager getPathManager() {
         return paths_;
     }
 
+    /// \brief Returns the motor factory
+    /// \returns the motor factory
     public MotorFactory getMotorFactory() {
         return motors_;
     }
 
+    /// \brief Returns the mesasge logger
+    /// \returns the message logger    
     public PlotManager getPlotManager() {
         return plot_mgr_;
     }
 
+    /// \brief enable specific messages, epxected to be overridden by the derived class
     protected void enableMessages() {
     }
 
+    /// \brief add specific models to the simulation, expected to be overridden by the derived class
     protected void addRobotSimulationModels() {
     }
 
+    /// \brief return the name of the robot, expected to be overridden by the derived class
     public String getName() {
-        return "XeroRobot";
+        return "YouShouldOverrideMeInTheDerivedClass" ;
     }
 
+    /// \brief initialize the robot hardware.  Expected to be overridden by the derived classa
     protected void hardwareInit() throws Exception {
         throw new Exception("override this in the derived class");
     }
 
+    // \brief return the MAC address for the practice bot, expected to be overridden by the derived class
+    /// \returns the MAC address for the practice bot
     protected byte[] getPracticeBotMacAddress() {
         return null;
     }
 
+    /// \brief returns true if the current robot is the practice bot.  This is done by comparing the MAC
+    /// address of the ethernet port on the RoboRio to a specific MAC address provided by the method getParcticeBotMacAddress().
+    /// \returns true if the current robot is the practice bot
     protected boolean isPracticeBot() {
         if (mac_addr_ == null)
             return false;
@@ -428,15 +546,44 @@ public abstract class XeroRobot extends TimedRobot {
         return ret ;
     }
 
+    /// \brief Abtract method to create the automode controller, must be overridden by the derived class
+    /// \returns the automode controller
     protected abstract AutoController createAutoController() throws MissingParameterException, BadParameterTypeException ;
-    
+
+    /// \brief Create and return the teleop controller
+    /// \returns the teleop controller
     protected TeleopController createTeleopController() throws MissingParameterException, BadParameterTypeException {
         return new TeleopController(this, getName() + "-teleop") ;
     }
 
+    /// \brief Returns the auto mode selection as provided by the OI
+    /// \returns the auto mode selection
+    protected int getAutoModeSelection() {
+        return robot_subsystem_.getOI().getAutoModeSelector() ;
+    }
+
+    /// \brief load the paths file from the paths file directory
+    protected void loadPathsFile() throws Exception {
+        XeroPathManager mgr = getPathManager() ;
+
+        try (Stream<Path> walk = Files.walk(Paths.get(mgr.getBaseDir()))) {
+            List<String> result = walk.map(x -> x.toString()).filter(f -> f.endsWith("_main.csv")).collect(Collectors.toList());
+            for(String name : result) {
+                int index = name.lastIndexOf(File.separator) ;
+                if (index != -1) {
+                    name = name.substring(index + 1) ;
+                    name = name.substring(0, name.length() - 9) ;
+                    mgr.loadPath(name) ;
+                }
+            }
+        }
+        catch(IOException ex) {
+        }
+    }   
+
     private void enableMessagesFromSettingsFile() {
         String path = "system:messages" ;
-        ISettingsSupplier p = getSettingsParser() ;
+        ISettingsSupplier p = getSettingsSupplier() ;
         MessageLogger m = getMessageLogger() ;
 
         var keys = p.getAllKeys(path) ;
@@ -578,10 +725,6 @@ public abstract class XeroRobot extends TimedRobot {
         SmartDashboard.putString("AutoModeName", auto_controller_.getAutoModeName()) ;
     }
 
-    protected int getAutoModeSelection() {
-        return robot_subsystem_.getOI().getAutoModeSelector() ;
-    }
-
     private void updateAutoMode() {
         if (auto_controller_ != null && robot_subsystem_.getOI() != null) {
             DriverStation ds = DriverStation.getInstance() ;
@@ -641,25 +784,7 @@ public abstract class XeroRobot extends TimedRobot {
 
         settings_ = file ;
     }
-
-    protected void loadPathsFile() throws Exception {
-        XeroPathManager mgr = getPathManager() ;
-
-        try (Stream<Path> walk = Files.walk(Paths.get(mgr.getBaseDir()))) {
-            List<String> result = walk.map(x -> x.toString()).filter(f -> f.endsWith("_main.csv")).collect(Collectors.toList());
-            for(String name : result) {
-                int index = name.lastIndexOf(File.separator) ;
-                if (index != -1) {
-                    name = name.substring(index + 1) ;
-                    name = name.substring(0, name.length() - 9) ;
-                    mgr.loadPath(name) ;
-                }
-            }
-        }
-        catch(IOException ex) {
-        }
-    }        
-
+     
     private void getMacAddress() {
         Enumeration<NetworkInterface> netlist ;
         mac_addr_ = null ;

@@ -1,5 +1,8 @@
 package org.xero1425.misc;
 
+/// \file
+
+/// \brief This class is an exception that is thrown when a JSON settings file is malformed
 public class BadSetingsJsonFileFormat extends Exception {
     private String param_ ;
 

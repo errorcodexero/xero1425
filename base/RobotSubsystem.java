@@ -6,18 +6,37 @@ import org.xero1425.base.tankdrive.TankDriveSubsystem;
 
 /// \file
 
-/// \brief This class is the top level subsystem for the robot
+/// \brief This class is the top level subsystem for the robot.  It is spected to be
+/// overridden by a top level robot subsystem class that is robot specific.
 public class RobotSubsystem extends Subsystem
 {
+    // The OI for the robot
+    private OISubsystem oi_ ;
+
+    // The tankdrive for the robot
+    private TankDriveSubsystem db_ ;
+
+    // The alarms subsystem for the robot
+    private AlarmSubsystem alarms_;
+
+    /// \brief Create the robot subsystem
+    /// \param robot the robot object
+    /// \param name the name of the subsystem
     public RobotSubsystem(XeroRobot robot, String name) throws Exception {
         super(robot, name) ;
 
         oi_ = null ;
         db_ = null ;
+
         alarms_ = new AlarmSubsystem(this) ;
         addChild(alarms_) ;
     }
 
+    /// \brief Add a child subsystem to this subsystem.  If the child is a drivebase
+    /// or an OI, it is remembered as these are special cases.  Otherwise the child is
+    /// just added to the current subsystem like any other child.  Adding more than one
+    /// drivebase or OI will cause and expection.
+    /// \param child the child subsystem to add.
     public void addChild(final Subsystem child) throws Exception {
         super.addChild(child) ;
 
@@ -35,19 +54,22 @@ public class RobotSubsystem extends Subsystem
         }
     }
 
+    /// \brief Return the OI subsystem for the robot
+    /// \returns the OI subsystem for the robot
     public OISubsystem getOI() {
         return oi_ ;
     }
 
+    /// \brief Return the tank drive subsystem for the robot
+    /// \returns the tankdrive subsystme for the robot
     public TankDriveSubsystem getDB() {
         return db_ ;
     }
 
+    /// \brief Return the alarms subsystem for the robot
+    /// \returns the alarms subsystem for the robot
     public AlarmSubsystem getAlarms() {
         return alarms_ ;
     }
 
-    private OISubsystem oi_ ;
-    private TankDriveSubsystem db_ ;
-    private AlarmSubsystem alarms_;
 } ;

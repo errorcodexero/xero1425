@@ -47,7 +47,7 @@ public class MotorEncoderHoldAction extends MotorAction {
         target_ = Double.NaN ;
 
         String subname = "subsystems:" + subsystem.getName() + ":hold" ;
-        pid_ = new PIDCtrl(subsystem.getRobot().getSettingsParser(), subname, subsystem.isAngular()) ;        
+        pid_ = new PIDCtrl(subsystem.getRobot().getSettingsSupplier(), subname, subsystem.isAngular()) ;        
     }
 
     /// \brief Create the action that holds the motor at an explicit position
@@ -60,7 +60,7 @@ public class MotorEncoderHoldAction extends MotorAction {
         target_ = target;
 
         String subname = "subsystems:" + subsystem.getName() + ":hold" ;
-        pid_ = new PIDCtrl(subsystem.getRobot().getSettingsParser(), subname, subsystem.isAngular()) ;           
+        pid_ = new PIDCtrl(subsystem.getRobot().getSettingsSupplier(), subname, subsystem.isAngular()) ;           
     }
 
     /// \brief Create the action that holds the motor at an explicit position
@@ -73,7 +73,7 @@ public class MotorEncoderHoldAction extends MotorAction {
         target_ = subsystem.getSettingsValue(target).getDouble() ;
 
         String subname = "subsystems:" + subsystem.getName() + ":hold" ;
-        pid_ = new PIDCtrl(subsystem.getRobot().getSettingsParser(), subname, subsystem.isAngular()) ;           
+        pid_ = new PIDCtrl(subsystem.getRobot().getSettingsSupplier(), subname, subsystem.isAngular()) ;           
     }      
 
     /// \brief Returns the current target for the action.  If this type of action is an implicit action

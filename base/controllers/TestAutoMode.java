@@ -45,7 +45,7 @@ public class TestAutoMode extends AutoMode {
     public TestAutoMode(AutoController ctrl, String name) throws BadParameterTypeException, MissingParameterException {
         super(ctrl, name) ;
 
-        ISettingsSupplier parser = ctrl.getRobot().getSettingsParser() ;
+        ISettingsSupplier parser = ctrl.getRobot().getSettingsSupplier() ;
         which_ = parser.get(Which).getInteger() ;
         power_ = parser.get(Power).getDouble() ;
         duration_ = parser.get(Duration).getDouble() ;
