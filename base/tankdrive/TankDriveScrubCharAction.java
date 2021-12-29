@@ -36,6 +36,7 @@ public class TankDriveScrubCharAction extends TankDriveAction {
         getSubsystem().startPlot(plot_id_, plot_columns_);
     }
 
+    /// \brief Called once per robot loop to manage the scrub action
     @Override
     public void run() {
 
@@ -71,6 +72,7 @@ public class TankDriveScrubCharAction extends TankDriveAction {
         }
     }
 
+    /// \brief Cancel the current actop and stop the drivebase motors
     @Override
     public void cancel() {
         super.cancel();
@@ -79,6 +81,8 @@ public class TankDriveScrubCharAction extends TankDriveAction {
         getSubsystem().endPlot(plot_id_);
     }
 
+    /// \brief Returns a human readable string describing the action
+    /// \returns a human readable string describing the action    
     public String toString(int indent) {
         String ret = prefix(indent) + "TankDriveScrubCharAction";
         ret += " power=" + Double.toString(power_);
