@@ -4,28 +4,73 @@ import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
 import org.xero1425.base.Subsystem;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.MessageLogger;
+import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
 import org.xero1425.misc.SettingsValue;
 
+/// \file
+
+/// \brief The limelight subsystem supports the LimeLight camera.  It is expected that a class that is game
+/// specific will be derived from this class.
 public class LimeLightSubsystem extends Subsystem {
+    // The camera mode (vision or driver)
     private CamMode cam_mode_ ;
+
+    // The LED mode
     private LedMode led_mode_ ;
+
+    // The pipeline number we are running
     private int pipeline_ ;
+
+    // If true, the target values are valid
     private boolean tv_ ;
+
+    // If true, the limelight is connected (via the Network Tables)
     private boolean connected_ ;
+
+    // The TX value from the limelight, see the limelight documentation for more details
     private double tx_ ;
+
+    // The TY value from the limelight, see the limelight documentation for more details    
     private double ty_ ;
+
+    // The TA value from the limelight, see the limelight documentation for more details    
     private double ta_ ;
+
+    // The total latency from the current values (TV, TX, TY, TA) to when the image was seen by the camera
     private double total_latency_ ;
+
+    // The camera latency from the current values (TV, TX, TY, TA) to when the image was seen by the camera
     private double camera_latency_ ;
+
+    // The network latency from the current values (TV, TX, TY, TA) to when the image was seen by the camera
     private double network_latency_ ;
+
+    // The network tables entry for the limelight
     private NetworkTable nt_ ;
 
+    // The amount of time to wait for the limelight to connect
+    private double limelight_timeout_ ;
+
+    // If true, we have printed a message about not finding the limelight
+    private boolean limelight_not_found_ ;
+
+    /// \brief  The name of the table to read for limelight information
     public final static String LimeLightTableName = "limelight";
+
+    /// \brief  The key to write for camera mode
     public final static String CamModeKeyName = "camMode" ;
+
+    /// \brief  The key to write for LED mode
     public final static String LedModeKeyName = "ledMode" ;
+
+    /// \brief The key to write for the pipeline number
     public final static String PipelineKeyName = "pipeline" ;
 
+    /// \brief Create a new limelight subsystem
+    /// \param parent the subsystem that manages this subsystem
+    /// \param name the name of hte subsystem
     public LimeLightSubsystem(Subsystem parent, String name) throws BadParameterTypeException, MissingParameterException {
         super(parent, name) ;
 
@@ -33,8 +78,11 @@ public class LimeLightSubsystem extends Subsystem {
         cam_mode_ = CamMode.Invalid ;
         pipeline_ = -1 ;
 
+        limelight_not_found_ = false ;
+
         camera_latency_ = getSettingsValue("camera_latency").getDouble() ;
         network_latency_ = getSettingsValue("network_latency").getDouble() ;
+        limelight_timeout_ = getSettingsValue("timeout").getDouble() ;
 
         nt_ = NetworkTableInstance.getDefault().getTable(LimeLightTableName) ;
 
@@ -43,22 +91,33 @@ public class LimeLightSubsystem extends Subsystem {
         setPipeline(0);
     }
 
+    /// \brief the mode for the camera
     public enum CamMode
     {
-        VisionProcessing,
-        DriverCamera,
-        Invalid ;
+        VisionProcessing,           ///< Processing vision targets on the field
+        DriverCamera,               ///< Relaying the image to the driver on the driver station
+        Invalid                     ///< Invalid camera mode
     } ;
 
+    /// \brief the mode for the LED
     public enum LedMode
     {
-        UseLED,
-        ForceOff,
-        ForceBlink,
-        ForceOn,
-        Invalid
+        UseLED,                     ///< Use the LED per the pipeline
+        ForceOff,                   ///< Force the LED to the off state
+        ForceBlink,                 ///< Force the LED to a blinking state
+        ForceOn,                    ///< Force the LED to the on state
+        Invalid                     ///< Invalid state
     } ;
 
+    /// \brief Return the property value from the subsystem.
+    /// This is used by the simulator to display information to the user and to
+    /// trigger asserts in the simulation files
+    ///
+    ///     tv - boolean, indicates if the remaining target values are valid
+    ///     tx - the X angle to the target relative to the camera
+    ///     ty - the Y angle to the target relative to the camera
+    ///
+    /// \param name the name of the property to return
     @Override
     public SettingsValue getProperty(String name) {
         SettingsValue v = null ;
@@ -76,6 +135,7 @@ public class LimeLightSubsystem extends Subsystem {
         return v ;
     }
 
+    /// \brief This method computes the state of the camera
     @Override
     public void computeMyState() {
         if (cam_mode_ == CamMode.VisionProcessing)
@@ -100,12 +160,16 @@ public class LimeLightSubsystem extends Subsystem {
             else
             {
                 connected_ = false ;
-                if (getRobot().getTime() > 4.0)
+                if (getRobot().getTime() > limelight_timeout_)
                 {
-                    // MessageLogger logger = getRobot().getMessageLogger() ;
-                    // logger.startMessage(MessageType.Error) ;
-                    // logger.add("did not detect limelight (after 4 seconds)") ;
-                    // logger.endMessage() ;
+                    if (!limelight_not_found_)
+                    {
+                        MessageLogger logger = getRobot().getMessageLogger() ;
+                        logger.startMessage(MessageType.Error) ;
+                        logger.add("did not detect limelight (after " + Double.toString(limelight_timeout_) + " seconds)") ;
+                        logger.endMessage() ;
+                        limelight_not_found_ = true ;
+                    }
                 }
             }
         }
@@ -117,30 +181,38 @@ public class LimeLightSubsystem extends Subsystem {
         putDashboard("ll-valid", DisplayType.Verbose, tv_);
     }
 
-    @Override
-    public void run() {
-    }
-
+    /// \brief Returns true if the limelight is detected
+    /// \returns true if the limelight is detected
     public boolean isLimeLightConnected() {
         return connected_ ;
     }
 
+    /// \brief Returns true if the limelight detects a target
+    /// \returns true if the limelight detects a target
     public boolean isTargetDetected() {
         return tv_ ;
     }
 
+    /// \brief Returns the X angle from the camera to the target
+    /// \returns the X angle from the camera to the target
     public double getTX() {
         return tx_ ;
     }
 
+    /// \brief Returns the Y angle from the camera to the target
+    /// \returns the Y angle from the camera to the target
     public double getTY() {
         return ty_ ;
     }
 
+    /// \brief Returns the area of the target detected
+    /// \returns the area of target detected
     public double getTA() {
         return ta_ ;
     }
 
+    /// \brief Set the camera mode
+    /// \param mode the desired camera mode
     public void setCamMode(CamMode mode) {
         if (cam_mode_ != mode)
         {
@@ -159,10 +231,14 @@ public class LimeLightSubsystem extends Subsystem {
         }
     }
 
+    /// \brief Returns the current camera mode
+    /// \returns the current camera mode
     public CamMode getCamMode() {
         return cam_mode_ ;
     }
 
+    /// \brief Set the LED mode for the camera
+    /// \param mode the desired LED mode
     public void setLedMode(LedMode mode) {
         if (led_mode_ != mode)
         {
@@ -188,10 +264,15 @@ public class LimeLightSubsystem extends Subsystem {
         }
     }
 
+    /// \brief Returns the LED mode for the camera
+    /// \returns the LED mode for the camera
     public LedMode getLedMode() {
         return led_mode_ ;
     }
 
+    /// \brief Set the desired pipeline to run on the camera.  See the Limelight documentation for more information
+    /// on pipelines and how they are used.
+    /// \param which the pipeline to use
     public void setPipeline(int which) {
         if (which != pipeline_)
         {
@@ -200,17 +281,22 @@ public class LimeLightSubsystem extends Subsystem {
         }
     }
 
+    /// \brief Returns the current pipeline in use
+    /// \returns the current pipeline in use
     public int getPipeline() {
         return pipeline_ ;
     }
 
+    /// \brief Returns the total latency from the camera image to values in the network tables
+    /// \returns the total latency from the camera image to values in the network tables
     public double getTotalLatency() {
         return total_latency_ ;
     }
 
+    /// \brief Returns a human readable string describing the subsystem
+    /// \returns a human readable string describing the subsystem
     @Override
     public String toString() {
         return "limelight" ;
     }
-
 } ;

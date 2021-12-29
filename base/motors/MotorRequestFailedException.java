@@ -3,6 +3,10 @@ package org.xero1425.base.motors;
 import com.ctre.phoenix.ErrorCode;
 import com.revrobotics.CANError;
 
+/// \file
+
+/// \brief This class is an exception that is thrown when a motor request fails with an error code
+/// from the underlying motor controller
 public class MotorRequestFailedException extends Exception {
     // The motor controller that had a failed request        
     private MotorController motor_ ;
@@ -13,15 +17,17 @@ public class MotorRequestFailedException extends Exception {
     /// \brief This method creates a new BadMotorRequestException
     /// \param motor the motor that causeed the exception
     /// \param msg a string describing the cause of the exception
+    /// \param code the error code that occurred
     public MotorRequestFailedException(MotorController motor, String msg, CANError code) {
         super("motor '" + motor.getName() + "' - " + code.toString() + ":" + msg) ;
 
         motor_ = motor ;
     }
 
-        /// \brief This method creates a new BadMotorRequestException
+    /// \brief This method creates a new BadMotorRequestException
     /// \param motor the motor that causeed the exception
     /// \param msg a string describing the cause of the exception
+    /// \param code the error code that occurred
     public MotorRequestFailedException(MotorController motor, String msg, ErrorCode code) {
         super("motor '" + motor.getName() + "' - " + code.toString() + ":" + msg) ;
 
