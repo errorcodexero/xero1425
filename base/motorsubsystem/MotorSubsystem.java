@@ -43,7 +43,6 @@ public class MotorSubsystem extends Subsystem
             getRobot().getMessageLogger().endMessage();
         }
         putDashboard(getName() + "-subsystem", DisplayType.Verbose, true);
-        setPower(0.0) ;
     }
 
     /// \brief Returns true if the motor is running.  Running is defined as a power greater
@@ -68,6 +67,14 @@ public class MotorSubsystem extends Subsystem
             logger.startMessage(MessageType.Error) ;
             logger.add("subsystem ").addQuoted(getName()).add(": cannot reapply inverted state -").add(ex.getMessage()).endMessage();
         }
+    }
+
+    /// \brief Set the motor power to 0 to ensure the motor does not start when the robot is enabled.
+    @Override
+    public void postHWInit() throws Exception {
+        super.postHWInit();
+
+        setPower(0.0) ;
     }
 
     /// \brief Reset the subsystem by setting the power to zero
