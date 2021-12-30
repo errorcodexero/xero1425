@@ -189,6 +189,12 @@ public class Subsystem {
         return getRobot().getSettingsSupplier().get("subsystems:" + name_ + ":" + name) ;
     }
 
+    /// \brief Returns true if the subsystem related setting is defined
+    /// \returns true if the subsystem related setting is defined
+    public boolean isSettingDefined(String name) {
+        return getRobot().getSettingsSupplier().isDefined("subsystems:" + name_ + ":" + name) ;
+    }
+
     /// \brief returns true if this is the OI subsystem
     /// \returns true if this is the OI subsystem
     public boolean isOI() {

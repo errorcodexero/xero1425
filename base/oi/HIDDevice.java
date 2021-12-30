@@ -30,6 +30,7 @@ public abstract class HIDDevice
         sub_ = sub ;
         index_ = index ;
         enabled_ = true ;
+        name_ = name ;
     }
 
     /// \brief Return the the name of the device

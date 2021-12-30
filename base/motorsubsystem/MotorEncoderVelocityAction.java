@@ -76,6 +76,12 @@ public class MotorEncoderVelocityAction extends MotorAction {
         }
     }
 
+    /// \brief Return the name of the action
+    /// \returns the name of the action
+    public String getName() {
+        return name_ ;
+    }
+
     /// \brief Update the target velocity to a new velocity
     /// \param target the target velocity desired
     public void setTarget(double target) throws BadMotorRequestException, MotorRequestFailedException {

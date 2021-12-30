@@ -9,6 +9,7 @@ import org.xero1425.base.actions.InvalidActionRequest;
 import org.xero1425.base.actions.SequenceAction;
 import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
+import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
@@ -52,7 +53,8 @@ public class OISubsystem extends Subsystem {
     private GamePadType gamepad_type_ ;
 
     // The index of the gamepad
-    private final String DriverGamepadHIDIndexName = "gamepad:index" ;
+    private final String DriverGamepadXero1425 = "xero1425_gamepad:index" ;
+    private final String DriverGamepadStandard = "standard_gamepad:index" ;
     
     /// \brief Create a new OI subsystem
     /// \param parent the subsystem that manages this one
@@ -168,44 +170,74 @@ public class OISubsystem extends Subsystem {
         if (db_ != null) {           
             MessageLogger logger = getRobot().getMessageLogger() ;
 
-            if (gp_index_ == -1) {
-                try {
-                    gp_index_ = getSettingsValue(DriverGamepadHIDIndexName).getInteger();
-                } catch (BadParameterTypeException e) {
-                    logger.startMessage(MessageType.Error) ;
-                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
-                    logger.add(" exists, but is not an integer").endMessage();
-                    gp_index_ = -1 ;
-                } catch (MissingParameterException e) {
-                    logger.startMessage(MessageType.Error) ;
-                    logger.add("parameter ").addQuoted(DriverGamepadHIDIndexName) ;
-                    logger.add(" does not exist").endMessage();
-                    gp_index_ = -1 ;            
-                }
-            }
-            
-            if (gp_index_ != -1 &&  gp_ == null) {
-                try {
-                    if (gamepad_type_ == GamePadType.Xero1425Historic)
-                        gp_ = new Xero1425Gamepad(this, gp_index_, db_) ;
-                    else if (gamepad_type_ == GamePadType.Standard)
-                        gp_ = new StandardGamepad(this, gp_index_, db_) ;
-                        
-                    addHIDDevice(gp_);
-
-                    logger.startMessage(MessageType.Info) ;
-                    logger.add("driver gamepad HID device was sucessfully created ").endMessage();
-                    logger.endMessage();
-                }
-                catch(Exception ex) {
-                    if (getRobot().getTime() - last_time_ > 10.0) {
-                        logger.startMessage(MessageType.Error) ;
-                        logger.add("driver gamepad HID device was not created ").endMessage();
-                        logger.endMessage();
-
-                        last_time_ = getRobot().getTime() ;
+            if (gp_index_ == -1)
+            {
+                if (isSettingDefined(DriverGamepadXero1425))
+                {
+                    try {   
+                        gp_index_ = getSettingsValue(DriverGamepadXero1425).getInteger() ;
                     }
-                    gp_ = null ;
+                    catch(BadParameterTypeException ex) {
+                        logger.startMessage(MessageType.Error) ;
+                        logger.add("parameter ").addQuoted(DriverGamepadXero1425) ;
+                        logger.add("exists but is not an integer type").endMessage();
+                        gp_index_ = -2 ;
+                    }
+                    catch(MissingParameterException ex) {
+                        //
+                        // This will not happen, but this catch keeps the compiler happy
+                        //
+                    }
+
+                    try { 
+                        gp_ = new Xero1425Gamepad(this, gp_index_, db_) ;
+                    }
+                    catch(Exception ex) {
+                        //
+                        // This is thrown if the gamepad cannot be created sucessfully, which means either
+                        // the driver station has not connected to the robot, or that the joystick is not plugged in
+                        //
+                        gp_index_ = -1 ;
+                    }
+                }
+                else if (isSettingDefined(DriverGamepadStandard))
+                {
+                    try {
+                        gp_index_ = getSettingsValue(DriverGamepadStandard).getInteger() ;
+                    }
+                    catch(BadParameterTypeException ex) {
+                        logger.startMessage(MessageType.Error) ;
+                        logger.add("parameter ").addQuoted(DriverGamepadStandard) ;
+                        logger.add("exists but is not an integer type").endMessage();
+                        gp_index_ = -2 ;
+                    }
+                    catch(MissingParameterException ex) {
+                        //
+                        // This will not happen, but this catch keeps the compiler happy
+                        //
+                    }      
+                    
+                    try { 
+                        gp_ = new StandardGamepad(this, gp_index_, db_) ;
+                    }
+                    catch(Exception ex) {
+                        //
+                        // This is thrown if the gamepad cannot be created sucessfully, which means either
+                        // the driver station has not connected to the robot, or that the joystick is not plugged in
+                        //
+                        gp_index_ = -1 ;
+                    }
+
+                }
+                else
+                {
+                    logger.startMessage(MessageType.Error) ;
+                    logger.add("parameter ").addQuoted(DriverGamepadStandard) ;
+                    logger.add("and parameter ").addQuoted(DriverGamepadXero1425) ;
+                    logger.add(" do not exist").endMessage();
+
+                    // This causes the OI to give up on trying to create the game pad
+                    gp_index_ = -2 ;
                 }
             }
         }
