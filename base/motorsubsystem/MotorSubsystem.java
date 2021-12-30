@@ -108,7 +108,7 @@ public class MotorSubsystem extends Subsystem
 
     /// \brief set the power for the motor
     /// \param p the power for the motor
-    protected void setPower(double p) {
+    public void setPower(double p) {
         try {
             // The limitPower method can be overridden in a derived class to place limits on the
             // power ever supplied to the motor
