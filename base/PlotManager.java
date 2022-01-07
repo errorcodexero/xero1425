@@ -84,6 +84,8 @@ class PlotManager
         entry.setBoolean(false) ;
 
         table.delete(DataEntry) ;
+
+        inst.flush() ;
     }
 
     public void addPlotData(int id, Double[] data)
@@ -113,6 +115,8 @@ class PlotManager
         NetworkTable table = inst.getTable(getKeyForPlot(id)) ;
         NetworkTableEntry entry = table.getEntry(CompleteEntry) ;
         entry.setBoolean(true) ;
+
+        inst.flush() ;
     }
 
     private String getKeyForPlot(int id)
