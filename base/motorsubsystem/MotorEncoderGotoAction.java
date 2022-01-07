@@ -167,6 +167,7 @@ public class MotorEncoderGotoAction extends MotorAction {
     public void cancel() {
         super.cancel() ;
         getSubsystem().setPower(0.0) ;
+        getSubsystem().endPlot(plot_id_);
     }
 
     /// \brief Returns a human readable string describing the action

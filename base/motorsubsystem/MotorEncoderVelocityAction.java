@@ -188,6 +188,8 @@ public class MotorEncoderVelocityAction extends MotorAction {
         catch(Exception ex) {
         }
         getSubsystem().setPower(0.0);
+        if (plot_id_ != -1)
+            getSubsystem().endPlot(plot_id_) ;
     }
 
     /// \brief return a human readable string for the action
