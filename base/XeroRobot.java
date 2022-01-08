@@ -214,7 +214,7 @@ public abstract class XeroRobot extends TimedRobot {
         boolean v;
 
         logger_.startMessage(MessageType.Info).add("initializing robot") ;
-        if (DriverStation.getInstance().isFMSAttached())
+        if (DriverStation.isFMSAttached())
             logger_.add(" - FMS connected") ;
         else
             logger_.add(" - No FMS, practice mode") ;
@@ -660,8 +660,6 @@ public abstract class XeroRobot extends TimedRobot {
     }
 
     private void logAutoModeState() {
-        DriverStation ds = DriverStation.getInstance() ;
-
         logger_.startMessage(MessageType.Info) ;
         logger_.add("Entering Autonomous Mode").endMessage();
 
@@ -673,24 +671,24 @@ public abstract class XeroRobot extends TimedRobot {
 
 
         String str = "undefined" ;
-        if (ds.getAlliance() == Alliance.Red)
+        if (DriverStation.getAlliance() == Alliance.Red)
             str = "RED" ;
-        else if (ds.getAlliance() == Alliance.Blue)
+        else if (DriverStation.getAlliance() == Alliance.Blue)
             str = "BLUE" ;
         logger_.startMessage(MessageType.Info) ;
         logger_.add("    Alliance: ").add(str).endMessage();
 
         logger_.startMessage(MessageType.Info) ;
-        logger_.add("    Location: ").add(ds.getLocation()).endMessage();
+        logger_.add("    Location: ").add(DriverStation.getLocation()).endMessage();
 
         logger_.startMessage(MessageType.Info) ;
         logger_.add("    GameData: '").add(game_data_).add("'").endMessage();   
         
         logger_.startMessage(MessageType.Info) ;
-        logger_.add("    EventName: ").add(ds.getEventName()).endMessage();
+        logger_.add("    EventName: ").add(DriverStation.getEventName()).endMessage();
 
         str = "invalid" ;
-        switch(ds.getMatchType()) {
+        switch(DriverStation.getMatchType()) {
             case None:
                 str = "NONE" ;
                 break ;
@@ -708,13 +706,13 @@ public abstract class XeroRobot extends TimedRobot {
         logger_.add("    MatchType: ").add(str).endMessage();
 
         logger_.startMessage(MessageType.Info) ;
-        logger_.add("    MatchNumber: ").add(ds.getMatchNumber()).endMessage();     
+        logger_.add("    MatchNumber: ").add(DriverStation.getMatchNumber()).endMessage();     
         
         logger_.startMessage(MessageType.Info) ;
-        logger_.add("    MatchTime: ").add(ds.getMatchTime()).endMessage();
+        logger_.add("    MatchTime: ").add(DriverStation.getMatchTime()).endMessage();
 
         str = "NO" ;
-        if (ds.isFMSAttached())
+        if (DriverStation.isFMSAttached())
             str = "YES" ;
             logger_.startMessage(MessageType.Info) ;
             logger_.add("    FMS Attached: ").add(str).endMessage();
@@ -727,15 +725,14 @@ public abstract class XeroRobot extends TimedRobot {
 
     private void updateAutoMode() {
         if (auto_controller_ != null && robot_subsystem_.getOI() != null) {
-            DriverStation ds = DriverStation.getInstance() ;
-            String msg = ds.getGameSpecificMessage() ;
+            String msg = DriverStation.getGameSpecificMessage() ;
 
             int sel = getAutoModeSelection() ;
-            if (sel != automode_ || msg.equals(game_data_) || ds.isFMSAttached() != fms_connection_ || auto_controller_.isTestMode())
+            if (sel != automode_ || msg.equals(game_data_) || DriverStation.isFMSAttached() != fms_connection_ || auto_controller_.isTestMode())
             {
                 automode_ = sel ;
                 game_data_ = msg ;
-                fms_connection_ = ds.isFMSAttached() ;
+                fms_connection_ = DriverStation.isFMSAttached() ;
                 displayAutoModeState() ;
             }
 

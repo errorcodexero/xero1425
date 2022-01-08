@@ -93,12 +93,11 @@ public class Xero1425Gamepad extends Gamepad {
     public Xero1425Gamepad(OISubsystem oi, int index, TankDriveSubsystem drive) throws Exception {
         super(oi, "xero1425_gamepad", index);
 
-        DriverStation ds = DriverStation.getInstance();
-        if (ds.getStickPOVCount(getIndex()) == 0) {
+        if (DriverStation.getStickPOVCount(getIndex()) == 0) {
             throw new Exception("invalid gamepad for TankDriveGamepad");
         }
 
-        if (ds.getStickAxisCount(getIndex()) <= AxisNumber.RIGHTX.value) {
+        if (DriverStation.getStickAxisCount(getIndex()) <= AxisNumber.RIGHTX.value) {
             throw new Exception("invalid gamepad for TankDriveGamepad");
         }
 
@@ -142,14 +141,13 @@ public class Xero1425Gamepad extends Gamepad {
         try {
             POVAngle povvalue ;
 
-            DriverStation ds = DriverStation.getInstance() ;
             if (pov_ == -1)
                 povvalue = POVAngle.NONE ;
             else
-                povvalue = POVAngle.fromInt(ds.getStickPOV(getIndex(), pov_)) ;
+                povvalue = POVAngle.fromInt(DriverStation.getStickPOV(getIndex(), pov_)) ;
 
-            double ly = ds.getStickAxis(getIndex(), AxisNumber.LEFTY.value) ;
-            double rx = ds.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
+            double ly = DriverStation.getStickAxis(getIndex(), AxisNumber.LEFTY.value) ;
+            double rx = DriverStation.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
 
             if (povvalue == POVAngle.LEFT)
                 seq.addSubActionPair(db_, nudge_counter_clockwise_, false);
@@ -167,7 +165,7 @@ public class Xero1425Gamepad extends Gamepad {
                     right = 0.0; 
                 }
                 else {
-                    double boost = ds.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) ;
+                    double boost = DriverStation.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) ;
                     boolean slow = isLBackButtonPrssed() ;
 
                     double power = scalePower(-ly, boost, slow) ;

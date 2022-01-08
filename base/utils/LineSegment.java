@@ -2,7 +2,7 @@ package org.xero1425.base.utils;
 
 /// \file
 
-import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /// \brief This class represents a line segment with a start end end point
 public class LineSegment {

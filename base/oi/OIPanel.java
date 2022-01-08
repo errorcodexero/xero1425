@@ -75,17 +75,16 @@ public class OIPanel extends HIDDevice
     /// \brief computes the state of the logical items
     @Override
     public void computeState() throws Exception {
-        DriverStation ds = DriverStation.getInstance() ;
         
         for(OIPanelItem item : items_.values()) {
             if (item.getResourceType() == OIPanelItem.JoystickResourceType.Button)
             {
-                boolean v = ds.getStickButton(getIndex(), item.getItemNumber()) ;
+                boolean v = DriverStation.getStickButton(getIndex(), item.getItemNumber()) ;
                 item.setButtonValue(v);
             }
             else
             {
-                double v = ds.getStickAxis(getIndex(), item.getItemNumber()) ;
+                double v = DriverStation.getStickAxis(getIndex(), item.getItemNumber()) ;
                 item.setAxisValue(v) ;
             }
         }

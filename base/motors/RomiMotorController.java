@@ -1,6 +1,6 @@
 package org.xero1425.base.motors;
 
-import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.motorcontrol.Spark;
 
 /// \file
 

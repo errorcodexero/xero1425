@@ -1,11 +1,10 @@
 package org.xero1425.base.motors;
 
-import com.revrobotics.CANEncoder;
-import com.revrobotics.CANError;
-import com.revrobotics.CANPIDController;
+import com.revrobotics.RelativeEncoder;
+import com.revrobotics.SparkMaxPIDController;
+import com.revrobotics.REVLibError;
 import com.revrobotics.CANSparkMax;
 import com.revrobotics.CANSparkMaxLowLevel;
-import com.revrobotics.ControlType;
 import com.revrobotics.CANSparkMax.IdleMode;
 import edu.wpi.first.hal.SimBoolean;
 import edu.wpi.first.hal.SimDevice;
@@ -20,10 +19,10 @@ import edu.wpi.first.wpilibj.RobotBase;
 public class SparkMaxMotorController extends MotorController
 {
     private CANSparkMax controller_ ;
-    private CANEncoder encoder_ ;
+    private RelativeEncoder encoder_ ;
     private boolean inverted_ ;
     private boolean brushless_ ;
-    private CANPIDController pid_ ;
+    private SparkMaxPIDController pid_ ;
     private PidType ptype_ ;
     private double target_ ;
 
@@ -67,7 +66,7 @@ public class SparkMaxMotorController extends MotorController
             sim_.createBoolean(MotorController.SimEncoderStoresTicksParamName, SimDevice.Direction.kBidir, false) ;            
         }
         else {
-            CANError code ;
+            REVLibError code ;
 
             if (brushless)
             {
@@ -79,11 +78,11 @@ public class SparkMaxMotorController extends MotorController
             }
 
             code = controller_.restoreFactoryDefaults() ;
-            if (code != CANError.kOk)
+            if (code != REVLibError.kOk)
                 throw new MotorRequestFailedException(this, "restoreFactoryDefaults() failed during initialization", code) ;
 
             code = controller_.enableVoltageCompensation(12.0) ;
-            if (code != CANError.kOk)
+            if (code != REVLibError.kOk)
                 throw new MotorRequestFailedException(this, "enableVoltageCompensation() failed during initialization", code) ;
 
             encoder_ = controller_.getEncoder() ;
@@ -120,18 +119,18 @@ public class SparkMaxMotorController extends MotorController
     /// \brief Set the target if running a PID loop on the motor controller
     /// \param target the target for the PID loop on the motor controller     
     public void setTarget(double target) throws BadMotorRequestException, MotorRequestFailedException {
-        CANError code = CANError.kOk ;
+        REVLibError code = REVLibError.kOk ;
 
         target_ = target ;
 
         if (pid_ != null) {
 
             if (ptype_ == PidType.Position)
-                code = pid_.setReference(target, ControlType.kPosition) ;
+                code = pid_.setReference(target, CANSparkMax.ControlType.kPosition) ;
             else if (ptype_ == PidType.Velocity)
-                code = pid_.setReference(target, ControlType.kVelocity) ;
+                code = pid_.setReference(target, CANSparkMax.ControlType.kVelocity) ;
             
-            if (code != CANError.kOk)
+            if (code != REVLibError.kOk)
                 throw new MotorRequestFailedException(this, "setReference() failed during setTarget() call", code) ;
         }
     }
@@ -146,33 +145,33 @@ public class SparkMaxMotorController extends MotorController
     /// \param outmax the maximum output parameter for the PID controller     
     public void setPID(PidType type, double p, double i, double d, double f, double outmax) throws BadMotorRequestException,
             MotorRequestFailedException {
-        CANError code = CANError.kOk ;
+        REVLibError code = REVLibError.kOk ;
 
         if (pid_ == null)
             pid_ = controller_.getPIDController() ;
 
         code = pid_.setP(p) ;
-        if (code != CANError.kOk)
+        if (code != REVLibError.kOk)
             throw new MotorRequestFailedException(this, "setP() failed during setPID() call", code) ;
 
         code = pid_.setI(i) ;
-        if (code != CANError.kOk)
+        if (code != REVLibError.kOk)
             throw new MotorRequestFailedException(this, "setI() failed during setPID() call", code) ;        
 
         code = pid_.setD(d) ;
-        if (code != CANError.kOk)
+        if (code != REVLibError.kOk)
             throw new MotorRequestFailedException(this, "setD() failed during setPID() call", code) ;
 
         code = pid_.setFF(f) ;
-        if (code != CANError.kOk)
+        if (code != REVLibError.kOk)
             throw new MotorRequestFailedException(this, "setFF() failed during setPID() call", code) ;
 
         code = pid_.setIZone(0.0) ;
-        if (code != CANError.kOk)
+        if (code != REVLibError.kOk)
             throw new MotorRequestFailedException(this, "setIZone() failed during setPID() call", code) ;
 
         code = pid_.setOutputRange(-outmax, outmax) ;
-        if (code != CANError.kOk)
+        if (code != REVLibError.kOk)
             throw new MotorRequestFailedException(this, "setOutputRange() failed during setPID() call", code) ;
 
         ptype_ = type ;

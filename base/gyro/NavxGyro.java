@@ -1,6 +1,6 @@
 package org.xero1425.base.gyro;
 
-import com.kauailabs.navx.frc.AHRS;
+import com.kauailabs.navx.frc.*;
 import edu.wpi.first.wpilibj.SPI;
 
 /// \file

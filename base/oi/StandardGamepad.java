@@ -46,6 +46,14 @@ public class StandardGamepad extends Gamepad {
     public void init(LoopType ltype) {
     }
 
+    public double getSum() {
+        return left_ + right_ ;
+    }
+
+    public TankDriveSubsystem getDB() {
+        return db_ ;
+    }
+
     /// \brief create the required static actions
     @Override
     public void createStaticActions() throws BadParameterTypeException, MissingParameterException {
@@ -56,10 +64,10 @@ public class StandardGamepad extends Gamepad {
     public void generateActions(SequenceAction seq) {
     }
 
-    private double mapJoyStick(double v, double maxv, double db, double power) {
-        if (Math.abs(v) < db)
-            return 0.0 ;
+    // private double mapJoyStick(double v, double maxv, double db, double power) {
+    //     if (Math.abs(v) < db)
+    //         return 0.0 ;
 
-        return Math.signum(v) * Math.pow(Math.abs(v), power) * maxv ;
-    }
+    //     return Math.signum(v) * Math.pow(Math.abs(v), power) * maxv ;
+    // }
 }

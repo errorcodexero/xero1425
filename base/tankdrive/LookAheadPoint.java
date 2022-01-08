@@ -1,6 +1,6 @@
 package org.xero1425.base.tankdrive;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Pose2d;
 
 /// \file
 

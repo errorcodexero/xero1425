@@ -27,9 +27,8 @@ public class AlarmSubsystem extends Subsystem {
     /// to communicate this to the drive team.
     @Override
     public void run() {
-        DriverStation ds = DriverStation.getInstance() ;
-        if (ds.isFMSAttached()) {
-            double remaining = ds.getMatchTime() ;
+        if (DriverStation.isFMSAttached()) {
+            double remaining = DriverStation.getMatchTime() ;
 
             while (!entries_.isEmpty())
             {

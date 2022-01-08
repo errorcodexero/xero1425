@@ -1,7 +1,7 @@
 package org.xero1425.base.motors;
 
 import com.ctre.phoenix.ErrorCode;
-import com.revrobotics.CANError;
+import com.revrobotics.REVLibError;
 
 /// \file
 
@@ -18,7 +18,7 @@ public class MotorRequestFailedException extends Exception {
     /// \param motor the motor that causeed the exception
     /// \param msg a string describing the cause of the exception
     /// \param code the error code that occurred
-    public MotorRequestFailedException(MotorController motor, String msg, CANError code) {
+    public MotorRequestFailedException(MotorController motor, String msg, REVLibError code) {
         super("motor '" + motor.getName() + "' - " + code.toString() + ":" + msg) ;
 
         motor_ = motor ;

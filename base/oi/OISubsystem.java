@@ -9,7 +9,6 @@ import org.xero1425.base.actions.InvalidActionRequest;
 import org.xero1425.base.actions.SequenceAction;
 import org.xero1425.base.tankdrive.TankDriveSubsystem;
 import org.xero1425.misc.BadParameterTypeException;
-import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.MessageLogger;
 import org.xero1425.misc.MessageType;
 import org.xero1425.misc.MissingParameterException;
@@ -46,9 +45,6 @@ public class OISubsystem extends Subsystem {
     // The gamepad index
     private int gp_index_ ;
 
-    // The last time a meesage was printed about no gamepad connected
-    private double last_time_ ;
-
     // If true, use
     private GamePadType gamepad_type_ ;
 
@@ -67,10 +63,13 @@ public class OISubsystem extends Subsystem {
         devices_ = new ArrayList<HIDDevice>();
         db_ = db ;
         gp_index_ = -1 ;
-        last_time_ = 0.0 ;
 
         gamepad_type_ = type ;
         addTankDriveGamePad();
+    }
+
+    public GamePadType getGamePadType() {
+        return gamepad_type_ ;
     }
 
     /// \brief return the gamepad

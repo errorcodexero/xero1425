@@ -12,8 +12,8 @@ import org.xero1425.misc.PIDCtrl;
 import org.xero1425.misc.XeroMath;
 import org.xero1425.misc.XeroPathSegment;
 
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
 
 /// \file
 

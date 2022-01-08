@@ -53,8 +53,9 @@ public class SimulationEngine {
     }
 
     static public void initializeSimulator(XeroRobot robot, MessageLogger logger) {
-        DriverStation.getInstance();
+        String evname = DriverStation.getEventName() ;
         the_one_ = new SimulationEngine(robot, logger);
+        logger.startMessage(MessageType.Info).add("Simulated Event: ").add(evname).endMessage();
     }
 
     public void addAssertError() {

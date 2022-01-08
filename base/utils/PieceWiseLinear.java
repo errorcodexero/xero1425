@@ -11,7 +11,7 @@ import org.xero1425.misc.BadParameterTypeException;
 import org.xero1425.misc.ISettingsSupplier;
 import org.xero1425.misc.SettingsValue;
 
-import edu.wpi.first.wpilibj.geometry.Translation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 /// \brief this class represents an XY function that consists of a series of line segments
 public class PieceWiseLinear {

@@ -59,78 +59,67 @@ public abstract class Gamepad extends HIDDevice
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed
     public boolean isRTriggerPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickAxis(getIndex(), AxisNumber.RTRIGGER.value) > 0.5 ;
+        return DriverStation.getStickAxis(getIndex(), AxisNumber.RTRIGGER.value) > 0.5 ;
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isLTriggerPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) > 0.5 ;
+        return DriverStation.getStickAxis(getIndex(), AxisNumber.LTRIGGER.value) > 0.5 ;
     }    
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isAPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.A.value) ;
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.A.value) ;
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isBPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.B.value) ;
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.B.value) ;
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isXPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.X.value) ;
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.X.value) ;
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isYPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.Y.value) ;
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.Y.value) ;
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isLJoyButtonPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.L_JOY.value) ;
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.L_JOY.value) ;
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isRJoyButtonPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.R_JOY.value) ;
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.R_JOY.value) ;
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isRBackButtonPressed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.RB.value) ;        
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.RB.value) ;        
     }
 
     /// \brief Returns true if the right trigger is pressed
     /// \returns true if the right trigger is pressed    
     public boolean isLBackButtonPrssed() {
-        DriverStation ds = DriverStation.getInstance() ;
-        return ds.getStickButton(getIndex(), ButtonNumber.LB.value) ;        
+        return DriverStation.getStickButton(getIndex(), ButtonNumber.LB.value) ;        
     }
 
     /// \brief Returns the POV angle for the gamepad
     /// \returns the POV angle for the gamepad
     public POVAngle getPOVAngle() {
-        DriverStation ds = DriverStation.getInstance() ;
-        int povval = ds.getStickPOV(getIndex(), 0) ;
+        int povval = DriverStation.getStickPOV(getIndex(), 0) ;
         return POVAngle.fromInt(povval) ;
     }
 

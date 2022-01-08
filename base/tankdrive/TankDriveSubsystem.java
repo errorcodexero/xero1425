@@ -1,8 +1,8 @@
 package org.xero1425.base.tankdrive;
 
 import edu.wpi.first.wpilibj.Encoder;
-import edu.wpi.first.wpilibj.geometry.Pose2d;
-import edu.wpi.first.wpilibj.geometry.Twist2d;
+import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Twist2d;
 
 import org.xero1425.base.LoopType;
 import org.xero1425.base.PositionTracker;

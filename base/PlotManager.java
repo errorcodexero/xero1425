@@ -46,7 +46,7 @@ class PlotManager
 
     public int initPlot(String name)
     {
-        if (!enabled_ || DriverStation.getInstance().isFMSAttached())
+        if (!enabled_ || DriverStation.isFMSAttached())
             return -1 ;
 
         for(int key : plots_.keySet())
@@ -63,7 +63,7 @@ class PlotManager
 
     public void startPlot(int id, String[] cols)
     {
-        if (!enabled_ || DriverStation.getInstance().isFMSAttached() || !plots_.containsKey(id))
+        if (!enabled_ || DriverStation.isFMSAttached() || !plots_.containsKey(id))
             return ;
         
         PlotInfo info = plots_.get(id) ;
@@ -90,7 +90,7 @@ class PlotManager
 
     public void addPlotData(int id, Double[] data)
     {
-        if (!enabled_ || DriverStation.getInstance().isFMSAttached() || !plots_.containsKey(id))
+        if (!enabled_ || DriverStation.isFMSAttached() || !plots_.containsKey(id))
             return ;
             
         PlotInfo info = plots_.get(id) ;
@@ -108,7 +108,7 @@ class PlotManager
 
     public void endPlot(int id)
     {
-        if (!enabled_ || DriverStation.getInstance().isFMSAttached() || !plots_.containsKey(id))
+        if (!enabled_ || DriverStation.isFMSAttached() || !plots_.containsKey(id))
             return ;
             
         NetworkTableInstance inst = NetworkTableInstance.getDefault() ;
