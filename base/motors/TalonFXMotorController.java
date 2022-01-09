@@ -35,7 +35,7 @@ public class TalonFXMotorController extends MotorController
     private SimBoolean sim_neutral_mode_ ;
 
     /// \brief the name of the device when simulating
-    public final static String SimDeviceName = "TalonFXController" ;
+    public final static String SimDeviceName = "CTREMotorController" ;
 
     private final int ControllerTimeout = 100 ;
 

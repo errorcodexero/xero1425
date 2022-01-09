@@ -95,7 +95,9 @@ public class SimMotorController {
 
         if (t.equals("talonfx") || t.equals("talonsrx")) {
             if (handle_ == -1)
+            {
                 handle_ = SimDeviceDataJNI.getSimDeviceHandle(CTREMotorController.SimDeviceName + "[" + index + "]") ;
+            }
         }
         else if (t.equals("sparkmax-brushed")) {
             if (handle_ == -1)
