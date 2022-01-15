@@ -17,6 +17,7 @@ public class PowerTestAction extends MotorAction {
     }
 
     public void start() throws Exception {
+        super.start() ;
         MotorEncoderSubsystem sub = (MotorEncoderSubsystem)getSubsystem() ;
         sub.setPower(current_) ;
     }
@@ -32,6 +33,7 @@ public class PowerTestAction extends MotorAction {
     }
 
     public void cancel() {
+        super.cancel() ;
         getSubsystem().setPower(0.0) ;
     }
 
