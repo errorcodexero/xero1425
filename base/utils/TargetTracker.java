@@ -1,36 +1,47 @@
 package org.xero1425.base.utils;
 
 import edu.wpi.first.math.geometry.Pose2d;
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
 
 public class TargetTracker {
     
-    public TargetTracker(Pose2d goal) throws Exception {
-        // initialize goal to smth...
-        // take in the turret's offset in x and y?
+    Translation2d target_ = new Translation2d() ;
+    // TODO: support turret offset in further math calculations.
+    Translation2d turret_offset_ = new Translation2d() ;
 
+    // \param target the position of the goal/target on the field
+    public TargetTracker(Translation2d target) throws Exception {
+        target_ = target ;
+        turret_offset_ = new Translation2d(0, 0) ;
     }
 
-    public double getAngleDifference(Pose2d robot) {
-        //aka, gets the relative [to robot] angle target
-        // perhaps rename this method...
-
-        //TODO: 
-        // perform calculations 
-        // https://docs.google.com/document/d/1I46HP8EBB1ETDHYZUqWiXNq7MdrrvPTCe26EkCgO5Uc/edit
-
-        // returns T theta
-
-        return 0.0 ;
+    // \param target  the position of the goal/arget on the field
+    // \param turret_offset the offset of the turret from the center of the robot (if back/right of robot is aligned to the field's (0, 0) corner)
+    public TargetTracker(Translation2d target, Translation2d turret_offset) throws Exception {
+        target_ = target ;
+        turret_offset_ = turret_offset ;
     }
 
-    public double getDistance(Pose2d robot) {
-        // perhaps rename this method...
+    // \returns double of relative angle difference; unit = degrees
+    public double getRelativeTargetAngle(Pose2d robot) {
+        
+        //following math [in some way/shape/form]
+        //  Gtheta = arctan((Gy - Ty)/(Gx - Tx))
+        //  Ttheta = Gtheta - Rtheta
 
-        // make calculations based on Pythagorean's theorem; goal; and robot
+        Translation2d rel_target_ = target_.minus(robot.getTranslation()) ;
+        Rotation2d rel_target_angle_ = new Rotation2d(rel_target_.getX(), rel_target_.getY()) ;
 
-        // returns distance
+        double rel_target_angle_degrees_ = rel_target_angle_.getDegrees() - robot.getRotation().getDegrees() ;
+            
+        return rel_target_angle_degrees_ ;
+    }
 
-        return 0.0 ;
+    // \returns double distance
+    public double getRelativeTargetDistance(Pose2d robot) {
+
+        return robot.getTranslation().getDistance(target_);
     }
 
 }
