@@ -190,6 +190,7 @@ public class OISubsystem extends Subsystem {
 
                     try { 
                         gp_ = new Xero1425Gamepad(this, gp_index_, db_) ;
+                        addHIDDevice(gp_) ;
                         logger.startMessage(MessageType.Info) ;
                         logger.add("using historic xero1425 gamepad control").endMessage();
                     }
@@ -205,8 +206,6 @@ public class OISubsystem extends Subsystem {
                 {
                     try {
                         gp_index_ = getSettingsValue(DriverGamepadStandard).getInteger() ;
-                        logger.startMessage(MessageType.Info) ;
-                        logger.add("using standard arcade gamepad control").endMessage();
                     }
                     catch(BadParameterTypeException ex) {
                         logger.startMessage(MessageType.Error) ;
@@ -222,6 +221,9 @@ public class OISubsystem extends Subsystem {
                     
                     try { 
                         gp_ = new StandardGamepad(this, gp_index_, db_) ;
+                        addHIDDevice(gp_) ;
+                        logger.startMessage(MessageType.Info) ;
+                        logger.add("using standard gamepad control").endMessage();
                     }
                     catch(Exception ex) {
                         //
