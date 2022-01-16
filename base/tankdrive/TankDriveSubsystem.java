@@ -323,6 +323,8 @@ public class TankDriveSubsystem extends Subsystem {
     /// and reads the gyro as well.  These three are used to compute the current state
     /// of the robot and to update the position tracker for the robot.
     public void computeMyState() {
+        MessageLogger logger = getRobot().getMessageLogger() ;
+
         double angle = 0.0;
 
         try {
@@ -366,8 +368,6 @@ public class TankDriveSubsystem extends Subsystem {
             putDashboard("db-trk-y", DisplayType.Verbose, tracker_.getPose().getY()) ;
             putDashboard("db-trk-a", DisplayType.Verbose, tracker_.getPose().getRotation().getDegrees());
 
-            
-            MessageLogger logger = getRobot().getMessageLogger() ;
             logger.startMessage(MessageType.Info, getLoggerID()) ;
             logger.add("TankDrive: ") ;
             logger.add("db-trk-t", getRobot().getTime()) ;
@@ -377,6 +377,9 @@ public class TankDriveSubsystem extends Subsystem {
             logger.endMessage();
         }
 
+        logger.startMessage(MessageType.Debug, getLoggerID()) ;
+        logger.add("Power: ") ;
+        logger.add("left", left_power_).add("right", right_power_).endMessage();
     }
 
     /// \brief This method return reverse kinematics for the drivebase

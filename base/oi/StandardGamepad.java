@@ -70,6 +70,10 @@ public class StandardGamepad extends Gamepad {
     /// \brief generate the actions for the drivebase for the current robot loop
     @Override
     public void generateActions(SequenceAction seq) {
+
+        if (db_ == null || isEnabled() == false)
+          return ;
+
         double xSpeed = DriverStation.getStickAxis(getIndex(), AxisNumber.LEFTY.value) ;
         double zRotation = DriverStation.getStickAxis(getIndex(), AxisNumber.RIGHTX.value) ;
 
