@@ -6,9 +6,5 @@ To add this code to your robbot, do the folllowing.
 cd src/main/java
 mkdir org
 cd org
-git submodule add https://github.com/errorcodexero/xero1425.git xero1425
+git submodule add -b main https://github.com/errorcodexero/xero1425.git xero1425
 git commit -a -m "added xero framework code"
-
-
-
-
