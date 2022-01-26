@@ -11,7 +11,10 @@ import java.util.Enumeration;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
+
+import edu.wpi.first.wpilibj.Compressor;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.PneumaticsModuleType;
 import edu.wpi.first.wpilibj.RobotBase;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.Timer;
@@ -110,6 +113,12 @@ public abstract class XeroRobot extends TimedRobot {
     // The test controller for the robot
     private TestController test_controller_ ;
 
+    // If not null, this is the compressor for pneumatics
+    private Compressor compressor_ ;
+
+    // The type of pneumatics on the robot
+    private PneumaticsModuleType pneumatics_type_ ;
+
     /// \brief The "subsystem" name for the message logger for this class
     public static final String LoggerName = "xerorobot" ;
 
@@ -172,6 +181,97 @@ public abstract class XeroRobot extends TimedRobot {
         last_time_ = getTime();
 
         automode_ = -1;
+    }
+
+    /// \brief returns true if pneumatics are enabled
+    /// \return true if pneumatics are enabled
+    public boolean arePneumaticsEnabled() {
+        return compressor_ != null ;
+    }
+
+    /// \brief returns the type of pneumatics enabled
+    /// \returns the type of pneumatics enabled
+    public PneumaticsModuleType getPneumaticsType() {
+        if (compressor_ == null) {
+            logger_.startMessage(MessageType.Error) ;
+            logger_.add("getPneumaticsType() called before enablePneumatics() was called") ;
+            logger_.endMessage();
+        }
+        return pneumatics_type_ ;
+    }
+
+    /// \brief returns the compressor for pneumatics
+    /// \returns the the compressor for pneumatics
+    public Compressor getCompressor() {
+        return compressor_ ;
+    }
+
+    /// \brief enable pneumatics for this robot
+    /// \returns true if pneumatics were enabled sucessfully, otherwise false
+    public boolean enablePneumatics() {
+        SettingsValue v ;
+        boolean enabled = false ;
+        PneumaticsModuleType type = PneumaticsModuleType.REVPH ;
+
+        v = settings_.getOrNull("system:pneumatics:enabled") ;
+        if (v == null) {
+            logger_.startMessage(MessageType.Error) ;
+            logger_.add("enablePneumatics() called but settings value 'system:pneumatics:enabled' was not found") ;
+            logger_.endMessage();
+            return false ;
+        }
+
+        if (!v.isBoolean()) {
+            logger_.startMessage(MessageType.Error) ;
+            logger_.add("enablePneumatics() called but settings value 'system:pneumatics:enabled' was not a boolean") ;
+            logger_.endMessage();
+            return false ;
+        }
+        try {
+            enabled = v.getBoolean() ;
+        } catch (BadParameterTypeException e) {
+            // Will never happen
+        }
+
+        v = settings_.getOrNull("system:pneumatics:type") ;
+        if (v == null) {
+            logger_.startMessage(MessageType.Error) ;
+            logger_.add("enablePneumatics() called but settings value 'system:pneumatics:type' was not found") ;
+            logger_.endMessage();
+            return false ;
+        }
+
+        if (!v.isString()) {
+            logger_.startMessage(MessageType.Error) ;
+            logger_.add("enablePneumatics() called but settings value 'system:pneumatics:type' was not a boolean") ;
+            logger_.endMessage();
+            return false ;
+        }
+        
+        try {
+            if (v.getString() == "CTREPCM") {
+                type = PneumaticsModuleType.CTREPCM ;
+            }
+            else if (v.getString() == "REVPH") {
+                type = PneumaticsModuleType.REVPH ;
+            }
+            else {
+                logger_.startMessage(MessageType.Error) ;
+                logger_.add("enablePneumatics() called but settings value 'system:pneumatics:type' must be either 'CTREPCM' or 'REVPH'") ;
+                logger_.endMessage();
+                return false ;                
+            }
+        }
+        catch(BadParameterTypeException e) {
+            // Will never happen
+        }
+
+        if (enabled) {
+            pneumatics_type_ = type ;
+            compressor_ = new Compressor(pneumatics_type_) ;
+        }
+
+        return true ;
     }
 
     /// \brief Returns the message logger id for this class
