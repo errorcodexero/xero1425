@@ -1,5 +1,7 @@
 package org.xero1425.base.utils;
 
+import org.xero1425.misc.XeroMath;
+
 import edu.wpi.first.math.geometry.Pose2d;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.geometry.Translation2d;
@@ -35,7 +37,7 @@ public class TargetTracker {
 
         double rel_target_angle_degrees_ = rel_target_angle_.getDegrees() - robot.getRotation().getDegrees() ;
             
-        return rel_target_angle_degrees_ ;
+        return XeroMath.normalizeAngleDegrees(rel_target_angle_degrees_) ;
     }
 
     // \returns double distance
